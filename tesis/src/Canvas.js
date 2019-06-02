@@ -3,6 +3,17 @@ import logo from './logo.svg';
 import './App.css';
 import cytoscape from 'cytoscape';
 
+const nodeStyle = {
+  'background-color': 'white',
+  'border-style': 'solid',
+  'width': '50',
+  'height': '50',
+  'border-width': '1',
+  'border-opacity': '1',
+  'border-color': 'black',
+  'label': 'data(id)',
+};
+
 class Canvas extends React.Component{
 
     layout = null; 
@@ -11,6 +22,7 @@ class Canvas extends React.Component{
         super(props);
         this.state = {
           cy: null,
+          selectedNode: null,
       }
     }
 
@@ -32,16 +44,7 @@ class Canvas extends React.Component{
         style: [ // the stylesheet for the graph
           {
             selector: 'node',
-            style: {
-              'background-color': 'white',
-              'border-style': 'solid',
-              'width': '50',
-              'height': '50',
-              'border-width': '1',
-              'border-opacity': '1',
-              'border-color': 'black',
-              'label': 'data(id)',
-            }
+            style: nodeStyle,
           },
       
           {
@@ -71,31 +74,30 @@ class Canvas extends React.Component{
       });
 
       cy.on('click', (event) => this.handleClickViewport(event));
+      cy.on('click', 'node', (event) => this.handleClickOnNode(event));
       this.layout = cy.createLayout({ name: 'preset'});
       this.layout.run();
 
       this.setState({cy});
     }
-
-    handleClick = () => {
-        let {cy} = this.state;
-        let n = cy.elements().length;
-        cy.add({
-          group: 'nodes',
-          data: { id: n + 1},
-          position: {
-            x: 100,
-            y: 100,
-          }
-        });
-        this.setState({cy});
-        this.layout.stop();
-        this.layout = cy.elements().makeLayout( {name: 'preset'});
-        this.layout.run();
-    }
     
+    handleClickOnNode = (event) => {
+      let node = event.target;
+      let nodeId = node.id();
+      let prevNode = this.state.selectedNode;
+      if(prevNode === nodeId){
+        node.style('background-color', 'white');
+        this.setState({selectedNode: null});
+      }else{
+        let previous = this.state.cy.getElementById(prevNode);
+        previous.style('background-color', 'white');
+        node.style('background-color', 'red');
+        this.setState({selectedNode: nodeId});
+      }
+      this.setState({selectedNode : prevNode === nodeId ? null : nodeId});
+    }
+
     handleClickViewport = (event) => {
-      console.log(event);
       if(event.target === this.state.cy){
         let {x, y} = event.position;
         let {cy} = this.state;
@@ -105,10 +107,15 @@ class Canvas extends React.Component{
           data: { id: n + 1},
           position: {x, y}
         });
+        if(this.state.selectedNode){
+          let previous = this.state.cy.getElementById(this.state.selectedNode);
+          previous.style('background-color', 'white');
+          this.setState({selectedNode : null});
+        }
         this.setState({cy});
         this.layout.stop();
         this.layout = cy.elements().makeLayout( {name: 'preset'});
-        this.layout.run();
+        this.layout.run();  
       }
     }
     render(){
@@ -122,7 +129,13 @@ class Canvas extends React.Component{
               display: 'block',
             }}
           />
-          <button onClick={this.handleClick}>Click me!</button>
+          <div>
+            {
+              !this.state.selectedNode ? 
+              <h1>No node selected</h1> :
+              <h1>Node {this.state.selectedNode} selected</h1>
+            }
+          </div>
         </div>
       )
     }
