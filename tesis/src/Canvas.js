@@ -53,7 +53,8 @@ class Canvas extends React.Component{
               'width': 3,
               'line-color': '#ccc',
               'target-arrow-color': '#ccc',
-              'target-arrow-shape': 'triangle'
+              'target-arrow-shape': 'triangle',
+              'curve-style': 'bezier',
             }
           }
         ],
@@ -90,11 +91,24 @@ class Canvas extends React.Component{
         this.setState({selectedNode: null});
       }else{
         let previous = this.state.cy.getElementById(prevNode);
+        let {cy} = this.state;
+        if(prevNode){
+          cy.add({
+            group: 'edges',
+            data: {
+              id: prevNode+'-'+nodeId,
+              source: prevNode,
+              target: nodeId,
+              directed: true,
+            }
+          });
+          this.setState({selectedNode: null});
+        }else{
+          node.style('background-color', 'red');
+          this.setState({selectedNode: nodeId});
+        }
         previous.style('background-color', 'white');
-        node.style('background-color', 'red');
-        this.setState({selectedNode: nodeId});
       }
-      this.setState({selectedNode : prevNode === nodeId ? null : nodeId});
     }
 
     handleClickViewport = (event) => {
