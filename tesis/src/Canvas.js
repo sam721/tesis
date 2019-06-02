@@ -18,6 +18,8 @@ class Canvas extends React.Component{
 
     layout = null; 
 
+    id = 2;
+
     constructor(props){
         super(props);
         this.state = {
@@ -82,6 +84,21 @@ class Canvas extends React.Component{
       this.setState({cy});
     }
     
+    removeNode = (node) => {
+      let {cy} = this.state;
+      cy.remove('node[id="' + node + '"]');
+      if(node === this.state.selectedNode){
+        this.setState({selectedNode: null});
+      }
+      this.setState({cy});
+    }
+
+    removeButton = () => {
+      if(this.state.selectedNode) {
+        this.removeNode(this.state.selectedNode);
+      }
+    }
+
     handleClickOnNode = (event) => {
       let node = event.target;
       let nodeId = node.id();
@@ -93,7 +110,7 @@ class Canvas extends React.Component{
         let previous = this.state.cy.getElementById(prevNode);
         let {cy} = this.state;
         if(prevNode){
-          if(!previous.outgoers('nodes').contains(node)){
+          if(!previous.outgoers().contains(node)){
             cy.add({
               group: 'edges',
               data: {
@@ -119,9 +136,10 @@ class Canvas extends React.Component{
         let n = cy.nodes().length;
         cy.add({
           group: 'nodes',
-          data: { id: n + 1},
+          data: { id: this.id},
           position: {x, y}
         });
+        this.id++;
         if(this.state.selectedNode){
           let previous = this.state.cy.getElementById(this.state.selectedNode);
           previous.style('background-color', 'white');
@@ -144,6 +162,7 @@ class Canvas extends React.Component{
               display: 'block',
             }}
           />
+          <button onClick = {this.removeButton}>Remove node</button>
         </div>
       )
     }
