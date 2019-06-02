@@ -93,15 +93,16 @@ class Canvas extends React.Component{
         let previous = this.state.cy.getElementById(prevNode);
         let {cy} = this.state;
         if(prevNode){
-          cy.add({
-            group: 'edges',
-            data: {
-              id: prevNode+'-'+nodeId,
-              source: prevNode,
-              target: nodeId,
-              directed: true,
-            }
-          });
+          if(!previous.outgoers('nodes').contains(node)){
+            cy.add({
+              group: 'edges',
+              data: {
+                id: prevNode+'-'+nodeId,
+                source: prevNode,
+                target: nodeId,
+              }
+            });
+          }
           this.setState({selectedNode: null});
         }else{
           node.style('background-color', 'red');
@@ -115,7 +116,7 @@ class Canvas extends React.Component{
       if(event.target === this.state.cy){
         let {x, y} = event.position;
         let {cy} = this.state;
-        let n = cy.elements().length;
+        let n = cy.nodes().length;
         cy.add({
           group: 'nodes',
           data: { id: n + 1},
@@ -143,13 +144,6 @@ class Canvas extends React.Component{
               display: 'block',
             }}
           />
-          <div>
-            {
-              !this.state.selectedNode ? 
-              <h1>No node selected</h1> :
-              <h1>Node {this.state.selectedNode} selected</h1>
-            }
-          </div>
         </div>
       )
     }
