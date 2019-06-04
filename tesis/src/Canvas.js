@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import cytoscape from 'cytoscape';
+import { isFulfilled } from 'q';
 
 const nodeStyle = {
   'background-color': 'white',
@@ -11,20 +12,22 @@ const nodeStyle = {
   'border-width': '1',
   'border-opacity': '1',
   'border-color': 'black',
-  'label': 'data(id)',
+  'label': 'data(value)',
 };
+
+const getNodeIdString = nodeId => {
+  return 'node-'+nodeId;
+}
 
 class Canvas extends React.Component{
 
     layout = null; 
 
-    id = 2;
-
     constructor(props){
         super(props);
         this.state = {
           cy: null,
-          selectedNode: null,
+          selection: null,
       }
     }
 
@@ -34,13 +37,6 @@ class Canvas extends React.Component{
         container: document.getElementById('canvas'), // container to render in
       
         elements: [
-          { // node a
-            data: { id: 1 },
-            position: {
-              x: 100,
-              y: 100,
-            }
-          }
         ],
       
         style: [ // the stylesheet for the graph
@@ -68,6 +64,7 @@ class Canvas extends React.Component{
         styleEnabled: true,
         hideEdgesOnViewport: false,
         hideLabelsOnViewport: false,
+        userPanningEnabled: false,
         zoomingEnabled: false,
         textureOnViewport: false,
         motionBlur: false,
@@ -78,91 +75,185 @@ class Canvas extends React.Component{
 
       cy.on('click', (event) => this.handleClickViewport(event));
       cy.on('click', 'node', (event) => this.handleClickOnNode(event));
+      cy.on('click', 'edge', (event) => this.handleClickOnEdge(event));
       this.layout = cy.createLayout({ name: 'preset'});
       this.layout.run();
 
       this.setState({cy});
     }
     
+    refreshLayout(cy){
+      this.layout.stop();
+      this.layout = cy.elements().makeLayout( {name: 'preset'});
+      this.layout.run();  
+    }
+
     removeNode = (node) => {
       let {cy} = this.state;
       cy.remove('node[id="' + node + '"]');
-      if(node === this.state.selectedNode){
-        this.setState({selectedNode: null});
+      if(node === this.state.selection.id){
+        this.setState({selection: null});
+      }
+      this.setState({cy});
+    }
+    
+    removeEdge = (edge) => {
+      let {cy} = this.state;
+      cy.remove('edge[id="' + edge + '"]');
+      if(edge === this.state.selection.id){
+        this.setState({selection: null});
       }
       this.setState({cy});
     }
 
     removeButton = () => {
-      if(this.state.selectedNode) {
-        this.removeNode(this.state.selectedNode);
+      let {selection} = this.state;
+      if(selection) {
+        if(selection.type === 'node'){
+          this.removeNode(selection.id);
+        }else if(selection.type === 'edge'){
+          this.removeEdge(selection.id);
+        }
       }
     }
 
     handleClickOnNode = (event) => {
       let node = event.target;
       let nodeId = node.id();
-      let prevNode = this.state.selectedNode;
-      if(prevNode === nodeId){
-        node.style('background-color', 'white');
-        this.setState({selectedNode: null});
-      }else{
-        let previous = this.state.cy.getElementById(prevNode);
-        let {cy} = this.state;
-        if(prevNode){
-          if(!previous.outgoers().contains(node)){
-            cy.add({
-              group: 'edges',
-              data: {
-                id: prevNode+'-'+nodeId,
-                source: prevNode,
-                target: nodeId,
-              }
-            });
+      let {cy} = this.state;
+
+      let {selection} = this.state;
+
+      if(!selection || selection.type !== 'node'){
+        node.style('background-color', 'black');
+        this.setState({selection: {
+          id: nodeId, type: 'node'
           }
-          this.setState({selectedNode: null});
-        }else{
-          node.style('background-color', 'red');
-          this.setState({selectedNode: nodeId});
+        });
+        if(selection && selection.type === 'edge'){
+          let edge = cy.getElementById(selection.id);
+          edge.style({
+            'line-color': '#ccc',
+            'target-arrow-color': '#ccc',
+          })
         }
-        previous.style('background-color', 'white');
+        return;
       }
+      if(selection.type === 'node'){
+        let prevNode = selection.id;
+        if(prevNode === nodeId){
+          node.style('background-color', 'white');
+          this.setState({selection: null});
+        }else{
+          let previous = this.state.cy.getElementById(prevNode);
+          if(prevNode){
+            if(!previous.outgoers().contains(node)){
+              cy.add({
+                group: 'edges',
+                data: {
+                  id: prevNode+'-'+nodeId,
+                  source: prevNode,
+                  target: nodeId,
+                }
+              });
+            }
+            this.setState({selection: null});
+          }
+          previous.style('background-color', 'white');
+        }
+      }
+    }
+
+    handleClickOnEdge = (event) => {
+      let edge = event.target;
+      let edgeId = edge.id();
+      
+      let {selection} = this.state;
+
+      let prevId = null;
+      if(selection){
+        prevId = selection.id;
+        let previous = this.state.cy.getElementById(prevId);
+        if(selection.type === 'edge'){
+          previous.style({
+            'line-color': '#ccc',
+            'target-arrow-color': '#ccc'
+          });
+        }else if(selection.type === 'node'){
+          previous.style('background-color', 'white');
+        }
+      }
+
+      if(prevId === edgeId){
+        this.setState({selection: null});
+        let previous = this.state.cy.getElementById(prevId);
+        previous.style({
+          'line-color': '#ccc',
+          'target-arrow-color': '#ccc'
+        });
+      }else{
+        this.setState({
+          selection:{
+            type: 'edge',
+            id: edgeId,
+          }
+        });
+        edge.style({
+          'line-color': 'black',
+          'target-arrow-color': 'black'
+        });
+      }
+    }
+
+    createNode(x, y){
+      let {cy} = this.state;
+      let id = 1;
+      while(cy.getElementById(getNodeIdString(id)).length > 0){
+        id++;
+      }
+      cy.add({
+        group: 'nodes',
+        data: { id: getNodeIdString(id), value: id},
+        position: {x, y}
+      });
+      this.setState({cy});
     }
 
     handleClickViewport = (event) => {
       if(event.target === this.state.cy){
-        let {x, y} = event.position;
-        let {cy} = this.state;
-        let n = cy.nodes().length;
-        cy.add({
-          group: 'nodes',
-          data: { id: this.id},
-          position: {x, y}
-        });
-        this.id++;
-        if(this.state.selectedNode){
-          let previous = this.state.cy.getElementById(this.state.selectedNode);
-          previous.style('background-color', 'white');
-          this.setState({selectedNode : null});
+        if(this.state.selection){
+          let previous = this.state.cy.getElementById(this.state.selection.id);
+          if(this.state.selection.type === 'node'){
+            previous.style('background-color', 'white');
+          }else if(this.state.selection.type === 'edge'){
+            previous.style({
+              'line-color' : '#ccc',
+              'target-arrow-color' : '#ccc',
+            });
+          }
+          this.setState({selection : null});
+        }else{
+          let {x, y} = event.position;
+          this.createNode(x, y);
+          this.refreshLayout(this.state.cy);
         }
-        this.setState({cy});
-        this.layout.stop();
-        this.layout = cy.elements().makeLayout( {name: 'preset'});
-        this.layout.run();  
       }
     }
+
     render(){
       return (
-        <div>
+        <div style={{margin: 'auto'}}>
           <div 
             id = "canvas" 
             style={{
-              width: '500px',
-              height: '500px',
-              display: 'block',
+              width: '70%',
+              height: '4in',
+              borderStyle: 'solid',
+              borderColor: 'black',
+              margin: 'auto'
             }}
           />
-          <button onClick = {this.removeButton}>Remove node</button>
+          <button onClick = {this.removeButton}>Eliminar elemento</button>
         </div>
       )
     }
