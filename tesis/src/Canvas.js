@@ -4,6 +4,9 @@ import './App.css';
 import cytoscape from 'cytoscape';
 import { isFulfilled } from 'q';
 
+const autopanOnDrag = require('cytoscape-autopan-on-drag');
+autopanOnDrag(cytoscape);
+
 const nodeStyle = {
   'background-color': 'white',
   'border-style': 'solid',
@@ -59,6 +62,8 @@ class Canvas extends React.Component{
       
         layout: {
           name: 'preset',
+          height: '50',
+          width: '50',
         },
         headless: false,
         styleEnabled: true,
@@ -76,7 +81,10 @@ class Canvas extends React.Component{
       cy.on('click', (event) => this.handleClickViewport(event));
       cy.on('click', 'node', (event) => this.handleClickOnNode(event));
       cy.on('click', 'edge', (event) => this.handleClickOnEdge(event));
-      this.layout = cy.createLayout({ name: 'preset'});
+      cy.autopanOnDrag({enabled: true, speed: 0.01});
+      this.layout = cy.elements().makeLayout( { name: 'preset',
+      height: '50',
+      width: '50',});
       this.layout.run();
 
       this.setState({cy});
@@ -84,7 +92,9 @@ class Canvas extends React.Component{
     
     refreshLayout(cy){
       this.layout.stop();
-      this.layout = cy.elements().makeLayout( {name: 'preset'});
+      this.layout = cy.elements().makeLayout( { name: 'preset',
+      height: '50',
+      width: '50',});
       this.layout.run();  
     }
 
