@@ -4,6 +4,7 @@ import './App.css';
 import cytoscape from 'cytoscape';
 import { isFulfilled } from 'q';
 
+import BFS from './Algorithms/BFS';
 const autopanOnDrag = require('cytoscape-autopan-on-drag');
 autopanOnDrag(cytoscape);
 
@@ -16,6 +17,8 @@ const nodeStyle = {
   'border-opacity': '1',
   'border-color': 'black',
   'label': 'data(value)',
+  'text-valign': 'center',
+  'text-halign': 'center',
 };
 
 const getNodeIdString = nodeId => {
@@ -127,6 +130,33 @@ class Canvas extends React.Component{
       }
     }
 
+    BFSButton = () => {
+     
+      let {cy} = this.state;
+      let commands = BFS(cy, 'node-1');
+      let animation = () => {
+        let pos = 0;
+        let step = () => {
+            if(pos === commands.length){
+                cy.nodes().style({
+                    'background-color': 'white',
+                    'color': 'black',
+                });
+                return;
+            }
+            let {node, paint} = commands[pos++];
+            cy.getElementById(node).style({
+                'background-color': paint,
+                'color': (paint === 'gray' ? 'black' : 'white'),
+            });
+            this.refreshLayout(cy);
+            setTimeout(step, 1000);
+        }
+        step();
+      }
+      animation();
+    }
+
     handleClickOnNode = (event) => {
       let node = event.target;
       let nodeId = node.id();
@@ -135,7 +165,7 @@ class Canvas extends React.Component{
       let {selection} = this.state;
 
       if(!selection || selection.type !== 'node'){
-        node.style('background-color', 'black');
+        node.style('background-color', '#00FFFF');
         this.setState({selection: {
           id: nodeId, type: 'node'
           }
@@ -264,6 +294,7 @@ class Canvas extends React.Component{
             }}
           />
           <button onClick = {this.removeButton}>Eliminar elemento</button>
+          <button onClick = {this.BFSButton}>Correr BFS</button>
         </div>
       )
     }
