@@ -1,9 +1,8 @@
 // @flow
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import cytoscape from 'cytoscape';
-import Canvas from './Canvas';
+import Editor from './Editor';
+
 class App extends React.Component {
   render(){
     return (
@@ -13,8 +12,9 @@ class App extends React.Component {
         <p>Click sobre elementos para seleccionarlos</p>
         <p>Para conectar nodos, primero seleccionar el origen y luego el destino</p>
         <br/>
-        <Canvas/>
+        <Editor/>
       </div>
+
 
     )
   }

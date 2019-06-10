@@ -5,6 +5,7 @@ import cytoscape from 'cytoscape';
 import { isFulfilled } from 'q';
 
 import BFS from './Algorithms/BFS';
+import DFS from './Algorithms/DFS';
 const autopanOnDrag = require('cytoscape-autopan-on-drag');
 autopanOnDrag(cytoscape);
 
@@ -130,10 +131,12 @@ class Canvas extends React.Component{
       }
     }
 
-    BFSButton = () => {
+    RunButton = () => {
      
       let {cy} = this.state;
-      let commands = BFS(cy, 'node-1');
+      let commands = this.props.algorithm === 'BFS' 
+                      ? BFS(cy, 'node-1')
+                      : DFS(cy, 'node-1');
       let animation = () => {
         let pos = 0;
         let step = () => {
@@ -294,7 +297,7 @@ class Canvas extends React.Component{
             }}
           />
           <button onClick = {this.removeButton}>Eliminar elemento</button>
-          <button onClick = {this.BFSButton}>Correr BFS</button>
+          <button onClick = {this.RunButton}>Correr algoritmo</button>
         </div>
       )
     }
