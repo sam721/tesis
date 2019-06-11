@@ -4,25 +4,19 @@ import Canvas from './Canvas';
 class Editor extends React.Component {
     constructor(props){
         super(props);
-        this.state = {
-            algorithm: "BFS",
-        }
-    }
-
-    handleChange(event){
-        this.setState({
-            algorithm: event.target.value
-        });
     }
 
     render(){
         return (
             <div>
-                <Canvas algorithm={this.state.algorithm}/>
-                <select value={this.state.algorithm} onChange={(e) => this.handleChange(e)}>
-                    <option value = "BFS">BFS</option>
-                    <option value = "DFS">DFS</option>
-                </select>
+                <h1>Edicion de grafos</h1>
+                <p>Click en el canvas para insertar nodos</p>
+                <p>Click sobre elementos para seleccionarlos</p>
+                <p>Para conectar nodos, primero seleccionar el origen y luego el destino</p>
+                <br/>
+                <div>
+                    <Canvas algorithm={this.props.algorithm}/>
+                </div>
             </div>
         )
     }

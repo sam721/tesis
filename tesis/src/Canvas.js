@@ -133,10 +133,13 @@ class Canvas extends React.Component{
 
     RunButton = () => {
      
-      let {cy} = this.state;
+      let {cy, selection} = this.state;
+
+      if(!selection || selection.type !== 'node') return;
       let commands = this.props.algorithm === 'BFS' 
-                      ? BFS(cy, 'node-1')
-                      : DFS(cy, 'node-1');
+                      ? BFS(cy, selection.id)
+                      : DFS(cy, selection.id);
+
       let animation = () => {
         let pos = 0;
         let step = () => {
@@ -145,6 +148,10 @@ class Canvas extends React.Component{
                     'background-color': 'white',
                     'color': 'black',
                 });
+                cy.getElementById(selection.id).style({
+                  'background-color': '#00FFFF',
+                  'color': 'black',
+                })
                 return;
             }
             let {node, paint} = commands[pos++];

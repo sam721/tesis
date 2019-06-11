@@ -1,22 +1,29 @@
 // @flow
 import React from 'react';
 import './App.css';
+import {Container, Row, Col} from 'react-bootstrap';
 import Editor from './Editor';
-
+import Sidebar from './Sidebar';
 class App extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      algorithm: 'none',
+    }
+  }
   render(){
     return (
-      <div>
-        <h1>Edicion de grafos</h1>
-        <p>Click en el canvas para insertar nodos</p>
-        <p>Click sobre elementos para seleccionarlos</p>
-        <p>Para conectar nodos, primero seleccionar el origen y luego el destino</p>
-        <br/>
-        <Editor/>
-      </div>
-
-
-    )
+      <Container fluid={true}>
+        <Row>
+          <Col md={2} className='sidebar'>
+            <Sidebar/>
+          </Col>
+          <Col>
+            <Editor algorithm={this.state.algorithm}/>
+          </Col>
+        </Row>
+      </Container>
+    );
   }
 }
 
