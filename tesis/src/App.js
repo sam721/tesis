@@ -3,14 +3,16 @@ import React from 'react';
 import './App.css';
 import {Container, Row, Col} from 'react-bootstrap';
 import Editor from './Editor';
-import Sidebar from './Sidebar';
+import Sidebar from './Components/Sidebar';
+
+import {connect} from 'react-redux';
+
+
+const mapStateToProps = state => ({
+  algorithm: state.algorithm,
+})
+
 class App extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      algorithm: 'none',
-    }
-  }
   render(){
     return (
       <Container fluid={true}>
@@ -19,7 +21,7 @@ class App extends React.Component {
             <Sidebar/>
           </Col>
           <Col>
-            <Editor algorithm={this.state.algorithm}/>
+            <Editor algorithm={this.props.algorithm}/>
           </Col>
         </Row>
       </Container>
@@ -27,4 +29,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default connect(mapStateToProps)(App);

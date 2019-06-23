@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.0.8",
+    "@types/react": "^16.8.19",
+    "@types/react-dom": "^16.8.4",
     "bootstrap": "^4.3.1",
     "cytoscape": "^3.6.2",
     "cytoscape-autopan-on-drag": "^2.2.0",
@@ -12,7 +16,8 @@
     "react-redux": "^7.0.3",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
-    "redux": "^4.0.1"
+    "redux": "^4.0.1",
+    "typescript": "^3.5.1"
   },
   "scripts": {
     "start": "react-scripts start",

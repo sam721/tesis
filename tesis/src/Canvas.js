@@ -12,8 +12,8 @@ autopanOnDrag(cytoscape);
 const nodeStyle = {
   'background-color': 'white',
   'border-style': 'solid',
-  'width': '50',
-  'height': '50',
+  'width': '35',
+  'height': '35',
   'border-width': '1',
   'border-opacity': '1',
   'border-color': 'black',
@@ -55,6 +55,10 @@ class Canvas extends React.Component{
           {
             selector: 'edge',
             style: {
+              'label': 'data(weight)',
+              'text-rotation': 'autorotate',
+              'text-margin-y': '-10',
+              'text-events': 'yes',
               'width': 3,
               'line-color': '#ccc',
               'target-arrow-color': '#ccc',
@@ -66,8 +70,8 @@ class Canvas extends React.Component{
       
         layout: {
           name: 'preset',
-          height: '50',
-          width: '50',
+          height: '35',
+          width: '35',
         },
         headless: false,
         styleEnabled: true,
@@ -87,8 +91,8 @@ class Canvas extends React.Component{
       cy.on('click', 'edge', (event) => this.handleClickOnEdge(event));
       cy.autopanOnDrag({enabled: true, speed: 0.01});
       this.layout = cy.elements().makeLayout( { name: 'preset',
-      height: '50',
-      width: '50',});
+      height: '35',
+      width: '35',});
       this.layout.run();
 
       this.setState({cy});
@@ -97,8 +101,8 @@ class Canvas extends React.Component{
     refreshLayout(cy){
       this.layout.stop();
       this.layout = cy.elements().makeLayout( { name: 'preset',
-      height: '50',
-      width: '50',});
+      height: '35',
+      width: '35',});
       this.layout.run();  
     }
 
@@ -202,6 +206,7 @@ class Canvas extends React.Component{
                 group: 'edges',
                 data: {
                   id: prevNode+'-'+nodeId,
+                  weight: 3,
                   source: prevNode,
                   target: nodeId,
                 }
