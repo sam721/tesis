@@ -17,7 +17,22 @@ const reducer = (state = initialState, action) => {
       return {
         algorithm: 'DFS',
       }
-
+    
+    case actions.SELECT_DIJKSTRA:
+      return {
+        algorithm: 'Dijkstra',
+      }
+    
+    case actions.SELECT_KRUSKAL:
+      return {
+        algorithm: 'Kruskal',
+      }
+      
+    case actions.SELECT_PRIM:
+      return {
+        algorithm: 'Prim',
+      }
+      
     case actions.NO_SELECTION:
       return {
         ...state,
@@ -40,6 +55,13 @@ const reducer = (state = initialState, action) => {
     case actions.ANIMATION_END:
       return {
         ...state,
+        animation: false,
+      }
+    
+    case actions.CLEAR_GRAPH:
+      return {
+        ...state,
+        selection: null,
         animation: false,
       }
       

@@ -2,7 +2,7 @@ class PriorityQueue{
     _data = [0];
     _comp = null;
 
-    constructor(_comp = (x,y) => x > y){
+    constructor(_comp = (x,y) => x >= y){
         this._comp = _comp;
     }
 
@@ -37,15 +37,20 @@ class PriorityQueue{
                 let l = this._data[2*pos],
                     r = (2*pos + 1 < this._data.length ? this._data[2*pos+1] : null);
                 x = this._data[pos];
-                if(this._comp(l, x)){
-                    if(r == null || this._comp(l, r)){
+                if(r == null){
+                    if(this._comp(l, x)){
                         [this._data[2*pos], this._data[pos]] = [this._data[pos], this._data[2*pos]];
                         pos = 2*pos;
-                    }else{
+                    }else break;
+                }else{
+                    if(this._comp(l, r) && this._comp(l, x)){
+                        [this._data[2*pos], this._data[pos]] = [this._data[pos], this._data[2*pos]];
+                        pos = 2*pos;
+                    }else if(!this._comp(l, r) && this._comp(r, x)){
                         [this._data[2*pos+1], this._data[pos]] = [this._data[pos], this._data[2*pos+1]];
                         pos = 2*pos+1;
-                    }
-                }else break;
+                    }else break;
+                }
             }
         }
     }

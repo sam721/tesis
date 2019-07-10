@@ -15,3 +15,10 @@ export interface CytoEvent extends Event {
 		y: string,
 	}
 }
+
+export type AnimationStep = {
+	eles: Array<string>,
+	style: Array<Object>,
+	distance: Array<string>,
+	duration: number,
+}

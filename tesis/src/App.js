@@ -1,11 +1,12 @@
 // @flow
 import React from 'react';
 import './App.css';
-import {Container, Row, Col} from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
+import AlgorithmInfo from './Components/AlgorithmInfo'
 import Editor from './Editor';
 import Sidebar from './Components/Sidebar';
 
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 
 const mapStateToProps = state => ({
@@ -13,18 +14,23 @@ const mapStateToProps = state => ({
 })
 
 class App extends React.Component {
-  render(){
+  render() {
     return (
-      <Container fluid={true}>
-        <Row>
-          <Col md={2} className='sidebar'>
-            <Sidebar/>
-          </Col>
-          <Col>
-            <Editor algorithm={this.props.algorithm}/>
-          </Col>
-        </Row>
-      </Container>
+      <body>
+        <Container fluid={true}>
+          <Row>
+            <Col xs={2} className='sidebar'>
+              <Sidebar />
+            </Col>
+            <Col xs={7}>
+              <Editor algorithm={this.props.algorithm} />
+            </Col>
+            <Col xs={3}>
+              <AlgorithmInfo algorithm={this.props.algorithm} />
+            </Col>
+          </Row>
+        </Container>
+      </body>
     );
   }
 }

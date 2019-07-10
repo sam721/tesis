@@ -10,37 +10,46 @@ const {connect}  = require('react-redux');
 
 type Props = {
 	dispatch: (action: Object) => Object,
+	algorithm: string,
+}
+
+type State = {
+	algorithm: string,
+}
+const mapStateToProps = (state:State) => {
+	return {
+		algorithm: state.algorithm,
+	}
 }
 const Sidebar = (props:Props) => {
+	const items = [
+		{name: 'BFS'},
+		{name: 'DFS'},
+		{name: 'Dijkstra'},
+		{name: 'Prim'},
+		{name: 'Kruskal'}
+	];
+
+	const list = [];
+
+	for(let i = 0; i < items.length; i++){
+		list.push(
+			<NavLink to={"/"+items[i].name}>
+				<li 
+					className={items[i].name === props.algorithm ? "active" : "normal"}
+				>
+					{items[i].name}
+				</li>
+			</NavLink>
+		)
+	}
 	return (
 		<HashRouter>
 			<ul>
-				<li className="menu-item">
-					Home
-				</li>
-
-				<li className="menu-item" onClick = {() => props.dispatch({type: actions.SELECT_BFS})}>
-					<NavLink to="/BFS">BFS</NavLink>
-				</li>
-
-				<li className="menu-item" onClick = {() => props.dispatch({type: actions.SELECT_DFS})}>
-					<NavLink to="/DFS">DFS</NavLink>
-				</li>
-
-				<li className="menu-item" onClick = {() => props.dispatch({type: actions.SELECT_DIJKSTRA})}>
-					<NavLink to="/Dijkstra">Dijkstra</NavLink>
-				</li>
-
-				<li className="menu-item" onClick = {() => props.dispatch({type: actions.SELECT_DIJKSTRA})}>
-					<NavLink to="/Prim">Prim</NavLink>
-				</li>
-
-				<li className="menu-item" onClick = {() => props.dispatch({type: actions.SELECT_DIJKSTRA})}>
-					<NavLink to="/Kruskal">Kruskal</NavLink>
-				</li>
+				{list}
 			</ul>
 		</HashRouter>
 	);
 }
 
-export default connect()(Sidebar);
+export default connect(mapStateToProps)(Sidebar);
