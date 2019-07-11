@@ -1,5 +1,6 @@
 export const NODE = {
 	'background-color': 'white',
+	'color': 'black',
 	'border-style': 'solid',
 	'width': '35',
 	'height': '35',

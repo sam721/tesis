@@ -10,27 +10,37 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actions.SELECT_BFS:
       return {
+        ...state,
         algorithm: 'BFS',
+        selection: null,
       }
 
     case actions.SELECT_DFS:
       return {
+        ...state,
         algorithm: 'DFS',
+        selection: null,
       }
     
     case actions.SELECT_DIJKSTRA:
       return {
+        ...state,
         algorithm: 'Dijkstra',
+        selection: null,
       }
     
     case actions.SELECT_KRUSKAL:
       return {
+        ...state,
         algorithm: 'Kruskal',
+        selection: null,
       }
       
     case actions.SELECT_PRIM:
       return {
+        ...state,
         algorithm: 'Prim',
+        selection: null,
       }
       
     case actions.NO_SELECTION:

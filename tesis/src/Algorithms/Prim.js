@@ -16,62 +16,65 @@ const Prim = param => {
   }];
 
   let mst = 0;
-  pq.push({
-    target: nodes[0].id(),
-    edgeId: 'NONE',
-    weight: 0,
-  });
-  dist[nodes[0].id()] = 0;
-  const popped_edges = {};
-  let tree_edges = 0;
-  while(!pq.isEmpty()){
-    const edge = pq.top(); pq.pop() ;
-    const{target, edgeId, weight} = edge;
 
-    if(part_of_tree[target]) continue;
+  for(let i = 0; i < nodes.length; i++){
+    
+    let src = nodes[i].id();
+    if(dist[src] !== undefined) continue;
+    pq.push({
+      target: src,
+      edgeId: 'NONE',
+      weight: 0,
+    });
+    dist[src]= 0;
+    const popped_edges = {};
+    let tree_edges = 0;
+    while(!pq.isEmpty()){
+      const edge = pq.top(); pq.pop() ;
+      const{target, edgeId, weight} = edge;
 
-    part_of_tree[target] = true;
-    if(edgeId !== 'NONE'){
-      commands.push({
-        eles: [edgeId],
-        style: [{'line-color': 'green'}],
-        duration: 1000,
+      if(part_of_tree[target]) continue;
+
+      part_of_tree[target] = true;
+      if(edgeId !== 'NONE'){
+        commands.push({
+          eles: [edgeId],
+          style: [{'line-color': 'green'}],
+          duration: 1000,
+        });
+      }
+
+      commands.push(
+        {
+          eles: [target, edgeId],
+          style: [
+            {'background-color': 'red', 'color': 'black'},
+            {'line-color': 'black', 'line-style': 'solid'}
+          ],
+          duration: 1000,
+        }
+      );
+
+      
+      mst += weight;
+      const neighborhood = cy.getElementById(target).connectedEdges();
+
+      neighborhood.forEach(edge => {
+        if(popped_edges[edge.id()]) return;
+        popped_edges[edge.id()] = true;
+        let t = edge.target().id();
+        if(t === target) t = edge.source().id();
+        let w = edge.data('weight');
+        if(dist[t] === undefined || dist[t] > w){
+          dist[t] = w;
+          pq.push({
+            target: t,
+            edgeId: edge.id(),
+            weight: w,
+          })
+        }
       });
     }
-
-    commands.push(
-      {
-        eles: [target, edgeId],
-        style: [
-          {'background-color': 'red', 'color': 'black'},
-          {'line-color': 'black', 'line-style': 'solid'}
-        ],
-        duration: 1000,
-      }
-    );
-
-    
-    mst += weight;
-    tree_edges++;
-    if(tree_edges === nodes.length) break;
-    const neighborhood = cy.getElementById(target).connectedEdges();
-
-    neighborhood.forEach(edge => {
-      if(popped_edges[edge.id()]) return;
-      popped_edges[edge.id()] = true;
-      let t = edge.target().id();
-      if(t === target) t = edge.source().id();
-      let w = edge.data('weight');
-      console.log(edge.id());
-      if(dist[t] === undefined || dist[t] > w){
-        dist[t] = w;
-        pq.push({
-          target: t,
-          edgeId: edge.id(),
-          weight: w,
-        })
-      }
-    });
   } 
   commands.push(
     {

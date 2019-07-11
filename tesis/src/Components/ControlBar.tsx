@@ -1,12 +1,13 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faTimes, faPlayCircle } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faTimes, faPlayCircle, faStopCircle} from '@fortawesome/free-solid-svg-icons'
 const { connect } = require('react-redux');
 
 type Props = {
   dispatch: (action: Object) => Object,
   algorithm: string,
+  animation: Boolean,
   selection: any, //CAMBIAR
   weighted: boolean,
   run: () => void,
@@ -17,6 +18,7 @@ type Props = {
 
 type State = {
   algorithm: string,
+  animation: Boolean,
   selection: Object,
   weight: string,
 }
@@ -25,6 +27,7 @@ const mapStateToProps = (state: State) => {
   return ({
     algorithm: state.algorithm,
     selection: state.selection,
+    animation: state.animation,
   })
 }
 class ControlBar extends React.Component<Props, State> {
@@ -34,6 +37,7 @@ class ControlBar extends React.Component<Props, State> {
       algorithm: '',
       selection: {},
       weight: '',
+      animation: false,
     }
   }
 
@@ -92,7 +96,7 @@ class ControlBar extends React.Component<Props, State> {
           </Col>
           <Col xs={6} style={{ textAlign: 'center' }}>
             <button onClick={this.props.run} title="Reproducir">
-              <FontAwesomeIcon icon={faPlayCircle} />
+              <FontAwesomeIcon icon={(this.props.animation ? faStopCircle : faPlayCircle)} />
             </button>
           </Col>
           <Col> {edgeWeightInput}</Col>

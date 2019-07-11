@@ -1,14 +1,14 @@
 import React from 'react';
 import actions from '../Actions/actions';
-import {CytoscapeElement, CytoEvent, AnimationStep} from '../Types/types';
+import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 
 import ControlBar from './ControlBar';
-import {Row, Col, Container} from 'react-bootstrap';
+import { Row, Col, Container } from 'react-bootstrap';
 
 const Styles = require('../Styles/Styles');
 const popper = require('cytoscape-popper');
 const cytoscape = require('cytoscape');
-const {connect} = require('react-redux');
+const { connect } = require('react-redux');
 
 
 const autopanOnDrag = require('cytoscape-autopan-on-drag');
@@ -44,7 +44,7 @@ const getNodeIdString = (nodeId: string) => {
 	return 'node-' + nodeId;
 }
 
-const mapStateToProps = (state : State) => {
+const mapStateToProps = (state: State) => {
 	return {
 		selection: state.selection,
 		algorithm: state.algorithm,
@@ -55,32 +55,32 @@ const mapStateToProps = (state : State) => {
 class Graph extends React.Component<Props>{
 
 	layout = {
-		run: () => {},
-		stop: () => {},
+		run: () => { },
+		stop: () => { },
 	};
 
 	nodeStyle = Styles.NODE;
 	edgeStyle = Styles.EDGE;
 	cy = cytoscape();
-	
 
-	constructor(props: Props){
+
+	constructor(props: Props) {
 		super(props);
-		if(this.props.weighted){
-			this.edgeStyle = {...this.edgeStyle, ...Styles.EDGE_WEIGHTED};
+		if (this.props.weighted) {
+			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_WEIGHTED };
 		}
-		if(this.props.directed){
-			this.edgeStyle = {...this.edgeStyle, ...Styles.EDGE_DIRECTED};
+		if (this.props.directed) {
+			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_DIRECTED };
 		}
 	}
 	componentDidMount() {
 
 		let edgeStyle = Styles.EDGE;
-		if(this.props.weighted){
-			edgeStyle = {...edgeStyle, ...Styles.EDGE_WEIGHTED};
+		if (this.props.weighted) {
+			edgeStyle = { ...edgeStyle, ...Styles.EDGE_WEIGHTED };
 		}
-		if(this.props.directed){
-			edgeStyle = {...edgeStyle, ...Styles.EDGE_DIRECTED};
+		if (this.props.directed) {
+			edgeStyle = { ...edgeStyle, ...Styles.EDGE_DIRECTED };
 		}
 		this.cy = cytoscape({
 
@@ -116,10 +116,10 @@ class Graph extends React.Component<Props>{
 			wheelSensitivity: 1,
 			pixelRatio: '1.0'
 		});
-		
+
 		this.cy.on('click', (event: CytoEvent) => this.handleClickViewport(event));
-		this.cy.on('click', 'node', (event : CytoEvent) => this.handleClickOnNode(event.target));
-		this.cy.on('click', 'edge', (event : CytoEvent) => this.handleClickOnEdge(event.target));
+		this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
+		this.cy.on('click', 'edge', (event: CytoEvent) => this.handleClickOnEdge(event.target));
 		this.cy.autopanOnDrag({ enabled: true, speed: 0.01 });
 		this.layout = this.cy.elements().makeLayout({
 			name: 'preset',
@@ -130,17 +130,17 @@ class Graph extends React.Component<Props>{
 		})
 	}
 
-	componentWillUnmount(){
+	componentWillUnmount() {
 		let nodes = this.cy.nodes();
-		nodes.forEach((node:CytoscapeElement) => {
+		nodes.forEach((node: CytoscapeElement) => {
 			let id = node.id();
-			let popper = document.getElementById(id+'popper');
-			if(popper){
+			let popper = document.getElementById(id + 'popper');
+			if (popper) {
 				document.body.removeChild(popper);
 			}
 		});
 	}
-	
+
 	refreshLayout() {
 		this.layout.stop();
 		this.layout = this.cy.elements().makeLayout({ name: 'preset' });
@@ -148,52 +148,60 @@ class Graph extends React.Component<Props>{
 	}
 
 	clearGraph = () => {
+		if (this.props.animation === true) return;
 		this.props.dispatch({
 			type: actions.CLEAR_GRAPH,
 		});
 		let nodes = this.cy.nodes();
-		let edges = this.cy.edges();
-		this.cy.remove(nodes);
-		this.cy.remove(edges);
+		for (let i = 0; i < nodes.length; i++) {
+			this.removeNode(nodes[i].id());
+		}
 	}
-	removeNode = (node : string) => {
-		this.cy.remove('node[id="' + node + '"]');
-		let nodePopper = document.getElementById(node+'popper');
-		if(nodePopper){
+
+	removeNodePopper(node: string) {
+		let nodePopper = document.getElementById(node + 'popper');
+		if (nodePopper) {
 			document.body.removeChild(nodePopper);
 		}
 	}
 
-	removeEdge = (edge : string) => {
+	removeNode = (node: string) => {
+		this.cy.remove('node[id="' + node + '"]');
+		this.removeNodePopper(node);
+	}
+
+	removeEdge = (edge: string) => {
 		this.cy.remove('edge[id="' + edge + '"]');
 	}
 
-	executeAnimation = (commands : Array<AnimationStep>)=> {
+	executeAnimation = (commands: Array<AnimationStep>) => {
+		this.cy.nodes().style({
+			'background-color': 'white',
+			'color': 'black',
+		});
 
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
-				if (pos === commands.length) {
-					this.cy.nodes().style({
-						'background-color': 'white',
-						'color': 'black',
-					});
+				if (pos === commands.length || !this.props.animation) {
+					this.cy.nodes().style(this.nodeStyle);
+					this.cy.edges().style(this.edgeStyle);
 					this.props.dispatch({
 						type: actions.ANIMATION_END,
 					});
 					this.cy.autolock(false);
 					return;
 				}
-				let { eles, distance, style, duration} = commands[pos++];
-				if(style){
+				let { eles, distance, style, duration } = commands[pos++];
+				if (style) {
 					eles.forEach((ele, index) => {
 						this.cy.getElementById(ele).style(style[index]);
 					});
 				}
-				if(distance !== undefined){
+				if (distance !== undefined) {
 					eles.forEach((node, index) => {
-						let nodeDom = document.getElementById(node+'popper');
-						if(nodeDom) nodeDom.innerHTML = distance[index];
+						let nodeDom = document.getElementById(node + 'popper');
+						if (nodeDom) nodeDom.innerHTML = distance[index];
 					});
 				}
 				this.refreshLayout();
@@ -205,42 +213,58 @@ class Graph extends React.Component<Props>{
 	}
 
 	runButton = () => {
-		let {selection} = this.props;
-		if(this.props.algorithm !== 'Kruskal' && this.props.algorithm !== 'Prim'){
+		if (this.props.animation === true) {
+			this.props.dispatch({
+				type: actions.ANIMATION_END,
+			});
+			return;
+		}
+		let { selection } = this.props;
+		if (this.props.algorithm !== 'Kruskal' && this.props.algorithm !== 'Prim') {
 			console.log(this.props.algorithm);
-			if(!selection || selection.type !== 'node'){
+			if (!selection || selection.type !== 'node') {
 				console.error('No node selected');
 				return;
 			}
 		}
-		this.props.dispatch({
-			type: actions.ANIMATION_START,
+
+		let animationPromise = new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
+			this.props.dispatch({
+				type: actions.ANIMATION_START,
+			});
+			let commands = this.props.execute({ cy: this.cy, selection: this.props.selection });
+			resolve(commands);
 		});
-		this.cy.autolock(true);
-		let commands = this.props.execute({cy: this.cy, selection: this.props.selection});
-		this.executeAnimation(commands);
+
+		animationPromise.then((commands: Array<AnimationStep>) => {
+			this.cy.autolock(true);
+
+			this.executeAnimation(commands);
+		});
 	}
-	
+
 	removeButton = () => {
-		let {selection} = this.props;
-		if(!selection) {
+		console.log(this.props);
+		if (this.props.animation === true) return;
+		let { selection } = this.props;
+		if (!selection) {
 			console.error('No element selected');
 			return;
 		}
 
-		if(selection.type === 'node'){
+		if (selection.type === 'node') {
 			this.removeNode(selection.id);
-		}else if(selection.type === 'edge'){
+		} else if (selection.type === 'edge') {
 			this.removeEdge(selection.id);
 		}
 
 		this.props.dispatch({
 			type: actions.NO_SELECTION,
 		});
-		
+
 	}
-	handleClickOnNode = (node : CytoscapeElement) => {
-		if(this.props.animation === true) return;
+	handleClickOnNode = (node: CytoscapeElement) => {
+		if (this.props.animation === true) return;
 		let nodeId = node.id();
 		let { selection } = this.props;
 
@@ -291,8 +315,8 @@ class Graph extends React.Component<Props>{
 		}
 	}
 
-	handleClickOnEdge = (edge : CytoscapeElement) => {
-		if(this.props.animation === true) return;
+	handleClickOnEdge = (edge: CytoscapeElement) => {
+		if (this.props.animation === true) return;
 		let edgeId = edge.id();
 
 		let { selection } = this.props;
@@ -332,7 +356,7 @@ class Graph extends React.Component<Props>{
 		}
 	}
 
-	createNode(x : string, y : string) {
+	createNode(x: string, y: string) {
 		let id = 1;
 		while (this.cy.getElementById(getNodeIdString(id.toString())).length > 0) {
 			id++;
@@ -349,26 +373,26 @@ class Graph extends React.Component<Props>{
 		let popper = node.popper({
 			content: () => {
 				let div = document.createElement('div');
-				div.setAttribute('id', nodeId+'popper');
-				document.body.appendChild( div );
+				div.setAttribute('id', nodeId + 'popper');
+				document.body.appendChild(div);
 
 				return div;
 			}
 		});
-		
+
 		let update = () => {
 			popper.scheduleUpdate();
 		};
-		
+
 		node.on('position', update);
 	}
 
-	createEdge(x : string, y : string) {
+	createEdge(x: string, y: string) {
 		this.cy.add({
 			group: 'edges',
 			data: {
 				id: x + '-' + y,
-				weight: Math.floor(Math.random()*15),
+				weight: Math.floor(Math.random() * 15),
 				source: x,
 				target: y,
 			}
@@ -376,9 +400,9 @@ class Graph extends React.Component<Props>{
 	}
 
 	changeWeight = (weight: number) => {
-		const {selection} = this.props;
-		if(selection.type === 'edge'){
-			const {id} = selection;
+		const { selection } = this.props;
+		if (selection.type === 'edge') {
+			const { id } = selection;
 			this.cy.getElementById(id).data('weight', weight);
 			this.props.dispatch({
 				type: actions.SELECTION,
@@ -392,8 +416,8 @@ class Graph extends React.Component<Props>{
 			})
 		}
 	}
-	handleClickViewport = (event : CytoEvent) => {
-		if(this.props.animation === true) return;
+	handleClickViewport = (event: CytoEvent) => {
+		if (this.props.animation === true) return;
 
 		let { selection } = this.props;
 		if (event.target === this.cy) {
@@ -415,21 +439,21 @@ class Graph extends React.Component<Props>{
 
 	render() {
 		let edgeWeight = null;
-		let {selection} = this.props;
-		if(selection && selection.type === 'edge'){
+		let { selection } = this.props;
+		if (selection && selection.type === 'edge') {
 			const id = selection.id;
 			edgeWeight = this.cy.getElementById(id).data('weight');
 		}
 		return (
-			<Container fluid={true}> 
-				<Row id="canvas"/>
-				<ControlBar 
-					run = {this.runButton} 
-					remove = {this.removeButton}
-					clearGraph = {this.clearGraph}
-					changeWeight = {this.changeWeight}
-					weighted = {this.props.weighted}
-					edgeWeight = {edgeWeight}
+			<Container fluid={true}>
+				<Row id="canvas" />
+				<ControlBar
+					run={this.runButton}
+					remove={this.removeButton}
+					clearGraph={this.clearGraph}
+					changeWeight={this.changeWeight}
+					weighted={this.props.weighted}
+					edgeWeight={edgeWeight}
 				/>
 			</Container>
 		)
