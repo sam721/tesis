@@ -17,7 +17,7 @@ export const NODE_SELECTED = {
 }
 
 export const EDGE = {
-  'width': 3,
+  'width': 2,
   'line-color': '#ccc',
 	'curve-style': 'bezier',
 	'line-style': 'solid',

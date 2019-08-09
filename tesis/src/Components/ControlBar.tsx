@@ -1,7 +1,10 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faTimes, faPlayCircle, faStopCircle} from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faTimes, faPlayCircle, faStopCircle } from '@fortawesome/free-solid-svg-icons'
+import actions from '../Actions/actions'
+
+import SpeedBar from './SpeedBar'
 const { connect } = require('react-redux');
 
 type Props = {
@@ -14,6 +17,7 @@ type Props = {
   remove: () => void,
   clearGraph: () => void,
   changeWeight: (weight: number) => void,
+  speed: number,
 }
 
 type State = {
@@ -21,6 +25,7 @@ type State = {
   animation: Boolean,
   selection: Object,
   weight: string,
+  speed: number,
 }
 
 const mapStateToProps = (state: State) => {
@@ -28,6 +33,7 @@ const mapStateToProps = (state: State) => {
     algorithm: state.algorithm,
     selection: state.selection,
     animation: state.animation,
+    speed: state.speed,
   })
 }
 class ControlBar extends React.Component<Props, State> {
@@ -38,6 +44,7 @@ class ControlBar extends React.Component<Props, State> {
       selection: {},
       weight: '',
       animation: false,
+      speed: 0,
     }
   }
 
@@ -59,6 +66,15 @@ class ControlBar extends React.Component<Props, State> {
   }
   handleWeightChange(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ weight: e.currentTarget.value });
+  }
+
+  handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.dispatch({
+      type: actions.CHANGE_SPEED,
+      payload: {
+        speed: e.target.value,
+      }
+    })
   }
   render() {
     let { selection } = this.props;
@@ -99,7 +115,10 @@ class ControlBar extends React.Component<Props, State> {
               <FontAwesomeIcon icon={(this.props.animation ? faStopCircle : faPlayCircle)} />
             </button>
           </Col>
-          <Col> {edgeWeightInput}</Col>
+          <Col xs={2}> {edgeWeightInput}</Col>
+          <Col xs={2}>
+            <SpeedBar/>
+          </Col>
         </Row>
       </Container>
     );

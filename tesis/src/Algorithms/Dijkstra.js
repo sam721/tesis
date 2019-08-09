@@ -15,11 +15,19 @@ const Dijkstra = (param) => {
     distance: 0,
     id: source,
   });
+
   commands.push(
     {
       eles: cy.nodes().map(x => x.id()),
       distance: Array(cy.nodes().length).fill('\u221E'),
       duration: 500,
+      inst: [{
+        name: 'fill',
+        data: {
+          value: '\u221E',
+          class: 'heap-default',
+        }
+      }],
     }
   )
 
@@ -34,6 +42,14 @@ const Dijkstra = (param) => {
         distance: [distance.toString()],
         style: [{ "background-color": 'red', 'color': 'black' }],
         duration: 1000,
+        inst: [{
+          name: 'change_element',
+          position: parseInt(current.data('value'), 10) - 1,
+          data: {
+            value: distance.toString(),
+            class: 'heap-wrong',
+          }
+        }]
       }
     )
     current.outgoers('edge').forEach(
@@ -69,6 +85,14 @@ const Dijkstra = (param) => {
               eles: [nextId],
               distance: [distance + weight],
               duration: 500,
+              inst: [{
+                name: 'change_element',
+                position: parseInt(next.data('value'), 10)-1,
+                data: {
+                  value: (distance + weight).toString(),
+                  class: 'heap-default',
+                }
+              }]
             }
           )
         } else {
@@ -100,6 +124,14 @@ const Dijkstra = (param) => {
         distance: [distance.toString()],
         style: [{ "background-color": 'black', 'color': 'white' }],
         duration: 1000,
+        inst: [{
+          name: 'change_element',
+          position: parseInt(current.data('value'), 10) - 1,
+          data: {
+            value: distance.toString(),
+            class: 'heap-default',
+          }
+        }]
       }
     )
   }

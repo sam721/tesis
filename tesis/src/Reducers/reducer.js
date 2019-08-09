@@ -4,6 +4,7 @@ const initialState = {
   algorithm: 'BFS',
   selection: null,
   animation: false,
+  speed: 1.0,
 };
 
 const reducer = (state = initialState, action) => {
@@ -42,7 +43,20 @@ const reducer = (state = initialState, action) => {
         algorithm: 'Prim',
         selection: null,
       }
-      
+    
+    case actions.SELECT_HEAP:
+      return {
+        ...state,
+        algorithm: 'Heap',
+        selection: null,
+      }
+    
+    case actions.SELECT_AVL:
+      return {
+        ...state,
+        algorithm: 'AVL',
+        selection: null,
+      }
     case actions.NO_SELECTION:
       return {
         ...state,
@@ -74,7 +88,24 @@ const reducer = (state = initialState, action) => {
         selection: null,
         animation: false,
       }
-      
+    
+    case actions.DEC_SPEED:
+      return {
+        ...state,
+        speed: Math.min(state.speed + 0.10, 2),
+      }
+    
+    case actions.INC_SPEED:
+      return {
+        ...state,
+        speed: Math.max(state.speed - 0.10, 0),
+      }
+    
+    case actions.CHANGE_SPEED:
+      return {
+        ...state,
+        speed: action.payload.speed,
+      }
     default:
       return state;
   }

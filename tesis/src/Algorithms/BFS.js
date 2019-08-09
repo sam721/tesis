@@ -10,7 +10,19 @@ const BFS = param => {
 	let commands = [];
 
 	q.push(source);
-
+	commands.push(
+		{
+			inst: [
+				{
+					name: 'push',
+					data: {
+						value: cy.getElementById(source).data('value'),
+						class: 'heap-default',
+					}
+				}
+			]
+		}
+	)
 	while (!q.isEmpty()) {
 		let current = cy.getElementById(q.front()); q.pop();
 		if (color[current] === 'black') continue;
@@ -18,6 +30,11 @@ const BFS = param => {
 		commands.push({
 			eles: [current.id()],
 			style: [{ 'background-color': 'black', 'color': 'white' }],
+			inst: [
+				{
+					name: 'shift',
+				}
+			]
 		});
 		current.outgoers('edge').forEach(
 			edge => {
@@ -31,6 +48,15 @@ const BFS = param => {
 								{ 'background-color': 'gray', 'color': 'black' },
 								{ 'line-color': 'green', 'target-arrow-color': 'green' }
 							],
+							inst: [
+								{
+									name: 'push',
+									data: {
+										value: next.data('value'),
+										class: 'heap-default',
+									}
+								}
+							]
 						},
 						{
 							eles: [edge.id()],

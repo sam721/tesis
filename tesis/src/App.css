@@ -92,3 +92,22 @@
   border-top-right-radius: 20px;
 }
 
+.heap-default{
+  background-color: white;
+  color: black;
+}
+
+.heap-focus{
+  background-color: black;
+  color: white;
+}
+
+.heap-wrong{
+  background-color: LightCoral ;
+  color: black;
+}
+
+.heap-correct{
+  background-color: Chartreuse ;
+  color: black;
+}

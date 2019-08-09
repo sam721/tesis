@@ -4,6 +4,7 @@ import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 
 import ControlBar from './ControlBar';
 import { Row, Col, Container } from 'react-bootstrap';
+import GraphArray from './GraphArray';
 
 const Styles = require('../Styles/Styles');
 const popper = require('cytoscape-popper');
@@ -32,27 +33,43 @@ type Props = {
 		id: string,
 		weight: string,
 	}
+	speed: number,
 }
 
-type State = {
+type Element = {
+	value: number,
+	class: string,
+}
+
+type storeState = {
 	selection: Object,
 	algorithm: string,
 	animation: Boolean,
+	speed: number,
+}
+
+type State = {
+	values: Array<string>,
 }
 
 const getNodeIdString = (nodeId: string) => {
 	return 'node-' + nodeId;
 }
 
-const mapStateToProps = (state: State) => {
+const mapStateToProps = (state: storeState) => {
 	return {
 		selection: state.selection,
 		algorithm: state.algorithm,
 		animation: state.animation,
+		speed: state.speed,
 	}
 }
 
-class Graph extends React.Component<Props>{
+class Graph extends React.Component<Props, State>{
+
+	state = {
+		values: new Array(),
+	}
 
 	layout = {
 		run: () => { },
@@ -189,23 +206,44 @@ class Graph extends React.Component<Props>{
 					this.props.dispatch({
 						type: actions.ANIMATION_END,
 					});
+					this.setState({values: Array()});
 					this.cy.autolock(false);
 					return;
 				}
-				let { eles, distance, style, duration } = commands[pos++];
+				let { eles, distance, style, duration, inst} = commands[pos++];
 				if (style) {
 					eles.forEach((ele, index) => {
 						this.cy.getElementById(ele).style(style[index]);
 					});
 				}
-				if (distance !== undefined) {
+				if(eles){
 					eles.forEach((node, index) => {
 						let nodeDom = document.getElementById(node + 'popper');
-						if (nodeDom) nodeDom.innerHTML = distance[index];
+						if (nodeDom && distance !== undefined) nodeDom.innerHTML = distance[index];
 					});
 				}
+				if(inst){
+					let {values} = this.state;
+					inst.forEach(ele => {
+						if(ele.name === 'push'){
+							const {data} = ele;
+							console.log(data);
+							values.push(data);
+						}else if(ele.name === 'shift'){
+							values.shift();
+						}else if(ele.name === 'pop'){
+							values.pop();
+						}else if(ele.name === 'change_element'){
+							let {position} = ele;
+							if(position != null) values[position] = ele.data;
+						}else if(ele.name === 'fill'){
+							values.fill(ele.data);
+						}
+					})
+					this.setState({values});
+				}
 				this.refreshLayout();
-				setTimeout(step, (duration === undefined) ? 1000 : duration);
+				setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 			}
 			step();
 		}
@@ -214,6 +252,7 @@ class Graph extends React.Component<Props>{
 
 	runButton = () => {
 		if (this.props.animation === true) {
+			this.setState({values: Array()});
 			this.props.dispatch({
 				type: actions.ANIMATION_END,
 			});
@@ -447,6 +486,8 @@ class Graph extends React.Component<Props>{
 		return (
 			<Container fluid={true}>
 				<Row id="canvas" />
+				<GraphArray array={this.state.values}/>
+
 				<ControlBar
 					run={this.runButton}
 					remove={this.removeButton}

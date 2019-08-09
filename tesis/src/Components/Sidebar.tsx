@@ -1,6 +1,4 @@
 import React from 'react';
-import Graph from './Graph';
-import actions from '../Actions/actions'
 const {
 	NavLink,
 	HashRouter
@@ -27,7 +25,9 @@ const Sidebar = (props:Props) => {
 		{name: 'DFS'},
 		{name: 'Dijkstra'},
 		{name: 'Prim'},
-		{name: 'Kruskal'}
+		{name: 'Kruskal'},
+		{name: 'Heap'},
+		{name: 'AVL'},
 	];
 
 	const list = [];

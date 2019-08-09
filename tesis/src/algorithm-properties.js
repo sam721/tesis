@@ -33,6 +33,12 @@ const properties = {
     directed: false,
     weighted: true,
     action: actions.SELECT_KRUSKAL,
+  },
+  Heap: {
+    action: actions.SELECT_HEAP,
+  },
+  AVL: {
+    action: actions.SELECT_AVL,
   }
 }
 
