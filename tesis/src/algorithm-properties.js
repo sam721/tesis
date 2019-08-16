@@ -39,7 +39,13 @@ const properties = {
   },
   AVL: {
     action: actions.SELECT_AVL,
-  }
+  },
+  BubbleSort: {
+    action: actions.SELECT_BUBBLESORT,
+  },
+  MergeSort: {
+    action: actions.SELECT_MERGESORT,
+  },
 }
 
 export default properties;

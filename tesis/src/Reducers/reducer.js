@@ -14,6 +14,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'BFS',
         selection: null,
+        speed: 1.0,
       }
 
     case actions.SELECT_DFS:
@@ -21,6 +22,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'DFS',
         selection: null,
+        speed: 1.0,
       }
     
     case actions.SELECT_DIJKSTRA:
@@ -28,6 +30,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'Dijkstra',
         selection: null,
+        speed: 1.0,
       }
     
     case actions.SELECT_KRUSKAL:
@@ -35,6 +38,8 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'Kruskal',
         selection: null,
+        speed: 1.0,
+
       }
       
     case actions.SELECT_PRIM:
@@ -42,6 +47,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'Prim',
         selection: null,
+        speed: 1.0,
       }
     
     case actions.SELECT_HEAP:
@@ -49,6 +55,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'Heap',
         selection: null,
+        speed: 1.0,
       }
     
     case actions.SELECT_AVL:
@@ -56,7 +63,25 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'AVL',
         selection: null,
+        speed: 1.0,
       }
+    
+    case actions.SELECT_BUBBLESORT:
+      return {
+        ...state,
+        algorithm: 'BubbleSort',
+        selection: null,
+        speed: 1.0,
+      }
+      
+    case actions.SELECT_MERGESORT:
+      return {
+        ...state,
+        algorithm: 'MergeSort',
+        selection: null,
+        speed: 1.0,
+      }
+
     case actions.NO_SELECTION:
       return {
         ...state,

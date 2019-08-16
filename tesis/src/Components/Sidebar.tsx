@@ -28,6 +28,8 @@ const Sidebar = (props:Props) => {
 		{name: 'Kruskal'},
 		{name: 'Heap'},
 		{name: 'AVL'},
+		{name: 'BubbleSort'},
+		{name: 'MergeSort'},
 	];
 
 	const list = [];

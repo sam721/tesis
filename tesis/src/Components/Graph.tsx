@@ -5,6 +5,8 @@ import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import ControlBar from './ControlBar';
 import { Row, Col, Container } from 'react-bootstrap';
 import GraphArray from './GraphArray';
+import downloadGif from '../utils/gifshot-utils';
+import MediaRecorder from '../utils/MediaRecorder';
 
 const Styles = require('../Styles/Styles');
 const popper = require('cytoscape-popper');
@@ -67,6 +69,10 @@ const mapStateToProps = (state: storeState) => {
 
 class Graph extends React.Component<Props, State>{
 
+	_isMounted = false;
+
+	_mediaRecorder = new MediaRecorder();
+
 	state = {
 		values: new Array(),
 	}
@@ -92,6 +98,7 @@ class Graph extends React.Component<Props, State>{
 	}
 	componentDidMount() {
 
+		this._isMounted = true;
 		let edgeStyle = Styles.EDGE;
 		if (this.props.weighted) {
 			edgeStyle = { ...edgeStyle, ...Styles.EDGE_WEIGHTED };
@@ -148,6 +155,11 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	componentWillUnmount() {
+		this.props.dispatch({
+			type: actions.ANIMATION_END,
+		});
+		
+		this._isMounted = false;
 		let nodes = this.cy.nodes();
 		nodes.forEach((node: CytoscapeElement) => {
 			let id = node.id();
@@ -206,7 +218,9 @@ class Graph extends React.Component<Props, State>{
 					this.props.dispatch({
 						type: actions.ANIMATION_END,
 					});
-					this.setState({values: Array()});
+					if(this._isMounted){
+						this.setState({values: Array()});
+					}
 					this.cy.autolock(false);
 					return;
 				}
@@ -239,8 +253,10 @@ class Graph extends React.Component<Props, State>{
 						}else if(ele.name === 'fill'){
 							values.fill(ele.data);
 						}
-					})
-					this.setState({values});
+					});
+					if(this._isMounted){
+						this.setState({values});
+					}
 				}
 				this.refreshLayout();
 				setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
@@ -475,7 +491,7 @@ class Graph extends React.Component<Props, State>{
 			}
 		}
 	}
-
+	
 	render() {
 		let edgeWeight = null;
 		let { selection } = this.props;
@@ -496,6 +512,8 @@ class Graph extends React.Component<Props, State>{
 					weighted={this.props.weighted}
 					edgeWeight={edgeWeight}
 				/>
+				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
+				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
 			</Container>
 		)
 	}

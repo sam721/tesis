@@ -63,7 +63,7 @@ const BFS = param => {
 							style: [
 								{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }
 							],
-							duration: 10,
+							duration: 1000,
 						}
 					);
 					q.push(next.id());

@@ -1,6 +1,7 @@
 import React from 'react';
 import actions from '../Actions/actions';
 
+import downloadGif from '../utils/gifshot-utils'
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import TreeBar from './TreeBar';
 import { Row, Container } from 'react-bootstrap';
@@ -11,6 +12,7 @@ import { number, string } from 'prop-types';
 
 import {isLeaf, getChildren, inorderSuccessor, getHeight, lca} from '../utils/avl-utils';
 import {edgeId} from '../utils/cy-utils';
+import MediaRecorder from '../utils/MediaRecorder';
 
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
@@ -69,6 +71,9 @@ const mapStateToProps = (state: storeState) => {
 }
 
 class AVL extends React.Component<Props, State>{
+
+  _isMounted = false;
+  _mediaRecorder = new MediaRecorder();
   layout = {
     run: () => { },
     stop: () => { },
@@ -83,6 +88,7 @@ class AVL extends React.Component<Props, State>{
   heap = new PriorityQueue((x, y) => x <= y);
 
   componentDidMount() {
+    this._isMounted = true;
 
     let edgeStyle = Styles.EDGE;
     this.cy = cytoscape({
@@ -124,6 +130,21 @@ class AVL extends React.Component<Props, State>{
     })
   }
 
+  componentWillUnmount(){
+    this.props.dispatch({
+      type: actions.ANIMATION_END,
+    });
+    
+    this._isMounted = false;
+		let nodes = this.cy.nodes();
+		nodes.forEach((node: CytoscapeElement) => {
+			let id = node.id();
+			let popper = document.getElementById(id + 'popper');
+			if (popper) {
+				document.body.removeChild(popper);
+			}
+		});
+  }
   componentDidUpdate(){
     layoutOptions.animationDuration = 1000/this.props.speed;
   }
@@ -528,6 +549,7 @@ class AVL extends React.Component<Props, State>{
       if(anc) this.balance(this.cy.getElementById(anc)).then(() => {
         this.props.dispatch({type: actions.ANIMATION_END});
       });
+      else this.props.dispatch({type: actions.ANIMATION_END});
     }else if(node.outgoers('node').length === 1){
       if(node.id() === this.treeRoot){
         this.treeRoot = node.outgoers('node')[0].id();
@@ -577,6 +599,7 @@ class AVL extends React.Component<Props, State>{
     if(mode === 0) this.rotateLeft(this.cy.getElementById(selection.id));
     else this.rotateRight(this.cy.getElementById(selection.id));
   }
+
   render() {
     return (
       <Container fluid={true}>
@@ -584,6 +607,8 @@ class AVL extends React.Component<Props, State>{
         <TreeBar insert={(v: number) => this.insert(v)} remove={() => this.remove()} />
         <button onClick = {() => this.testRotation(0)}>Test left rotation</button>
         <button onClick = {() => this.testRotation(1)}>Test right rotation</button>
+        <button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
+				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
       </Container>
     );
   }

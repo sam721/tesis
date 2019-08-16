@@ -18,6 +18,14 @@ export interface CytoEvent extends Event {
 	}
 }
 
+export type NODE = {
+	position: {
+		x: number,
+		y: number,
+	},
+	id: string,
+	value: string | number,
+}
 export type AnimationStep = {
 	eles: Array<string>,
 	style: Array<Object>,
@@ -26,5 +34,6 @@ export type AnimationStep = {
 	classes?: Array<string>,
 	data?: Array<{value: number, class?: string}>,
 
+	nodes?: Array<NODE>,
 	inst?: Array<{name: string, position?: number, data?: {value: number, class?: string}}>,
 }

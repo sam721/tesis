@@ -5,9 +5,10 @@ import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import TreeBar from './TreeBar';
 import { Row, Container} from 'react-bootstrap';
 import PriorityQueue from '../Algorithms/DS/PriorityQueue'
-
+import downloadGif from '../utils/gifshot-utils';
 import HeapArray from './HeapArray';
 import { number, string } from 'prop-types';
+import MediaRecorder from '../utils/MediaRecorder';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -56,6 +57,9 @@ const mapStateToProps = (state:storeState) => {
 }
 class Heap extends React.Component<Props, State>{
 
+	_isMounted = false;
+	_mediaRecorder = new MediaRecorder();
+
 	state = {
 		values: [{value: 0, class: 'heap-default'}],
 	}
@@ -72,6 +76,7 @@ class Heap extends React.Component<Props, State>{
 	heap = new PriorityQueue((x, y) => x <= y);
 
 	componentDidMount() {
+		this._isMounted = true;
 
 		let edgeStyle = Styles.EDGE;
 		this.cy = cytoscape({
@@ -113,6 +118,26 @@ class Heap extends React.Component<Props, State>{
 		})
 	}
 
+	componentDidUpdate(){
+    layoutOptions.animationDuration = 500/this.props.speed;
+	}
+	
+	componentWillUnmount(){
+		this.props.dispatch({
+      type: actions.ANIMATION_END,
+    });
+    this._isMounted = false;
+		let nodes = this.cy.nodes();
+		nodes.forEach((node: CytoscapeElement) => {
+			let id = node.id();
+			let popper = document.getElementById(id + 'popper');
+			if (popper) {
+				document.body.removeChild(popper);
+			}
+		});
+	}
+	
+
 	removeNode = (node: string) => {
 		this.cy.remove('node[id="' + node + '"]');
 	}
@@ -133,7 +158,7 @@ class Heap extends React.Component<Props, State>{
 					let {values} = this.state;
 
 					values = values.map(ele => { return {...ele, class:'heap-default'}});
-					this.setState({values});
+					if(this._isMounted) this.setState({values});
 
 					this.props.dispatch({
 						type: actions.ANIMATION_END,
@@ -156,16 +181,16 @@ class Heap extends React.Component<Props, State>{
 						const id = parseInt(ele, 10);
 						const {values} = this.state;
 						values[id].value = data[index].value;
-						this.setState({values});
+						if(this._isMounted) this.setState({values});
 					}
 					if(classes !== undefined){
 						const id = parseInt(ele, 10);
 						values[id].class = classes[index];
 					}
 				})
-				this.setState({values});
+				if(this._isMounted) this.setState({values});
 				this.refreshLayout();
-				setTimeout(step, ((duration === undefined) ? 1000 : duration)/this.props.speed);
+				setTimeout(step, ((duration === undefined) ? 1000/this.props.speed : duration)/this.props.speed);
 			}
 			step();
 		}
@@ -237,7 +262,7 @@ class Heap extends React.Component<Props, State>{
 
 		const {values} = this.state;
 		values.push({value: val, class: 'heap-default'});
-		this.setState({values});
+		if(this._isMounted) this.setState({values});
 
 		this.refreshLayout();
 		let animationPromise = new Promise((resolve, reject) => {
@@ -250,7 +275,7 @@ class Heap extends React.Component<Props, State>{
 		});
 		animationPromise.then(commands => {
 			//this.cy.autolock(true);
-			setTimeout(this.executeAnimation, 1000, commands);
+			setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
 		});
 	}
 
@@ -266,7 +291,7 @@ class Heap extends React.Component<Props, State>{
 		const lastValue = values[n];
 		values.pop();
 		if(n > 0) values[1] = lastValue;
-		this.setState({values});
+		if(this._isMounted) this.setState({values});
 
 		if (n === 1) return;
 
@@ -301,18 +326,18 @@ class Heap extends React.Component<Props, State>{
 		});
 		animationPromise.then(commands => {
 			//this.cy.autolock(true);
-			setTimeout(this.executeAnimation, 1000, commands);
+			setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
 		});
 	}
-	render() {
-		const cols = new Array(32).fill(<td style={{borderStyle: 'solid', borderWidth: '2px', textAlign: 'center', width:'3.125%'}}/>);
-		cols[0] = <td style={{borderStyle: 'solid', borderWidth: '2px', textAlign: 'center', width: '3.125%'}}>1</td>
 
+	render() {
 		return (
 			<Container fluid={true}>
 				<Row id="canvas" />
 				<HeapArray array={this.state.values}/>
 				<TreeBar insert={(v: number) => this.insert(v)} remove={() => this.remove()} />
+				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
+				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
 			</Container>
 		);
 	}
