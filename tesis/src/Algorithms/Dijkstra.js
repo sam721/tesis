@@ -6,10 +6,11 @@ const Dijkstra = (param) => {
   let comp = (x, y) => {
     return x.distance < y.distance;
   }
-  let commands = [];
   let pq = new PriorityQueue(comp);
   let dist = {};
   let visited = {};
+  const commands = [];
+  commands.push({line: 0, duration: 250}, {line: 1, duration: 250});
   dist[source] = 0;
   pq.push({
     distance: 0,
@@ -20,7 +21,7 @@ const Dijkstra = (param) => {
     {
       eles: cy.nodes().map(x => x.id()),
       distance: Array(cy.nodes().length).fill('\u221E'),
-      duration: 500,
+      duration: 1000,
       inst: [{
         name: 'fill',
         data: {
@@ -28,10 +29,12 @@ const Dijkstra = (param) => {
           class: 'heap-default',
         }
       }],
+      line: 3,
     }
   )
 
   while (!pq.isEmpty()) {
+    commands.push({line: 4});
     let { id, distance } = pq.top(); pq.pop();
     if (visited[id]) continue;
     visited[id] = true;
@@ -49,7 +52,8 @@ const Dijkstra = (param) => {
             value: distance.toString(),
             class: 'heap-wrong',
           }
-        }]
+        }],
+        line: 5,
       }
     )
     current.outgoers('edge').forEach(
@@ -60,6 +64,7 @@ const Dijkstra = (param) => {
           {
             eles: [edge.id()],
             style: [{ 'line-color': 'green', 'target-arrow-color': 'green' }],
+            line: 6,
             duration: 1000,
           }
         )
@@ -67,6 +72,9 @@ const Dijkstra = (param) => {
         if (prevDistance === undefined) prevDistance = 'inf';
         if (dist[nextId] === undefined || distance + weight < dist[nextId]) {
           dist[nextId] = distance + weight;
+          commands.push({
+            line: 7,
+          });
           pq.push({
             distance: distance + weight,
             id: nextId,
@@ -77,6 +85,7 @@ const Dijkstra = (param) => {
                 eles: [nextId],
                 distance: [(distance + weight) + '\u2264' + prevDistance],
                 duration: 1000,
+                line: 8,
               }
             );
           }
@@ -84,28 +93,31 @@ const Dijkstra = (param) => {
             {
               eles: [nextId],
               distance: [distance + weight],
-              duration: 500,
+              duration: 1000,
+              line: 8,
               inst: [{
                 name: 'change_element',
                 position: parseInt(next.data('value'), 10)-1,
                 data: {
                   value: (distance + weight).toString(),
                   class: 'heap-default',
-                }
+                },
               }]
             }
           )
+          commands.push({line: 9});
         } else {
           commands.push(
             {
               eles: [nextId],
               distance: [prevDistance + '\u2264' + (distance + weight)],
               duration: 1000,
+              line: 8,
             },
             {
               eles: [nextId],
               distance: [prevDistance],
-              duration: 500,
+              duration: 1000,
             }
           )
         }

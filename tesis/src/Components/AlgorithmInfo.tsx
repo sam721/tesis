@@ -1,5 +1,7 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
+import CodeBlock from './CodeBlock';
+import BFS from '../resources/pseudocodes/BFS';
 
 
 const {connect} = require('react-redux');
@@ -30,12 +32,12 @@ class AlgorithmInfo extends React.Component<any>{
         </Row>
         <Row style={{height: '50%'}}>
           <Col>
-            <div className="algorithm-description">
+            <div className="algorithm-description" >
               <div className="header">
                 <h4>Pseudocodigo</h4>
               </div>
               <div className="content">
-                Descripcion del algoritmo
+                <CodeBlock/>
               </div>
             </div>
           </Col>

@@ -17,6 +17,11 @@ const actions = {
     INC_SPEED: 'INC_SPEED',
     DEC_SPEED: 'DEC_SPEED',
     CHANGE_SPEED: 'CHANGE_SPEED',
+
+    CHANGE_LINE: 'CHANGE_LINE',
+
+    LOAD_GRAPH: 'LOAD_GRAPH',
+    FINISHED_LOAD: 'FINISHED_LOAD',
     
 }
 export default actions;

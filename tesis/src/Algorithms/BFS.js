@@ -7,7 +7,15 @@ const BFS = param => {
 	let color = {};
 	let q = new Queue();
 
-	let commands = [];
+	let commands = [{line: 0, duration: 250}, {line: 1, duration: 250}];
+
+	commands.push(
+		{
+			eles: [source],
+			style: [{ 'background-color': 'gray', 'color': 'black' }],
+			line: 3,
+		}
+	)
 
 	q.push(source);
 	commands.push(
@@ -20,34 +28,56 @@ const BFS = param => {
 						class: 'heap-default',
 					}
 				}
-			]
+			],
+			line: 4,
 		}
 	)
+	
 	while (!q.isEmpty()) {
+		commands.push({ line: 5});
 		let current = cy.getElementById(q.front()); q.pop();
 		if (color[current] === 'black') continue;
 		color[current.id()] = 'black';
-		commands.push({
-			eles: [current.id()],
-			style: [{ 'background-color': 'black', 'color': 'white' }],
-			inst: [
-				{
-					name: 'shift',
-				}
-			]
-		});
+		commands.push(
+			{
+				line: 6,
+				inst: [
+					{
+						name: 'shift',
+					}
+				],
+			},
+			{
+				eles: [current.id()],
+				style: [{ 'background-color': 'black', 'color': 'white' }],
+
+				line: 7,
+			}
+		);
 		current.outgoers('edge').forEach(
 			edge => {
 				let next = edge.target();
+				commands.push(
+					{
+						eles: [edge.id()],
+						style: [
+							{ 'line-color': 'green', 'target-arrow-color': 'green' }
+						],
+						line: 8,
+					},
+					{ line: 9}
+				);
+
 				if (color[next.id()] === undefined) {
 					color[next.id()] = 'gray';
 					commands.push(
 						{
-							eles: [next.id(), edge.id()],
-							style: [
-								{ 'background-color': 'gray', 'color': 'black' },
-								{ 'line-color': 'green', 'target-arrow-color': 'green' }
-							],
+							eles: [next.id()],
+							style: [{'background-color': 'gray', 'color': 'black'}],
+							line: 10,
+						},
+
+						{
 							inst: [
 								{
 									name: 'push',
@@ -56,17 +86,26 @@ const BFS = param => {
 										class: 'heap-default',
 									}
 								}
-							]
+							],
+							line: 11,
 						},
 						{
 							eles: [edge.id()],
 							style: [
 								{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }
 							],
-							duration: 1000,
+							duration: 10,
 						}
 					);
 					q.push(next.id());
+				}else{
+					commands.push({
+						eles: [edge.id()],
+						style: [
+							{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }
+						],
+						duration: 10,
+					});
 				}
 			}
 		)

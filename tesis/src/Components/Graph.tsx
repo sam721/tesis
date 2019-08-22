@@ -5,8 +5,8 @@ import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import ControlBar from './ControlBar';
 import { Row, Col, Container } from 'react-bootstrap';
 import GraphArray from './GraphArray';
-import downloadGif from '../utils/gifshot-utils';
 import MediaRecorder from '../utils/MediaRecorder';
+import MyModal from './UploadGraphModal';
 
 const Styles = require('../Styles/Styles');
 const popper = require('cytoscape-popper');
@@ -36,6 +36,9 @@ type Props = {
 		weight: string,
 	}
 	speed: number,
+
+	loadingGraph: Boolean,
+	data: string,
 }
 
 type Element = {
@@ -48,10 +51,13 @@ type storeState = {
 	algorithm: string,
 	animation: Boolean,
 	speed: number,
+	loadingGraph: Boolean,
+	data: string,
 }
 
 type State = {
 	values: Array<string>,
+	showModal: boolean,
 }
 
 const getNodeIdString = (nodeId: string) => {
@@ -64,6 +70,8 @@ const mapStateToProps = (state: storeState) => {
 		algorithm: state.algorithm,
 		animation: state.animation,
 		speed: state.speed,
+		loadingGraph: state.loadingGraph,
+		data: state.data,
 	}
 }
 
@@ -75,6 +83,7 @@ class Graph extends React.Component<Props, State>{
 
 	state = {
 		values: new Array(),
+		showModal: false,
 	}
 
 	layout = {
@@ -96,9 +105,8 @@ class Graph extends React.Component<Props, State>{
 			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_DIRECTED };
 		}
 	}
-	componentDidMount() {
 
-		this._isMounted = true;
+	initialize(elements: Array<Object>){
 		let edgeStyle = Styles.EDGE;
 		if (this.props.weighted) {
 			edgeStyle = { ...edgeStyle, ...Styles.EDGE_WEIGHTED };
@@ -110,8 +118,7 @@ class Graph extends React.Component<Props, State>{
 
 			container: document.getElementById('canvas'), // container to render in
 
-			elements: [
-			],
+			elements,
 
 			style: [ // the stylesheet for the graph
 				{
@@ -149,11 +156,26 @@ class Graph extends React.Component<Props, State>{
 			name: 'preset',
 		});
 		this.layout.run();
+	}
+
+	componentDidMount() {
+		this._isMounted = true;
+		this.initialize([]);
 		this.props.dispatch({
 			type: this.props.action,
 		})
 	}
 
+	componentDidUpdate(prevProps:Props){
+		if(!prevProps.loadingGraph && this.props.loadingGraph){
+			const elements = JSON.parse(this.props.data).elements;
+			if(elements)
+				this.initialize(JSON.parse(this.props.data).elements);
+			this.props.dispatch({
+				type: actions.FINISHED_LOAD,
+			});
+		}
+	}
 	componentWillUnmount() {
 		this.props.dispatch({
 			type: actions.ANIMATION_END,
@@ -224,7 +246,7 @@ class Graph extends React.Component<Props, State>{
 					this.cy.autolock(false);
 					return;
 				}
-				let { eles, distance, style, duration, inst} = commands[pos++];
+				let { eles, distance, style, duration, inst, line} = commands[pos++];
 				if (style) {
 					eles.forEach((ele, index) => {
 						this.cy.getElementById(ele).style(style[index]);
@@ -257,6 +279,12 @@ class Graph extends React.Component<Props, State>{
 					if(this._isMounted){
 						this.setState({values});
 					}
+				}
+				if(line != null && this._isMounted){
+					this.props.dispatch({
+						type: actions.CHANGE_LINE,
+						payload: {line}
+					})
 				}
 				this.refreshLayout();
 				setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
@@ -492,6 +520,10 @@ class Graph extends React.Component<Props, State>{
 		}
 	}
 	
+	showDialog = () => {
+		this.setState({showModal: !this.state.showModal});
+	}
+
 	render() {
 		let edgeWeight = null;
 		let { selection } = this.props;
@@ -500,21 +532,26 @@ class Graph extends React.Component<Props, State>{
 			edgeWeight = this.cy.getElementById(id).data('weight');
 		}
 		return (
-			<Container fluid={true}>
-				<Row id="canvas" />
-				<GraphArray array={this.state.values}/>
+			<>
+				<MyModal show={this.state.showModal} handleClose={this.showDialog}/>
+				<Container fluid={true}>
+					<Row id="canvas" />
+					<GraphArray array={this.state.values}/>
 
-				<ControlBar
-					run={this.runButton}
-					remove={this.removeButton}
-					clearGraph={this.clearGraph}
-					changeWeight={this.changeWeight}
-					weighted={this.props.weighted}
-					edgeWeight={edgeWeight}
-				/>
-				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-			</Container>
+					<ControlBar
+						run={this.runButton}
+						remove={this.removeButton}
+						clearGraph={this.clearGraph}
+						changeWeight={this.changeWeight}
+						weighted={this.props.weighted}
+						edgeWeight={edgeWeight}
+					/>
+					<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
+					<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
+					<button onClick={() => this._mediaRecorder.takeJson(this.cy)}>Test json</button>
+					<button onClick={() => this.setState({showModal: true})}>Test input</button>
+				</Container>
+			</>
 		)
 	}
 };

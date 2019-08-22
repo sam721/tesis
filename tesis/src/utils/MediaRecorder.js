@@ -7,7 +7,6 @@ class MediaRecorder{
   _interval = 0;
 
   downloadGif = (buffer, width, height) => {
-    console.log(buffer.length);
     gifshot.createGIF({
       'images': buffer,
       'gifWidth': width,
@@ -54,6 +53,39 @@ class MediaRecorder{
       this._takingGif = false;
       this._gifBuffer = [];
     }
+  }
+
+  takeJson(cy){
+    const graphCy = cy.json();
+    const graph = JSON.stringify({
+      elements: graphCy.elements,
+    });
+    
+    let link = document.createElement('a');
+    link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(graph));
+    link.setAttribute('download', 'graph.json');
+    link.setAttribute('target', '_blank');
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  readJson(cy){
+    /*
+    const graph = prompt("Insertar grafo en formato JSON");
+    if(graph){
+      console.log(JSON.parse(graph));
+      cy.json(JSON.parse(graph));
+    }
+    */
+   let input = document.createElement('input');
+   input.setAttribute('type', 'file');
+   input.setAttribute('id','myFile');
+   input.setAttribute('style', 'position: absolute');
+   document.body.appendChild(input);
+   input.click();
+   console.log(input.value);
   }
 }
 

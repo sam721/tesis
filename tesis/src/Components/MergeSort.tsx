@@ -157,14 +157,20 @@ class BubbleSort extends React.Component<Props> {
 					this.refreshLayout();
 					return;
 				}
-        let {nodes, duration} = commands[pos++];
+        let {nodes, duration, line} = commands[pos++];
         if(nodes){
           nodes.forEach(node => {
 						let ele = this.cy.getElementById(node.id);
 						ele.style({visibility: 'visible'})
 						layoutOptions.positions[node.id] = node.position;
           })
-        }
+				}
+				if(this._isMounted && line != null){
+					this.props.dispatch({
+						type: actions.CHANGE_LINE,
+						payload: {line},
+					});
+				}
 				this.refreshLayout();
 				setTimeout(step, ((duration === undefined) ? 1000/this.props.speed : duration)/this.props.speed);
 			}

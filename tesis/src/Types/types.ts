@@ -26,9 +26,11 @@ export type NODE = {
 	id: string,
 	value: string | number,
 }
+
 export type AnimationStep = {
 	eles: Array<string>,
 	style: Array<Object>,
+	line?: number,
 	distance?: Array<string>,
 	duration?: number,
 	classes?: Array<string>,
@@ -36,4 +38,6 @@ export type AnimationStep = {
 
 	nodes?: Array<NODE>,
 	inst?: Array<{name: string, position?: number, data?: {value: number, class?: string}}>,
+	
+	tableValues?: Object,
 }

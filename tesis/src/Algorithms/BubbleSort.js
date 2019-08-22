@@ -3,13 +3,14 @@ const BubbleSort = (param) => {
   for(let i = 0; i < param.length; i++) values.push(param[i]);
   const n = values.length;
 
-  const commands = [];
-  for(let j = values.length; j > 0; j--){
+  const commands = [{eles: [], style: [], line: 0}];
+  for(let j = 0; j < n; j++){
+    for(let i = 0; i < 3; i++) commands.push({eles: [], style: [], line: i+1});
     let sorted = true;
-    for(let i = 0; i <  j - 1; i++){
-      let bcolor;
+    for(let i = 0; i < n-1; i++){
+      let bcolor, swap=false;
       if(values[i] > values[i+1]){
-        sorted = false;
+        sorted = false; swap=true;
         [values[i], values[i+1]] = [values[i+1], values[i]];
         bcolor = 'LightCoral';
       }else bcolor = 'Chartreuse';
@@ -22,6 +23,7 @@ const BubbleSort = (param) => {
             {'background-color': bcolor},
           ], 
           duration: 1000,
+          line: 4,
         },
         {
           eles: [i.toString(), (i+1).toString()],
@@ -34,12 +36,20 @@ const BubbleSort = (param) => {
             {'value': values[i+1]},
           ],
           duration: 1000,
-        }
-      )
+          line: (swap ? 5 : 3)
+        },
+      );
+      if(swap) commands.push({eles: [], style: [], line: 3});
     }
-    if(sorted) break;
+    if(sorted){
+      commands.push({
+        eles: [],
+        style: [],
+        line:7
+      });
+      break;
+    }
   }
-  console.log(param);
   return commands;
 }
 

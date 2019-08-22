@@ -81,6 +81,7 @@
   height: 90%;
   margin-top: 10px;
   border-radius: 20px;
+  overflow: scroll;
 }
 
 .algorithm-description .header{
@@ -110,4 +111,11 @@
 .heap-correct{
   background-color: Chartreuse ;
   color: black;
+}
+
+.values-table div{
+  border-style: solid;
+  border-width: 0.5px;
+  border-color: black;
+  font-style: italic;
 }

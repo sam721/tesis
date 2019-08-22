@@ -15,25 +15,21 @@ class Editor extends React.Component {
 
 	render() {
 		return (
-			<Container fluid={true}>
-				<Row>
-					<Col>
-						<div>
-							<HashRouter>
-								<Route path="/BFS" render={() => <Graph {...properties.BFS} />} />
-								<Route path="/DFS" render={() => <Graph {...properties.DFS} />} />
-								<Route path="/Dijkstra" render={() => <Graph {...properties.Dijkstra} />} />
-								<Route path="/Prim" render={() => <Graph {...properties.Prim} />} />
-								<Route path="/Kruskal" render={() => <Graph {...properties.Kruskal} />} />
-								<Route path="/Heap" render={() => <Heap {...properties.Heap}/>}/>
-								<Route path="/AVL" render={() => <AVL {...properties.AVL}/>}/>
-								<Route path="/BubbleSort" render={() => <BubbleSort {...properties.BubbleSort}/>}/>
-								<Route path="/MergeSort" render={() => <MergeSort {...properties.MergeSort}/>}/>
-							</HashRouter>
-						</div>
-					</Col>
-				</Row>
-			</Container>
+			<Row>
+				<Col>
+					<HashRouter>
+						<Route path="/BFS" render={() => <Graph {...properties.BFS} />} />
+						<Route path="/DFS" render={() => <Graph {...properties.DFS} />} />
+						<Route path="/Dijkstra" render={() => <Graph {...properties.Dijkstra} />} />
+						<Route path="/Prim" render={() => <Graph {...properties.Prim} />} />
+						<Route path="/Kruskal" render={() => <Graph {...properties.Kruskal} />} />
+						<Route path="/Heap" render={() => <Heap {...properties.Heap} />} />
+						<Route path="/AVL" render={() => <AVL {...properties.AVL} />} />
+						<Route path="/BubbleSort" render={() => <BubbleSort {...properties.BubbleSort} />} />
+						<Route path="/MergeSort" render={() => <MergeSort {...properties.MergeSort} />} />
+					</HashRouter>
+				</Col>
+			</Row>
 		)
 	}
 }

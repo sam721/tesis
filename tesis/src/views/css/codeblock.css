@@ -1,0 +1,11 @@
+.codeblock span {
+  margin-bottom: 0px;
+  font-size: 15px;
+  font-family: monospace;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.codeblock{
+  padding-left: 10px;
+}

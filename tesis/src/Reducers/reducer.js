@@ -1,10 +1,21 @@
 import actions from '../Actions/actions'
 
+import BFS from '../resources/pseudocodes/BFS';
+import DFS from '../resources/pseudocodes/DFS';
+import dijkstra from '../resources/pseudocodes/dijkstra';
+import kruskal from '../resources/pseudocodes/kruskal';
+import bubblesort from '../resources/pseudocodes/bubblesort';
+import mergesort from '../resources/pseudocodes/mergesort';
+import prim from '../resources/pseudocodes/prim';
 const initialState = {
   algorithm: 'BFS',
   selection: null,
   animation: false,
   speed: 1.0,
+  loadingGraph: false,
+  data: null,
+  pseudo: null,
+  line: null,
 };
 
 const reducer = (state = initialState, action) => {
@@ -15,6 +26,7 @@ const reducer = (state = initialState, action) => {
         algorithm: 'BFS',
         selection: null,
         speed: 1.0,
+        pseudo: BFS,
       }
 
     case actions.SELECT_DFS:
@@ -23,6 +35,7 @@ const reducer = (state = initialState, action) => {
         algorithm: 'DFS',
         selection: null,
         speed: 1.0,
+        pseudo: DFS,
       }
     
     case actions.SELECT_DIJKSTRA:
@@ -31,6 +44,7 @@ const reducer = (state = initialState, action) => {
         algorithm: 'Dijkstra',
         selection: null,
         speed: 1.0,
+        pseudo: dijkstra,
       }
     
     case actions.SELECT_KRUSKAL:
@@ -39,7 +53,7 @@ const reducer = (state = initialState, action) => {
         algorithm: 'Kruskal',
         selection: null,
         speed: 1.0,
-
+        pseudo: kruskal,
       }
       
     case actions.SELECT_PRIM:
@@ -48,6 +62,7 @@ const reducer = (state = initialState, action) => {
         algorithm: 'Prim',
         selection: null,
         speed: 1.0,
+        pseudo: prim,
       }
     
     case actions.SELECT_HEAP:
@@ -72,6 +87,7 @@ const reducer = (state = initialState, action) => {
         algorithm: 'BubbleSort',
         selection: null,
         speed: 1.0,
+        pseudo: bubblesort,
       }
       
     case actions.SELECT_MERGESORT:
@@ -80,6 +96,7 @@ const reducer = (state = initialState, action) => {
         algorithm: 'MergeSort',
         selection: null,
         speed: 1.0,
+        pseudo: mergesort,
       }
 
     case actions.NO_SELECTION:
@@ -105,6 +122,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         animation: false,
+        line: null,
       }
     
     case actions.CLEAR_GRAPH:
@@ -130,6 +148,26 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         speed: action.payload.speed,
+      }
+
+    case actions.CHANGE_LINE:
+      return {
+        ...state,
+        line: action.payload.line,
+      }
+
+    case actions.LOAD_GRAPH:
+      return {
+        ...state,
+        loadingGraph: true,
+        data: action.payload.data,
+      }
+    
+    case actions.FINISHED_LOAD:
+      return {
+        ...state,
+        loadingGraph: false,
+        data: null,
       }
     default:
       return state;
