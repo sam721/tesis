@@ -48,3 +48,93 @@ export function getHeight(node){
   if(!node) return 0;
   return node.data('height');
 }
+
+export function validateAVL(text, addNode, addEdge, clearGraph){
+  let pos = 0, n = text.length, id = 0;
+  const nodes = [], edges = [];
+  const recursion = (min, max, parent=-1) => {
+    if(text[pos] === '.'){
+      pos++;
+      return {correct: true, height: 0, balance: 0};
+    }
+    let sign = 1;
+    if(text[pos] === '-'){
+      sign = -1; pos++;
+    }
+    if(pos === n || text[pos] < '0' || text[pos] > '9'){
+      return {correct: false};
+    }
+    let value = 0;
+    while(pos < n && text[pos] >= '0' && text[pos] <= '9'){
+      value = (value*10) + parseInt(text[pos++]);
+    }
+    value = value*sign;
+    if(value <= min || value >= max) return {correct: false}
+    const current = id++;
+    if(pos === n || text[pos] !== '(') return {correct: false}
+    pos++;
+    const left = recursion(min, value, current);
+    if(!left.correct || pos === n || text[pos] !== ')') return {correct: false}
+    pos++;
+    if(pos === n || text[pos] !== '(') return {correct: false}
+    pos++;
+    const right = recursion(value, max, current);
+    if(!right.correct || pos === n || text[pos] !== ')') return {correct: false}
+    pos++;
+
+    const height = Math.max(left.height, right.height) + 1;
+    const balance = right.height - left.height;
+
+    if(Math.abs(balance) > 1) return {correct: false};
+    nodes.push({id: current.toString(), value, height, balance});
+    if(parent !== -1){
+      edges.push({
+        source: parent.toString(),
+        target: current.toString(),
+      });
+    }
+    return {correct: true, height, balance};
+  }
+
+  const valid = recursion(-Infinity, Infinity);
+  if(!valid || pos !== n){
+    return false;
+  }
+
+  clearGraph();
+  nodes.forEach(node => {
+    addNode(node.id, node.value, node.height, node.balance);
+  });
+  edges.forEach(edge => {
+    addEdge(edge.source, edge.target);
+  });
+
+  return true;
+}
+
+export function parseAVL(root){
+  let output = "";
+
+  const recursion = node => {
+    if(!node){
+      output += ".";
+      return;
+    }
+    output += node.data('value').toString();
+    const [left, right] = getChildren(node);
+    output += "("; recursion(left); output += ")";
+    output += "("; recursion(right); output += ")";
+  }
+
+  recursion(root);
+
+  let link = document.createElement('a');
+  link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(output));
+  link.setAttribute('download', 'avl.txt');
+  link.setAttribute('target', '_blank');
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  return output;
+}

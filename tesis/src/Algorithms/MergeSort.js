@@ -4,6 +4,7 @@ const mergeSortAnimation = (input, width, height) => {
   const mergeSort = (param, start, l, r, h) => {
     const values = [...param];
     const n = values.length;
+    if(start === 0 && l === 0) console.log(h);
     let cmd = {
       nodes: [],
       line: 0,

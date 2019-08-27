@@ -24,11 +24,13 @@ class MediaRecorder{
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
+        }else{
+          console.log(obj.error);
         }
       }
     );
   }
-  takePicture(_this, cy, download = true){
+  takePicture(cy, _this = null, download = true){
     console.log('Taking picture');
     let image = cy.jpg();
     if(download){
@@ -40,15 +42,16 @@ class MediaRecorder{
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }else _this._gifBuffer.push(image);
+    }else if(_this._gifBuffer.length < 600) _this._gifBuffer.push(image);
   }
 
   takeGif(cy){
     if(!this._takingGif){
       this._takingGif = true;
-      this._interval = setInterval(this.takePicture, 100, this, cy, false);
+      this._interval = setInterval(this.takePicture, 100, cy, this, false);
     }else{
       clearInterval(this._interval);
+      console.log(this._gifBuffer.length);
       this.downloadGif(this._gifBuffer, cy.width(), cy.height());
       this._takingGif = false;
       this._gifBuffer = [];
@@ -87,6 +90,8 @@ class MediaRecorder{
    input.click();
    console.log(input.value);
   }
+
+  
 }
 
 export default MediaRecorder;

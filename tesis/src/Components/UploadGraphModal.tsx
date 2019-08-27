@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Button } from 'react-bootstrap';
 import actions from '../Actions/actions';
@@ -10,7 +10,7 @@ type Props = {
   dispatch: (action: Object) => Object,
 }
 
-class MyModal extends React.Component<Props>{
+class UploadGraphModal extends React.Component<Props>{
 
   uploadGraph = () => {
     const input = (document.getElementById('graphUploadInput') as HTMLInputElement);
@@ -55,4 +55,4 @@ class MyModal extends React.Component<Props>{
   }
 }
 
-export default connect()(MyModal);
+export default connect()(UploadGraphModal);

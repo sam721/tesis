@@ -188,6 +188,10 @@ class PriorityQueue {
 
 		return commands;
 	}
+
+	clear(){
+		while(!this.isEmpty()) this.pop();
+	}
 }
 
 export default PriorityQueue;

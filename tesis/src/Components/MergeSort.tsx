@@ -2,9 +2,9 @@ import React from 'react';
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import { Container, Row } from 'react-bootstrap';
 import ControlBar from './ControlBar';
+import InputArrayModal from './InputArrayModal';
 import Mergesort from '../Algorithms/MergeSort';
 import actions from '../Actions/actions';
-import downloadGif from '../utils/gifshot-utils';
 import MediaRecorder from '../utils/MediaRecorder';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
@@ -16,6 +16,11 @@ type options = {
   padding: number,
   animate: boolean,
   animationDuration: number,
+}
+
+type State = {
+	show: boolean,
+	values: Array<number>,
 }
 
 let layoutOptions: options = {
@@ -44,12 +49,15 @@ const mapStateToProps = (state: storeState) => {
   }
 }
 
-class BubbleSort extends React.Component<Props> {
+class BubbleSort extends React.Component<Props, State> {
 	_isMounted = false;
 	_mediaRecorder = new MediaRecorder();
   cy = cytoscape();
 
-  values = [4,-8,1,2,10,-1,4,10,-69,100,13,-44,13,495,-13,69];
+  state = {
+		show: false,
+		values: [1,4,8,1,4,3,6,9,10,-10],
+	}
 
 	layout = {
 		run: () => { },
@@ -100,11 +108,15 @@ class BubbleSort extends React.Component<Props> {
 		this.props.dispatch({
 			type: this.props.action,
     })
-    
+		
+		this.initialize();
 	}
 	
-	componentDidUpdate(){
-    layoutOptions.animationDuration = 500/this.props.speed;
+	componentDidUpdate(_prevProps:Props, prevState:State){
+		layoutOptions.animationDuration = 500/this.props.speed;
+		if(prevState.values !== this.state.values){
+			this.initialize();
+		}
 	}
 	
 	componentWillUnmount(){
@@ -129,15 +141,22 @@ class BubbleSort extends React.Component<Props> {
     this.layout.run();
 	}
   
-  addNode = (id: string, value: number | string, hidden: boolean) => {
+  addNode = (id: string, value: number | string) => {
     this.cy.add({
       group: 'nodes',
       data: {
         id,
         value,
-      },
+			},
+			position: {
+				x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
+				y: this.cy.height()/2,
+			},
 		});
-		if(hidden) this.cy.getElementById(id).style({visibility: 'hidden'});
+		layoutOptions.positions[id] = {
+			x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
+			y: this.cy.height()/2,
+		}
   }
   
   executeAnimation = (commands: Array<AnimationStep>) => {
@@ -159,6 +178,7 @@ class BubbleSort extends React.Component<Props> {
 				}
         let {nodes, duration, line} = commands[pos++];
         if(nodes){
+					console.log(nodes);
           nodes.forEach(node => {
 						let ele = this.cy.getElementById(node.id);
 						ele.style({visibility: 'visible'})
@@ -172,40 +192,67 @@ class BubbleSort extends React.Component<Props> {
 					});
 				}
 				this.refreshLayout();
+				console.log(this.cy.nodes());
 				setTimeout(step, ((duration === undefined) ? 1000/this.props.speed : duration)/this.props.speed);
 			}
 			step();
 		}
 		animation();
-  }
+	}
+	
+	initialize(){
+		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
+    for(let i = 0; i < this.state.values.length; i++){
+      this.addNode(i.toString(), this.state.values[i]);
+		}
+	}
 
   runButton = () => {
-    this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
-    console.log(this.values);
+    if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_END,
+			});
+			this.initialize();
+			return;
+		}
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => { 
       this.props.dispatch({
         type: actions.ANIMATION_START,
 			})
-			for(let i = 0; i < this.values.length; i++) this.addNode(i.toString(), this.values[i], true);
-      const commands = Mergesort(this.values, this.cy.width(), this.cy.height());
+      const commands = Mergesort(this.state.values, this.cy.width(), this.cy.height());
       resolve(commands);
     }).then((commands: Array<AnimationStep>) => {
-			console.log(commands);
       setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
     })
-   
+	}
+	
+	handleClose = () => {
+		this.setState({show: false});
+	}
+
+	changeArray = (values: Array<number>) => {
+		this.setState({values});
 	}
 
   render(){
     return (
-			<Container fluid={true}>
-				<Row id="canvas" />
-				<ControlBar
-					run={this.runButton}
+			<>
+				<InputArrayModal 
+					show={this.state.show} 
+					handleClose={this.handleClose} 
+					changeArray={this.changeArray}
+					currentValues={this.state.values}
 				/>
-				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-			</Container>
+				<Container fluid={true}>
+					<Row id="canvas" />
+					<ControlBar
+						run={this.runButton}
+					/>
+					<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
+					<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
+					<button onClick={() => this.setState({show: true})}>Change array</button>
+				</Container>
+			</>
 		)
   }
 }

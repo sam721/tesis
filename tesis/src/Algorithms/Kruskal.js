@@ -39,10 +39,15 @@ const Kruskal = param => {
     if(!ds.connected(x, y)){
       ds.join(x, y);
       weight += edge.data('weight');
+      const source = edge.source(), target = edge.target();
       commands.push(
         {
-          eles: [edge.id()],
-          style: [{'line-style': 'solid', 'line-color': 'black'}],
+          eles: [edge.id(), source.id(), target.id()],
+          style: [
+            {'line-style': 'solid', 'line-color': 'black'},
+            {'background-color': 'red'},
+            {'background-color': 'red'},
+          ],
           duration: 1000,
           line: 6,
         },
@@ -61,11 +66,6 @@ const Kruskal = param => {
     }
   }
 
-  commands.push({
-    eles: edges.map(x => x.data('id')),
-    style: Array(cy.edges().length).fill({'line-style': 'solid', 'line-color': '#ccc'}),
-    duration: 10,
-  })
   return commands;
 }
 

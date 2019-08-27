@@ -4,13 +4,14 @@ import actions from '../Actions/actions';
 import downloadGif from '../utils/gifshot-utils'
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import TreeBar from './TreeBar';
+import InputAVLModal from './InputAVLModal';
 import { Row, Container } from 'react-bootstrap';
 import PriorityQueue from '../Algorithms/DS/PriorityQueue'
 
 import HeapArray from './HeapArray';
 import { number, string } from 'prop-types';
 
-import {isLeaf, getChildren, inorderSuccessor, getHeight, lca} from '../utils/avl-utils';
+import {isLeaf, getChildren, getHeight, lca, parseAVL} from '../utils/avl-utils';
 import {edgeId} from '../utils/cy-utils';
 import MediaRecorder from '../utils/MediaRecorder';
 
@@ -47,7 +48,7 @@ type Element = {
 }
 
 type State = {
-  values: Array<Element>,
+  show: boolean,
 }
 
 type Props = {
@@ -80,6 +81,10 @@ class AVL extends React.Component<Props, State>{
   };
 
   treeRoot = "";
+
+  state = {
+    show: false,
+  }
 
   nodeStyle = Styles.NODE;
   edgeStyle = Styles.EDGE;
@@ -166,14 +171,15 @@ class AVL extends React.Component<Props, State>{
     this.cy.remove('edge[id="'+edgeId(source, target)+'"]');
   }
 
-  addNode = (id: string, value: number) => {
+  addNode = (id: string, value: number, height:number=0, balance:number=0) => {
+    console.log('INSERTAR ' + value + ' ' + balance)
     this.cy.add({
       group: 'nodes',
       data: {
         id,
         value,
-        height: 0,
-        balance: 0,
+        height,
+        balance,
       }
     });
     /*
@@ -196,14 +202,16 @@ class AVL extends React.Component<Props, State>{
     node.on('position', update);
     */
   }
-
+  
   addEdge = (source: string, target: string) => {
+    console.log(source, target);
     this.cy.add({
       group: 'edges',
       data: {
         id: edgeId(source, target), source, target,
       }
     });
+    this.cy.getElementById(target).data('prev', source);
     //this.refreshLayout();
   }
 
@@ -270,6 +278,7 @@ class AVL extends React.Component<Props, State>{
     const levels:{[lvl: number]: Array<string>} = {};
 
     const dfs = (node: CytoscapeElement, depth: number, x: number) => {
+      console.log(node.data('value'));
       node.data('depth', depth);
       node.data('X', x);
       
@@ -288,8 +297,8 @@ class AVL extends React.Component<Props, State>{
     }
 
     let height = dfs(this.cy.getElementById(this.treeRoot), 0, 0);
-
-    while(true){
+    let iter = 0;
+    while(iter++ < 1000){
       let correct = true;
       for(let i = height-1; i >= 0; i--){
         const current = levels[i];
@@ -309,7 +318,9 @@ class AVL extends React.Component<Props, State>{
       }
       if(correct) break;
     }
-    
+    if(iter === 1001){
+      console.error('ALERT, INFINITE LOOP AVOIDED');
+    }
 
     const setSep = (node: CytoscapeElement, nx: number, ny: number) => {
       layoutOptions.positions[node.id()] = { x: node.data('X')*24 + nx, y: ny }
@@ -331,20 +342,20 @@ class AVL extends React.Component<Props, State>{
     if(B){
       this.removeEdge(y.id(), B.id());
       this.addEdge(x.id(), B.id());
-      B.data('prev', x.id());
+      //B.data('prev', x.id());
     }
+    const prev = x.data('prev');
     this.addEdge(y.id(), x.id());
 
     if(this.treeRoot !== x.id()){
-      const prev = x.data('prev');
       this.removeEdge(prev, x.id());
       this.addEdge(prev, y.id());
-      y.data('prev', prev);
+      //y.data('prev', prev);
     }else{
       this.treeRoot = y.id();
       console.log(this.treeRoot);
     }
-    x.data('prev', y.id());
+    //x.data('prev', y.id());
 
     x.data('height', Math.max(getHeight(B), getHeight(C))+1);
     y.data('height', Math.max(getHeight(A), getHeight(x))+1);
@@ -361,20 +372,20 @@ class AVL extends React.Component<Props, State>{
     if(B){
       this.removeEdge(x.id(), B.id());
       this.addEdge(y.id(), B.id());
-      B.data('prev', y.id());
+      //B.data('prev', y.id());
     }
+    const prev = y.data('prev');
     this.addEdge(x.id(), y.id());
-
+    
     if(this.treeRoot !== y.id()){
-      const prev = y.data('prev');
       this.removeEdge(prev, y.id());
       this.addEdge(prev, x.id());
-      x.data('prev', prev);
+      //x.data('prev', prev);
     }else{
       this.treeRoot = x.id();
       console.log(this.treeRoot);
     }
-    y.data('prev', x.id());
+    //y.data('prev', x.id());
 
     y.data('height', Math.max(getHeight(A), getHeight(B))+1);
     x.data('height', Math.max(getHeight(y), getHeight(C))+1);
@@ -394,7 +405,7 @@ class AVL extends React.Component<Props, State>{
         node.data('height', Math.max(lh, rh)+1);
         const bal = rh - lh;
         node.data('balance', bal);
-        //console.log('NODO ' + node.id() + ' BAL ' + bal);
+        console.log('NODO ' + node.id() + ' BAL ' + bal);
         if(bal === 2){
           if(right.data('balance') >= 0) this.rotateRight(node);
           else{
@@ -472,9 +483,9 @@ class AVL extends React.Component<Props, State>{
           }else{
             if(prev){
               this.addEdge(prev.id(), newNode.id());
-              newNode.data(
+              /*newNode.data(
                 'prev', prev.id(),
-              );
+              );*/
             }
             this.refreshLayout();
             setTimeout(resolve, 1000/this.props.speed, null);
@@ -600,15 +611,36 @@ class AVL extends React.Component<Props, State>{
     else this.rotateRight(this.cy.getElementById(selection.id));
   }
 
+  handleClose = (update: boolean = false) => {
+    this.setState({show: false});
+    if(update){
+      this.treeRoot = "0";
+      this.refreshLayout();
+    }
+  }
+
+  clearGraph = () => {
+		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
+  }
+
   render() {
     return (
       <Container fluid={true}>
+        <InputAVLModal 
+          show={this.state.show} 
+          handleClose={this.handleClose} 
+          addNode={this.addNode} 
+          addEdge={this.addEdge} 
+          clearGraph={this.clearGraph}
+        />
         <Row id="canvas" />
         <TreeBar insert={(v: number) => this.insert(v)} remove={() => this.remove()} />
         <button onClick = {() => this.testRotation(0)}>Test left rotation</button>
         <button onClick = {() => this.testRotation(1)}>Test right rotation</button>
         <button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
 				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
+        <button onClick={() => this.setState({show: true})}>Test AVL input</button>
+        <button onClick={() => parseAVL(this.cy.getElementById(this.treeRoot))}>Test AVL output</button>
       </Container>
     );
   }

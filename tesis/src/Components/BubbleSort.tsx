@@ -5,6 +5,7 @@ import ControlBar from './ControlBar';
 import Bubblesort from '../Algorithms/BubbleSort';
 import actions from '../Actions/actions';
 import MediaRecorder from '../utils/MediaRecorder';
+import InputArrayModal from './InputArrayModal';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -20,6 +21,12 @@ type Props = {
   speed: number,
   dispatch: (action: Object) => Object,
 }
+
+type State = {
+	show: boolean,
+	values: Array<number>,
+}
+
 const mapStateToProps = (state: storeState) => {
   return {
     animation: state.animation,
@@ -27,14 +34,17 @@ const mapStateToProps = (state: storeState) => {
   }
 }
 
-class BubbleSort extends React.Component<Props> {
+class BubbleSort extends React.Component<Props, State> {
 	_isMounted = false;
 	
 	_mediaRecorder = new MediaRecorder();
 
   cy = cytoscape();
 
-  values = [1,4,8,1,4,3,6,9,10,-1];
+	state = {
+		show: false,
+		values: [1,4,8,1,4,3,6,9,10,-1],
+	}
 
 	layout = {
 		run: () => { },
@@ -88,9 +98,15 @@ class BubbleSort extends React.Component<Props> {
 		this.props.dispatch({
 			type: this.props.action,
     })
-    
+		
+		this.initialize();
 	}
 	
+	componentDidUpdate(prevProps: Props, prevState: State){
+		if(prevState.values !== this.state.values){
+			this.initialize();
+		}
+	}
 	componentWillUnmount(){
     this.props.dispatch({
       type: actions.ANIMATION_END,
@@ -173,33 +189,58 @@ class BubbleSort extends React.Component<Props> {
 		animation();
   }
 
-  runButton = () => {
-    this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
-    console.log(this.values);
-    for(let i = 0; i < this.values.length; i++){
-      this.addNode(i.toString(), this.values[i]);
+	initialize(){
+		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
+    for(let i = 0; i < this.state.values.length; i++){
+      this.addNode(i.toString(), this.state.values[i]);
       this.refreshLayout();
     }
+	}
+
+  runButton = () => {
+    if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_END,
+			});
+			this.initialize();
+			return;
+		}
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => { 
       this.props.dispatch({
         type: actions.ANIMATION_START,
       })
-      const commands = Bubblesort(this.values);
+      const commands = Bubblesort(this.state.values);
       resolve(commands);
     }).then((commands: Array<AnimationStep>) => {
       setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
     })
-   
 	}
+
+	handleClose = () => {
+		this.setState({show: false});
+	}
+	
+
+	changeArray = (values: Array<number>) => {
+		this.setState({values});
+	}
+
   render(){
     return (
 			<Container fluid={true}>
+				<InputArrayModal 
+					show={this.state.show} 
+					handleClose={this.handleClose} 
+					changeArray={this.changeArray}
+					currentValues={this.state.values}
+				/>
 				<Row id="canvas" />
 				<ControlBar
 					run={this.runButton}
 				/>
 				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
 				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
+				<button onClick={() => this.setState({show: true})}>Change array</button>
 			</Container>
 		)
   }

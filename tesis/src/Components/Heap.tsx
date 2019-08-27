@@ -8,7 +8,9 @@ import PriorityQueue from '../Algorithms/DS/PriorityQueue'
 import downloadGif from '../utils/gifshot-utils';
 import HeapArray from './HeapArray';
 import { number, string } from 'prop-types';
+import InputHeapModal from './InputHeapModal';
 import MediaRecorder from '../utils/MediaRecorder';
+import { parseHeap } from '../utils/heap-utils';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -41,6 +43,7 @@ type Element = {
 
 type State = {
 	values: Array<Element>,
+	show: boolean,
 }
 
 type Props = {
@@ -62,6 +65,7 @@ class Heap extends React.Component<Props, State>{
 
 	state = {
 		values: [{value: 0, class: 'heap-default'}],
+		show: false,
 	}
 
 	layout = {
@@ -330,15 +334,68 @@ class Heap extends React.Component<Props, State>{
 		});
 	}
 
+	changeArray(values: Array<number>){
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			this.cy.remove(node);
+		});
+		this.heap.clear();
+		for(let i = 1; i < values.length; i++){
+			this.heap.push(values[i]);
+			this.cy.add(
+				{
+					group: 'nodes',
+					data: { id: (i).toString(), value: values[i] },
+					grabbable: false,
+					pannable: false,
+				},
+			);
+		}
+		for(let i = 1; 2*i < values.length; i++){
+			const left = 2*i, right = 2*i + 1;
+			this.cy.add({
+				group: 'edges',
+				data: {
+					id:  (i).toString() + '-' + (left).toString(),
+					source: (i).toString(),
+					target: (left).toString(),
+				}
+			});
+			if(right < values.length){
+				this.cy.add({
+					group: 'edges',
+					data: {
+						id:  (i).toString() + '-' + (right).toString(),
+						source: (i).toString(),
+						target: (right).toString(),
+					}
+				});
+			}
+		}
+		const stateValues = Array(values.length);
+		values.forEach((value, i) => {
+			stateValues[i] = {value, class: 'heap-default'}
+		});
+		this.setState({values: stateValues});
+		this.refreshLayout();
+	}
 	render() {
 		return (
-			<Container fluid={true}>
-				<Row id="canvas" />
-				<HeapArray array={this.state.values}/>
-				<TreeBar insert={(v: number) => this.insert(v)} remove={() => this.remove()} />
-				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-			</Container>
+			<>
+				<InputHeapModal 
+					show={this.state.show}
+					changeArray = {(values: Array<number>) => this.changeArray(values)}
+					handleClose = {() => this.setState({show: false})}
+				/>
+				<Container fluid={true}>
+					<Row id="canvas" />
+					<HeapArray array={this.state.values}/>
+					<TreeBar insert={(v: number) => this.insert(v)} remove={() => this.remove()} />
+					<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
+					<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
+					<button onClick={() => this.setState({show: true})}>Test input heap</button>
+					<button onClick={() => parseHeap(this.state.values)}>Test output heap</button>
+				</Container>
+			</>
 		);
 	}
 }

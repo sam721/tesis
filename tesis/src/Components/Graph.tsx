@@ -234,7 +234,8 @@ class Graph extends React.Component<Props, State>{
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
-				if (pos === commands.length || !this.props.animation) {
+				if(pos === commands.length) return;
+				if (!this.props.animation) {
 					this.cy.nodes().style(this.nodeStyle);
 					this.cy.edges().style(this.edgeStyle);
 					this.props.dispatch({
@@ -300,6 +301,9 @@ class Graph extends React.Component<Props, State>{
 			this.props.dispatch({
 				type: actions.ANIMATION_END,
 			});
+			this.cy.nodes().style(this.nodeStyle);
+			this.cy.edges().style(this.edgeStyle);
+			this.cy.autolock(false);
 			return;
 		}
 		let { selection } = this.props;

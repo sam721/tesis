@@ -123,19 +123,6 @@ const Prim = param => {
       }], 
     });
   }
-   
-  commands.push(
-    {
-      eles: edges.map(x => x.data('id')),
-      style: Array(cy.edges().length).fill({'line-style': 'solid', 'line-color': '#ccc'}),
-      duration: 10,
-    },
-    {
-      eles: nodes.map(x => x.id()),
-      style: Array(cy.nodes().length).fill({'background-color':'white', 'color':'black'}),
-      duration: 10,
-    }
-  )
   return commands;
 }
 
