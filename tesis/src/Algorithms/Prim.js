@@ -11,6 +11,11 @@ const Prim = param => {
   const commands = [];
   commands.push(
     {
+      eles: nodes.map(x => x.data('id')),
+      distance: Array(cy.nodes().length).fill('\u221E'),
+      lines: [1,2,3,4,5],
+    },
+    {
       eles: edges.map(x => x.data('id')),
       style: Array(cy.edges().length).fill({'line-style': 'dashed', 'line-color': '#eee'}),
       duration: 1000,
@@ -19,6 +24,7 @@ const Prim = param => {
   );
   
   nodes.forEach(node => {
+    if(node.id().match('-popper')) return;
     pq.push({target: node.id(), edgeId: 'NONE', weight: Infinity})
   })
   let mst = 0;
@@ -77,6 +83,9 @@ const Prim = param => {
       if(dist[t] === undefined || dist[t] > w){
         commands.push({
           lines: [13,14],
+          eles: [t],
+          style: [{'background-color': 'gray'}],
+          distance: [w],
           inst: [{
             name: 'change_element',
             position: parseInt(cy.getElementById(t).data('value'), 10) - 1,

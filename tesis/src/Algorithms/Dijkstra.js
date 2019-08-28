@@ -74,6 +74,8 @@ const Dijkstra = (param) => {
           dist[nextId] = distance + weight;
           commands.push({
             lines: [7],
+            eles: [nextId],
+            style: [{'background-color': 'gray'}],
           });
           pq.push({
             distance: distance + weight,

@@ -10,6 +10,7 @@ export const NODE = {
 	'label': 'data(value)',
 	'text-valign': 'center',
 	'text-halign': 'center',
+	'z-index': 10,
 };
 
 export const NODE_SELECTED = {

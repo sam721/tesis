@@ -9,15 +9,12 @@ import MediaRecorder from '../utils/MediaRecorder';
 import MyModal from './UploadGraphModal';
 
 const Styles = require('../Styles/Styles');
-const popper = require('cytoscape-popper');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
 
 
 const autopanOnDrag = require('cytoscape-autopan-on-drag');
 autopanOnDrag(cytoscape);
-
-cytoscape.use(popper);
 
 type Props = {
 	dispatch: (action: Object) => Object,
@@ -147,7 +144,7 @@ class Graph extends React.Component<Props, State>{
 			wheelSensitivity: 1,
 			pixelRatio: '1.0'
 		});
-
+		this.removePoppers();
 		this.cy.on('click', (event: CytoEvent) => this.handleClickViewport(event));
 		this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
 		this.cy.on('click', 'edge', (event: CytoEvent) => this.handleClickOnEdge(event.target));
@@ -182,14 +179,7 @@ class Graph extends React.Component<Props, State>{
 		});
 		
 		this._isMounted = false;
-		let nodes = this.cy.nodes();
-		nodes.forEach((node: CytoscapeElement) => {
-			let id = node.id();
-			let popper = document.getElementById(id + 'popper');
-			if (popper) {
-				document.body.removeChild(popper);
-			}
-		});
+		this.removePoppers();
 	}
 
 	refreshLayout() {
@@ -210,10 +200,8 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	removeNodePopper(node: string) {
-		let nodePopper = document.getElementById(node + 'popper');
-		if (nodePopper) {
-			document.body.removeChild(nodePopper);
-		}
+		this.cy.remove('node[id="' + node + '-popper"]');
+
 	}
 
 	removeNode = (node: string) => {
@@ -255,8 +243,12 @@ class Graph extends React.Component<Props, State>{
 				}
 				if(eles){
 					eles.forEach((node, index) => {
-						let nodeDom = document.getElementById(node + 'popper');
-						if (nodeDom && distance !== undefined) nodeDom.innerHTML = distance[index];
+						
+						if (distance !== undefined){
+							this.cy.getElementById(node+'-popper').style({visibility: 'visible'});
+							this.cy.getElementById(node+'-popper').data('value', distance[index]);
+						}
+						
 					});
 				}
 				if(inst){
@@ -303,6 +295,7 @@ class Graph extends React.Component<Props, State>{
 			});
 			this.cy.nodes().style(this.nodeStyle);
 			this.cy.edges().style(this.edgeStyle);
+			this.removePoppers();
 			this.cy.autolock(false);
 			return;
 		}
@@ -314,7 +307,11 @@ class Graph extends React.Component<Props, State>{
 				return;
 			}
 		}
-
+		const nodes = this.cy.nodes();
+		nodes.forEach((node:CytoscapeElement) => {
+			this.createPopper(node.id());
+		});
+		this.refreshLayout();
 		let animationPromise = new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
 			this.props.dispatch({
 				type: actions.ANIMATION_START,
@@ -454,24 +451,34 @@ class Graph extends React.Component<Props, State>{
 			data: { id: nodeId, value: id },
 			position: { x, y }
 		});
+	}
 
-		let node = this.cy.getElementById(nodeId);
-
-		let popper = node.popper({
-			content: () => {
-				let div = document.createElement('div');
-				div.setAttribute('id', nodeId + 'popper');
-				document.body.appendChild(div);
-
-				return div;
+	createPopper(nodeId: string){
+		const ele = this.cy.getElementById(nodeId);
+		const position = ele.position();
+		this.cy.add({
+			group: 'nodes',
+			data: {id : nodeId+'-popper'},
+			position: {
+				x: position.x,
+				y: position.y+30,
+			},
+			style: {
+				'z-index': 0,
+				'border-width': 0,
+				'font-size': 15,
+				'width': 10,
+				'height': 10,
+				'visibility': 'hidden',
 			}
 		});
+	}
 
-		let update = () => {
-			popper.scheduleUpdate();
-		};
-
-		node.on('position', update);
+	removePoppers(){
+		const nodes = this.cy.nodes();
+		nodes.forEach((node:CytoscapeElement) => {
+			this.removeNode(node.id()+'-popper');
+		})
 	}
 
 	createEdge(x: string, y: string) {
