@@ -247,7 +247,7 @@ class Graph extends React.Component<Props, State>{
 					this.cy.autolock(false);
 					return;
 				}
-				let { eles, distance, style, duration, inst, line} = commands[pos++];
+				let { eles, distance, style, duration, inst, lines} = commands[pos++];
 				if (style) {
 					eles.forEach((ele, index) => {
 						this.cy.getElementById(ele).style(style[index]);
@@ -281,10 +281,10 @@ class Graph extends React.Component<Props, State>{
 						this.setState({values});
 					}
 				}
-				if(line != null && this._isMounted){
+				if(lines != null && this._isMounted){
 					this.props.dispatch({
 						type: actions.CHANGE_LINE,
-						payload: {line}
+						payload: {lines}
 					})
 				}
 				this.refreshLayout();

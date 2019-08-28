@@ -28,7 +28,7 @@ class InputArrayModal extends React.Component<Props, State>{
   }
 
   validateArray(text: string) {
-    let regex = /^(([-]?([0-9]{1,3})[,]){0,15})([-]?([0-9]{1,3}))$/;
+    let regex = /^(([-]?([0-9]{1,3})([,][ ]*)){0,15})([-]?([0-9]{1,3}))$/;
     if (text && regex.test(text)) {
       return true;
     } else {

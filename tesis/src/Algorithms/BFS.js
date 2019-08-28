@@ -7,19 +7,12 @@ const BFS = param => {
 	let color = {};
 	let q = new Queue();
 
-	let commands = [{line: 0, duration: 250}, {line: 1, duration: 250}];
-
+	let commands = [{lines: [1,2], duration: 1000}];
+	q.push(source);
 	commands.push(
 		{
 			eles: [source],
 			style: [{ 'background-color': 'gray', 'color': 'black' }],
-			line: 3,
-		}
-	)
-
-	q.push(source);
-	commands.push(
-		{
 			inst: [
 				{
 					name: 'push',
@@ -29,29 +22,25 @@ const BFS = param => {
 					}
 				}
 			],
-			line: 4,
+			lines: [3,4],
 		}
 	)
 	
 	while (!q.isEmpty()) {
-		commands.push({ line: 5});
+		commands.push({ lines: [5]});
 		let current = cy.getElementById(q.front()); q.pop();
 		if (color[current] === 'black') continue;
 		color[current.id()] = 'black';
 		commands.push(
 			{
-				line: 6,
+				eles: [current.id()],
+				style: [{ 'background-color': 'black', 'color': 'white' }],
+				lines: [6,7],
 				inst: [
 					{
 						name: 'shift',
 					}
 				],
-			},
-			{
-				eles: [current.id()],
-				style: [{ 'background-color': 'black', 'color': 'white' }],
-
-				line: 7,
 			}
 		);
 		current.outgoers('edge').forEach(
@@ -63,9 +52,9 @@ const BFS = param => {
 						style: [
 							{ 'line-color': 'green', 'target-arrow-color': 'green' }
 						],
-						line: 8,
+						lines: [8],
 					},
-					{ line: 9}
+					{ lines: [9]}
 				);
 
 				if (color[next.id()] === undefined) {
@@ -74,10 +63,6 @@ const BFS = param => {
 						{
 							eles: [next.id()],
 							style: [{'background-color': 'gray', 'color': 'black'}],
-							line: 10,
-						},
-
-						{
 							inst: [
 								{
 									name: 'push',
@@ -87,7 +72,7 @@ const BFS = param => {
 									}
 								}
 							],
-							line: 11,
+							lines: [10,11]
 						},
 						{
 							eles: [edge.id()],

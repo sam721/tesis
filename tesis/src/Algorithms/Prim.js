@@ -8,17 +8,14 @@ const Prim = param => {
   const dist = {};
   const part_of_tree = {};
   const pq = new PriorityQueue((x, y) => x.weight <= y.weight);
-  const commands = [{line: 0}];
+  const commands = [];
   commands.push(
     {
       eles: edges.map(x => x.data('id')),
       style: Array(cy.edges().length).fill({'line-style': 'dashed', 'line-color': '#eee'}),
       duration: 1000,
-      line: 1,
-    },
-    {
-      line: 2, duration: 1000,
-    },
+      lines: [1,2,3,4,5],
+    }
   );
   
   nodes.forEach(node => {
@@ -30,17 +27,9 @@ const Prim = param => {
     const{target, edgeId, weight} = edge;
     if(part_of_tree[target]) continue;
     if(weight === Infinity) dist[target] = 0;
-    commands.push({line: 6, duration: 1000}, {line: 7, duration: 1000});
+    commands.push({lines: [6], duration: 1000});
 
     part_of_tree[target] = true;
-    if(edgeId !== 'NONE'){
-      commands.push({
-        eles: [edgeId],
-        style: [{'line-color': 'green'}],
-        duration: 1000,
-      });
-      part_of_tree[edgeId]=true;
-    }
 
     const current = cy.getElementById(target);
     commands.push(
@@ -50,7 +39,7 @@ const Prim = param => {
           {'background-color': 'red', 'color': 'black'},
         ],
         duration: 1000,
-        line: 8,
+        lines: [7,8],
         inst: [{
           name: 'change_element',
           position: parseInt(current.data('value'), 10) - 1,
@@ -62,31 +51,32 @@ const Prim = param => {
       },
     );
 
-    commands.push({line:9});
     if(edgeId !== 'NONE'){
       commands.push({
         eles: [edgeId],
         style: [{'line-color': 'black', 'line-style': 'solid'}],
-        line: 10,
+        lines: [9, 10],
       });
+      part_of_tree[edgeId] = true;
     }
 
     mst += weight;
     const neighborhood = cy.getElementById(target).connectedEdges();
 
     neighborhood.forEach(edge => {
+      if(part_of_tree[edge.id()]) return;
       commands.push({
         eles: [edge.id()],
         style: [{'line-color':'green'}],
-        line: 11,
+        lines: [11],
       });
-      commands.push({line: 12});
+      commands.push({lines: [12]});
       let t = edge.target().id();
       if(t === target) t = edge.source().id();
       let w = edge.data('weight');
       if(dist[t] === undefined || dist[t] > w){
         commands.push({
-          line: 13,
+          lines: [13,14],
           inst: [{
             name: 'change_element',
             position: parseInt(cy.getElementById(t).data('value'), 10) - 1,

@@ -4,17 +4,17 @@ const { connect } = require('react-redux');
 
 type Props = {
   code: Array<{text: string, ind: number}>,
-  current: number,
+  lines: Array<number>,
 }
 
 type State = {
   pseudo: Array<{text: string, ind: number}> | null,
-  line: number,
+  lines: Array<number>,
 }
 const mapStateToProps = (state: State) => {
   return {
     code: state.pseudo,
-    current: state.line,
+    lines: state.lines,
   }
 }
 const CodeLine = (props:{line:{text:string, ind: number}, current: boolean}) => {
@@ -24,16 +24,16 @@ const CodeLine = (props:{line:{text:string, ind: number}, current: boolean}) => 
 
 class CodeBlock extends React.Component<Props>{
   render(){
-    const {code, current} = this.props;
-    let lines = [];
+    const {code, lines} = this.props;
+    let codelines = [];
     if(code){
       for(let i = 0; i < code.length; i++){
-        lines.push(<CodeLine line = {code[i]} current = {i === current}/>);
+        codelines.push(<CodeLine line = {code[i]} current = {lines && lines.includes(i)}/>);
       }
     }
     return (
       <div className='codeblock'>
-        {lines}
+        {codelines}
       </div>
     );
   }

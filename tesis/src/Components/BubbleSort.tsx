@@ -162,7 +162,7 @@ class BubbleSort extends React.Component<Props, State> {
 					this.refreshLayout();
 					return;
 				}
-				let { eles, style, duration, data, line} = commands[pos++];
+				let { eles, style, duration, data, lines} = commands[pos++];
 				if (style) {
 					eles.forEach((ele, index) => {
 						this.cy.getElementById(ele).style(style[index]);
@@ -173,11 +173,11 @@ class BubbleSort extends React.Component<Props, State> {
 						this.cy.getElementById(ele).data(data[index]);
 					}
 				});
-				if(this._isMounted && line != null){
+				if(this._isMounted && lines != null){
 					this.props.dispatch({
 						type: actions.CHANGE_LINE,
 						payload: {
-							line,
+							lines,
 						}
 					})
 				}

@@ -15,7 +15,7 @@ const initialState = {
   loadingGraph: false,
   data: null,
   pseudo: null,
-  line: null,
+  lines: null,
 };
 
 const reducer = (state = initialState, action) => {
@@ -122,7 +122,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         animation: false,
-        line: null,
+        lines: null,
       }
     
     case actions.CLEAR_GRAPH:
@@ -153,7 +153,7 @@ const reducer = (state = initialState, action) => {
     case actions.CHANGE_LINE:
       return {
         ...state,
-        line: action.payload.line,
+        lines: action.payload.lines,
       }
 
     case actions.LOAD_GRAPH:

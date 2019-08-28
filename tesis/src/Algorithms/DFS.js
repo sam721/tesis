@@ -1,7 +1,4 @@
 const dfs = (cy, source, commands, visited) => {
-	commands.push({
-		line: 0,
-	});
 
 	visited[source.id()] = true;
 
@@ -14,7 +11,7 @@ const dfs = (cy, source, commands, visited) => {
 				data: {value: source.data('value'), class: 'heap-default'}
 			}
 		],
-		line: 1,
+		lines: [1],
 	});
 	source.outgoers('edge').forEach(
 		edge => {
@@ -23,16 +20,13 @@ const dfs = (cy, source, commands, visited) => {
 				{
 					eles: [edge.id()],
 					style: [{ 'line-color': 'green', 'target-arrow-color': 'green' }],
-					line: 2,
+					lines: [2],
 				},
-				{
-					line: 3,
-				}
 			);
 			if (visited[next.id()] === undefined) {
 				commands.push(
 					{
-						line: 4,
+						lines: [3,4],
 					},
 					{
 						eles: [edge.id()],
@@ -54,7 +48,7 @@ const dfs = (cy, source, commands, visited) => {
 		eles: [source.id()],
 		style: [{ 'background-color': 'black', 'color': 'white' }],
 		inst: [{name: 'pop'}],
-		line: 5,
+		lines: [5],
 	})
 }
 const DFS = param => {
@@ -62,10 +56,7 @@ const DFS = param => {
 	const source = selection.id;
 
 	let commands = [
-		{line: 7, duration: 250},
-		{line: 8, duration: 250},
-		{line: 9, duration: 250},
-		{line: 10},
+		{lines: [8,9,10]},
 	];
 	let visited = {};
 	dfs(cy, cy.getElementById(source), commands, visited);

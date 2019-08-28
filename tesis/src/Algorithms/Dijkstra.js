@@ -10,7 +10,7 @@ const Dijkstra = (param) => {
   let dist = {};
   let visited = {};
   const commands = [];
-  commands.push({line: 0, duration: 250}, {line: 1, duration: 250});
+  commands.push({lines: [1,2]});
   dist[source] = 0;
   pq.push({
     distance: 0,
@@ -29,12 +29,12 @@ const Dijkstra = (param) => {
           class: 'heap-default',
         }
       }],
-      line: 3,
+      lines: [3],
     }
   )
 
   while (!pq.isEmpty()) {
-    commands.push({line: 4});
+    commands.push({lines: [4]});
     let { id, distance } = pq.top(); pq.pop();
     if (visited[id]) continue;
     visited[id] = true;
@@ -53,7 +53,7 @@ const Dijkstra = (param) => {
             class: 'heap-wrong',
           }
         }],
-        line: 5,
+        lines: [5],
       }
     )
     current.outgoers('edge').forEach(
@@ -64,7 +64,7 @@ const Dijkstra = (param) => {
           {
             eles: [edge.id()],
             style: [{ 'line-color': 'green', 'target-arrow-color': 'green' }],
-            line: 6,
+            lines: [6],
             duration: 1000,
           }
         )
@@ -73,7 +73,7 @@ const Dijkstra = (param) => {
         if (dist[nextId] === undefined || distance + weight < dist[nextId]) {
           dist[nextId] = distance + weight;
           commands.push({
-            line: 7,
+            lines: [7],
           });
           pq.push({
             distance: distance + weight,
@@ -85,7 +85,6 @@ const Dijkstra = (param) => {
                 eles: [nextId],
                 distance: [(distance + weight) + '\u2264' + prevDistance],
                 duration: 1000,
-                line: 8,
               }
             );
           }
@@ -94,7 +93,7 @@ const Dijkstra = (param) => {
               eles: [nextId],
               distance: [distance + weight],
               duration: 1000,
-              line: 8,
+              lines: [8,9],
               inst: [{
                 name: 'change_element',
                 position: parseInt(next.data('value'), 10)-1,
@@ -105,14 +104,13 @@ const Dijkstra = (param) => {
               }]
             }
           )
-          commands.push({line: 9});
         } else {
           commands.push(
             {
               eles: [nextId],
               distance: [prevDistance + '\u2264' + (distance + weight)],
               duration: 1000,
-              line: 8,
+              lines: [8],
             },
             {
               eles: [nextId],

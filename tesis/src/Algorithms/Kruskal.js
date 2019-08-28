@@ -16,10 +16,7 @@ const Kruskal = param => {
       eles: edges.map(x => x.data('id')),
       style: Array(cy.edges().length).fill({'line-style': 'dashed', 'line-color': '#eee'}),
       duration: 1000,
-      line: 2,
-    },
-    {
-      line: 3,
+      lines: [1,2],
     }
   ];
 
@@ -34,7 +31,7 @@ const Kruskal = param => {
       eles: [edge.id()],
       style: [{'line-color': 'green'}],
       duration: 1000,
-      line: 4,
+      lines: [3],
     })
     if(!ds.connected(x, y)){
       ds.join(x, y);
@@ -49,10 +46,7 @@ const Kruskal = param => {
             {'background-color': 'red'},
           ],
           duration: 1000,
-          line: 6,
-        },
-        {
-          line: 7,
+          lines: [4,5],
         }
       );
       edges_used++;
@@ -61,7 +55,7 @@ const Kruskal = param => {
         eles: [edge.id()],
         style: [{'line-color': '#ccc'}],
         duration: 1000,
-        line: null,
+        lines: null,
       })
     }
   }
