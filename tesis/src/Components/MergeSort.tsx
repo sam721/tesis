@@ -108,6 +108,8 @@ class BubbleSort extends React.Component<Props, State> {
 		this.props.dispatch({
 			type: this.props.action,
 			payload: {
+				photo: () => this._mediaRecorder.takePicture(this.cy),
+				gif: () => this._mediaRecorder.takeGif(this.cy),
 				options: [
 					{
 						name: 'Ordenar',

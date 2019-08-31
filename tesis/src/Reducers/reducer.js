@@ -91,6 +91,8 @@ const reducer = (state = initialState, action) => {
         algorithm: 'Heap',
         selection: null,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif
       }
 
     case actions.SELECT_AVL:
@@ -99,6 +101,8 @@ const reducer = (state = initialState, action) => {
         algorithm: 'AVL',
         selection: null,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif
       }
 
     case actions.SELECT_BUBBLESORT:
@@ -109,6 +113,8 @@ const reducer = (state = initialState, action) => {
 
         pseudo: bubblesort,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif
       }
 
     case actions.SELECT_MERGESORT:
@@ -118,6 +124,8 @@ const reducer = (state = initialState, action) => {
         selection: null,
         pseudo: mergesort,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif
       }
     
     case actions.SELECT_BINARY_SEARCH:
@@ -126,6 +134,8 @@ const reducer = (state = initialState, action) => {
         algorithm: 'BinarySearch',
         selection: null,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif
       }
       
     case actions.NO_SELECTION:

@@ -213,6 +213,7 @@ class Graph extends React.Component<Props, State>{
 		});
 		
 		this._isMounted = false;
+		this._mediaRecorder.cancelGif();
 		this.removePoppers();
 	}
 

@@ -45,6 +45,11 @@ class MediaRecorder{
     }else if(_this._gifBuffer.length < 600) _this._gifBuffer.push(image);
   }
 
+  cancelGif(){
+    this._takingGif = false;
+    clearInterval(this._interval);
+  }
+
   takeGif(cy){
     if(!this._takingGif){
       this._takingGif = true;

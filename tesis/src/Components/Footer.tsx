@@ -2,6 +2,7 @@ import {Row, Col} from 'react-bootstrap';
 import React from 'react';
 import OptionsMenu from './OptionsMenu';
 import SpeedBar from './SpeedBar';
+import GIFControl from './GIFControl';
 const { connect } = require('react-redux');
 
 type Props = {
@@ -41,7 +42,7 @@ class Footer extends React.Component<Props>{
             <button className='dropdown-button' onClick={this.props.photo}>Foto</button>
             </Col>
           <Col md={1}>
-            <button className='dropdown-button' onClick={this.props.gif}>GIF</button>
+            <GIFControl callback={this.props.gif}/>
           </Col>
         </Row>
       </div>
