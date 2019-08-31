@@ -7,6 +7,7 @@ import { Row, Col, Container } from 'react-bootstrap';
 import GraphArray from './GraphArray';
 import MediaRecorder from '../utils/MediaRecorder';
 import MyModal from './UploadGraphModal';
+import InputModal from './InputModal';
 
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
@@ -55,6 +56,7 @@ type storeState = {
 type State = {
 	values: Array<string>,
 	showModal: boolean,
+	showWeightModal: boolean,
 }
 
 const getNodeIdString = (nodeId: string) => {
@@ -81,6 +83,7 @@ class Graph extends React.Component<Props, State>{
 	state = {
 		values: new Array(),
 		showModal: false,
+		showWeightModal: false,
 	}
 
 	layout = {
@@ -160,7 +163,36 @@ class Graph extends React.Component<Props, State>{
 		this.initialize([]);
 		this.props.dispatch({
 			type: this.props.action,
-		})
+			payload:{
+				run: this.runButton,
+				options: [
+					{
+						name: 'Ejecutar',
+						run: this.runButton,
+					},
+					{
+						name: 'Eliminar',
+						run: this.removeButton,
+					},
+					{
+						name: 'Cambiar peso',
+						run: this.weightButton,
+					},
+					{
+						name: 'Limpiar canvas',
+						run: this.clearGraph,
+					},
+					{
+						name: 'Descargar grafo',
+						run: () => this._mediaRecorder.takeJson(this.cy),
+					},
+					{
+						name: 'Subir grafo',
+						run: () => this.setState({showModal: true}),
+					}
+				]
+			}
+		});
 	}
 
 	componentDidUpdate(prevProps:Props){
@@ -510,6 +542,14 @@ class Graph extends React.Component<Props, State>{
 			})
 		}
 	}
+
+	weightButton = () => {
+		const {selection} = this.props;
+		if(selection && selection.type === 'edge'){
+			this.setState({showWeightModal: true});
+		}
+	}
+
 	handleClickViewport = (event: CytoEvent) => {
 		if (this.props.animation === true) return;
 
@@ -530,10 +570,6 @@ class Graph extends React.Component<Props, State>{
 			}
 		}
 	}
-	
-	showDialog = () => {
-		this.setState({showModal: !this.state.showModal});
-	}
 
 	render() {
 		let edgeWeight = null;
@@ -544,11 +580,18 @@ class Graph extends React.Component<Props, State>{
 		}
 		return (
 			<>
-				<MyModal show={this.state.showModal} handleClose={this.showDialog}/>
-				<Container fluid={true}>
-					<Row id="canvas" />
-					<GraphArray array={this.state.values}/>
-
+				<MyModal show={this.state.showModal} handleClose={() => this.setState({showModal: false})}/>
+				<InputModal 
+					show={this.state.showWeightModal} 
+					handleClose = {() => this.setState({showWeightModal: false})}
+					callback = {(w:number) => this.changeWeight(w)}
+				/>
+				<div id = "canvas"/>
+				{
+					/*
+				<GraphArray array={this.state.values}/>
+				
+					
 					<ControlBar
 						run={this.runButton}
 						remove={this.removeButton}
@@ -559,9 +602,8 @@ class Graph extends React.Component<Props, State>{
 					/>
 					<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
 					<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-					<button onClick={() => this._mediaRecorder.takeJson(this.cy)}>Test json</button>
-					<button onClick={() => this.setState({showModal: true})}>Test input</button>
-				</Container>
+					*/
+				}
 			</>
 		)
 	}

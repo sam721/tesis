@@ -16,6 +16,8 @@ const initialState = {
   data: null,
   pseudo: null,
   lines: null,
+  run: () => { },
+  options: [],
 };
 
 const reducer = (state = initialState, action) => {
@@ -25,8 +27,9 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'BFS',
         selection: null,
-        speed: 1.0,
         pseudo: BFS,
+        run: action.payload.run,
+        options: action.payload.options,
       }
 
     case actions.SELECT_DFS:
@@ -34,69 +37,75 @@ const reducer = (state = initialState, action) => {
         ...state,
         algorithm: 'DFS',
         selection: null,
-        speed: 1.0,
         pseudo: DFS,
+        run: action.payload.run,
+        options: action.payload.options,
       }
-    
+
     case actions.SELECT_DIJKSTRA:
       return {
         ...state,
         algorithm: 'Dijkstra',
         selection: null,
-        speed: 1.0,
         pseudo: dijkstra,
+        run: action.payload.run,
+        options: action.payload.options,
       }
-    
+
     case actions.SELECT_KRUSKAL:
       return {
         ...state,
         algorithm: 'Kruskal',
         selection: null,
-        speed: 1.0,
         pseudo: kruskal,
+        run: action.payload.run,
+        options: action.payload.options,
       }
-      
+
     case actions.SELECT_PRIM:
       return {
         ...state,
         algorithm: 'Prim',
         selection: null,
-        speed: 1.0,
+
         pseudo: prim,
+        run: action.payload.run,
+        options: action.payload.options,
       }
-    
+
     case actions.SELECT_HEAP:
       return {
         ...state,
         algorithm: 'Heap',
         selection: null,
-        speed: 1.0,
+        options: action.payload.options,
       }
-    
+
     case actions.SELECT_AVL:
       return {
         ...state,
         algorithm: 'AVL',
         selection: null,
-        speed: 1.0,
+        options: action.payload.options,
       }
-    
+
     case actions.SELECT_BUBBLESORT:
       return {
         ...state,
         algorithm: 'BubbleSort',
         selection: null,
-        speed: 1.0,
+
         pseudo: bubblesort,
+        options: action.payload.options,
       }
-      
+
     case actions.SELECT_MERGESORT:
       return {
         ...state,
         algorithm: 'MergeSort',
         selection: null,
-        speed: 1.0,
         pseudo: mergesort,
+        options: action.payload.options,
       }
 
     case actions.NO_SELECTION:
@@ -117,33 +126,33 @@ const reducer = (state = initialState, action) => {
         selection: null,
         animation: true,
       }
-    
+
     case actions.ANIMATION_END:
       return {
         ...state,
         animation: false,
         lines: null,
       }
-    
+
     case actions.CLEAR_GRAPH:
       return {
         ...state,
         selection: null,
         animation: false,
       }
-    
+
     case actions.DEC_SPEED:
       return {
         ...state,
         speed: Math.min(state.speed + 0.10, 2),
       }
-    
+
     case actions.INC_SPEED:
       return {
         ...state,
         speed: Math.max(state.speed - 0.10, 0),
       }
-    
+
     case actions.CHANGE_SPEED:
       return {
         ...state,
@@ -162,7 +171,7 @@ const reducer = (state = initialState, action) => {
         loadingGraph: true,
         data: action.payload.data,
       }
-    
+
     case actions.FINISHED_LOAD:
       return {
         ...state,

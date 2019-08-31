@@ -97,6 +97,18 @@ class BubbleSort extends React.Component<Props, State> {
     
 		this.props.dispatch({
 			type: this.props.action,
+			payload:{
+				options: [
+					{
+						name: 'Ordenar',
+						run: this.runButton,
+					},
+					{
+						name: 'Cambiar arreglo',
+						run: () => this.setState({show: true}),
+					}
+				],
+			}
     })
 		
 		this.initialize();
@@ -240,7 +252,6 @@ class BubbleSort extends React.Component<Props, State> {
 				/>
 				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
 				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-				<button onClick={() => this.setState({show: true})}>Change array</button>
 			</Container>
 		)
   }

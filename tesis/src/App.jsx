@@ -11,48 +11,37 @@ import { connect } from 'react-redux';
 import BFS from './resources/pseudocodes/BFS';
 import BFS_table from './resources/value_tables/BFS_table';
 
+import Footer from './Components/Footer';
+import MenuBar from './Components/MenuBar';
 const mapStateToProps = state => ({
   algorithm: state.algorithm,
 })
 
 class App extends React.Component {
-  /*
-  render() {
-    const props = {
-      color: ['Gris', 'Blanco', 'Gris', 'Negro', 'Gris'],
-      u: 0,
-      v: 3,
-      inicio: 1,
-    }
-    return (
-      <body>
-        <BFS_table props={props}/>
-      </body>
-    );
-  }
-  */
   
   render() {
     return (
       <body>
-        <div style={{display: 'table', width: '100%'}}>
+        <div>
           <Container fluid={true}>
+            <MenuBar/>
             <Row>
-              <Col xs={2} className='sidebar'>
-                <Sidebar />
-              </Col>
-              <Col xs={7}>
+              <Col>
                 <Editor algorithm={this.props.algorithm} />
               </Col>
-              <Col xs={3}>
-                <AlgorithmInfo algorithm={this.props.algorithm} />
-              </Col>
+              {/*
+                <Col xs={3}>
+                  <AlgorithmInfo algorithm={this.props.algorithm} />
+                </Col>
+              */}
             </Row>
+            <Footer/>
           </Container>
         </div>
       </body>
     );
   }
+  
 }
 
 export default connect(mapStateToProps)(App);

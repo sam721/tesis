@@ -11,6 +11,7 @@ import { number, string } from 'prop-types';
 import InputHeapModal from './InputHeapModal';
 import MediaRecorder from '../utils/MediaRecorder';
 import { parseHeap } from '../utils/heap-utils';
+import InputModal from './InputModal';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -44,6 +45,7 @@ type Element = {
 type State = {
 	values: Array<Element>,
 	show: boolean,
+	showInsertModal: boolean,
 }
 
 type Props = {
@@ -66,6 +68,7 @@ class Heap extends React.Component<Props, State>{
 	state = {
 		values: [{value: 0, class: 'heap-default'}],
 		show: false,
+		showInsertModal: false,
 	}
 
 	layout = {
@@ -119,6 +122,26 @@ class Heap extends React.Component<Props, State>{
 		this.layout.run();
 		this.props.dispatch({
 			type: this.props.action,
+			payload: {
+				options: [
+					{
+						name: 'Insertar',
+						run: () => this.setState({showInsertModal: true}),
+					},
+					{
+						name: 'Eliminar',
+						run: this.remove,
+					},
+					{
+						name: 'Subir Heap',
+						run: () => this.setState({show: true}),
+					},
+					{
+						name: 'Descargar Heap',
+						run: () => parseHeap(this.state.values),
+					}
+				]
+			}
 		})
 	}
 
@@ -283,7 +306,7 @@ class Heap extends React.Component<Props, State>{
 		});
 	}
 
-	remove() {
+	remove = () => {
 		if(this.props.animation) return;
 		const n = this.cy.nodes().length;
 		if (n === 0) return;
@@ -385,6 +408,11 @@ class Heap extends React.Component<Props, State>{
 					show={this.state.show}
 					changeArray = {(values: Array<number>) => this.changeArray(values)}
 					handleClose = {() => this.setState({show: false})}
+				/>
+				<InputModal 
+					show={this.state.showInsertModal} 
+					handleClose = {() => this.setState({showInsertModal: false})}
+					callback = {(v:number) => this.insert(v)}
 				/>
 				<Container fluid={true}>
 					<Row id="canvas" />

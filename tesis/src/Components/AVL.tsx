@@ -4,6 +4,7 @@ import actions from '../Actions/actions';
 import downloadGif from '../utils/gifshot-utils'
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import TreeBar from './TreeBar';
+import InputModal from './InputModal';
 import InputAVLModal from './InputAVLModal';
 import { Row, Container } from 'react-bootstrap';
 import PriorityQueue from '../Algorithms/DS/PriorityQueue'
@@ -49,6 +50,8 @@ type Element = {
 
 type State = {
   show: boolean,
+  showSearchModal: boolean,
+  showInsertModal: boolean,
 }
 
 type Props = {
@@ -84,6 +87,8 @@ class AVL extends React.Component<Props, State>{
 
   state = {
     show: false,
+    showSearchModal: false,
+    showInsertModal: false,
   }
 
   nodeStyle = Styles.NODE;
@@ -132,6 +137,34 @@ class AVL extends React.Component<Props, State>{
     this.layout.run();
     this.props.dispatch({
       type: this.props.action,
+      payload:{
+        options: [
+          {
+            name: 'Insertar',
+            run: () => this.setState({showInsertModal: true}),
+          },
+          {
+            name: 'Eliminar',
+            run: this.remove,
+          },
+          {
+            name: 'Buscar',
+            run: () => this.setState({showSearchModal: true}),
+          },
+          {
+            name: 'Limpiar canvas',
+            run: this.clearGraph,
+          },
+          {
+            name: 'Subir AVL',
+            run: () => this.setState({show: true}),
+          },
+          {
+            name: 'Descargar AVL',
+            run:  () => parseAVL(this.cy.getElementById(this.treeRoot)),
+          }
+        ]
+      }
     })
   }
 
@@ -543,8 +576,43 @@ class AVL extends React.Component<Props, State>{
     let result = await promise;
     return result;
   }
-
-  remove() {
+  
+  async search(value: number){
+    let promise = new Promise((resolve: (node?: CytoscapeElement | null) => void, reject) => {
+      const bsearch = (node: CytoscapeElement, prev: CytoscapeElement | null) => {
+        if(prev){
+          prev.style({
+            'background-color': 'white',
+            'color': 'black',
+          });
+        }
+        if(node){
+          node.style({
+            'background-color': 'red',
+            'color': 'black',
+          });
+          const [left, right] = getChildren(node);
+          if(node.data('value') === value){
+            node.style({
+              'background-color': 'lightgreen',
+              'color': 'black',
+            });
+            setTimeout(bsearch, 1000/this.props.speed, null, node);
+          }else if(node.data('value') < value){
+            setTimeout(bsearch, 1000/this.props.speed, right, node);
+          }else{
+            setTimeout(bsearch, 1000/this.props.speed, left, node);
+          }
+        }else{
+          resolve(prev);
+        }
+      }
+      bsearch(this.cy.getElementById(this.treeRoot), null);
+    });
+    let result = await promise;
+    return result;
+  }
+  remove = () => {
     if(this.props.animation) return;
     let {selection} = this.props;
     if(!selection) return;
@@ -625,7 +693,17 @@ class AVL extends React.Component<Props, State>{
 
   render() {
     return (
-      <Container fluid={true}>
+      <>
+        <InputModal 
+          show={this.state.showInsertModal} 
+          handleClose={() => this.setState({showInsertModal: false})}
+          callback={(v:number) => this.insert(v)}
+        />
+        <InputModal 
+          show={this.state.showSearchModal} 
+          handleClose={() => this.setState({showSearchModal: false})}
+          callback={(v:number) => this.search(v)}
+        />
         <InputAVLModal 
           show={this.state.show} 
           handleClose={this.handleClose} 
@@ -633,15 +711,8 @@ class AVL extends React.Component<Props, State>{
           addEdge={this.addEdge} 
           clearGraph={this.clearGraph}
         />
-        <Row id="canvas" />
-        <TreeBar insert={(v: number) => this.insert(v)} remove={() => this.remove()} />
-        <button onClick = {() => this.testRotation(0)}>Test left rotation</button>
-        <button onClick = {() => this.testRotation(1)}>Test right rotation</button>
-        <button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-        <button onClick={() => this.setState({show: true})}>Test AVL input</button>
-        <button onClick={() => parseAVL(this.cy.getElementById(this.treeRoot))}>Test AVL output</button>
-      </Container>
+        <div id="canvas" />
+      </>
     );
   }
 }
