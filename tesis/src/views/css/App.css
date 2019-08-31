@@ -140,6 +140,7 @@
   border-color: transparent;
   outline: none;
   width: 100%;
+  height: 40px;
 }
 
 .dropup{
@@ -158,7 +159,7 @@
 .actions-menu{
   display: none;
   position: absolute;
-  bottom: 25px;
+  bottom: 40px;
   width: 100%;
   z-index: 1;
 }

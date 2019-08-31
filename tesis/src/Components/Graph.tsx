@@ -165,6 +165,8 @@ class Graph extends React.Component<Props, State>{
 			type: this.props.action,
 			payload:{
 				run: this.runButton,
+				photo: () => this._mediaRecorder.takePicture(this.cy),
+				gif: () => this._mediaRecorder.takeGif(this.cy),
 				options: [
 					{
 						name: 'Ejecutar',

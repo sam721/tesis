@@ -18,7 +18,8 @@ const initialState = {
   lines: null,
   run: () => { },
   options: [],
-
+  photo: () => {},
+  gif: () => {},
 };
 
 const reducer = (state = initialState, action) => {
@@ -31,6 +32,8 @@ const reducer = (state = initialState, action) => {
         pseudo: BFS,
         run: action.payload.run,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif,
       }
 
     case actions.SELECT_DFS:
@@ -41,6 +44,8 @@ const reducer = (state = initialState, action) => {
         pseudo: DFS,
         run: action.payload.run,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif,
       }
 
     case actions.SELECT_DIJKSTRA:
@@ -51,6 +56,8 @@ const reducer = (state = initialState, action) => {
         pseudo: dijkstra,
         run: action.payload.run,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif,
       }
 
     case actions.SELECT_KRUSKAL:
@@ -61,6 +68,8 @@ const reducer = (state = initialState, action) => {
         pseudo: kruskal,
         run: action.payload.run,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif,
       }
 
     case actions.SELECT_PRIM:
@@ -72,6 +81,8 @@ const reducer = (state = initialState, action) => {
         pseudo: prim,
         run: action.payload.run,
         options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif,
       }
 
     case actions.SELECT_HEAP:
