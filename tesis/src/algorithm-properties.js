@@ -46,6 +46,9 @@ const properties = {
   MergeSort: {
     action: actions.SELECT_MERGESORT,
   },
+  BinarySearch: {
+    action: actions.SELECT_BINARY_SEARCH,
+  }
 }
 
 export default properties;

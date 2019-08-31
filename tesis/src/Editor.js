@@ -6,6 +6,7 @@ import AVL from './Components/AVL'
 import properties from './algorithm-properties';
 import BubbleSort from './Components/BubbleSort';
 import MergeSort from './Components/MergeSort';
+import BinarySearch from './Components/BinarySearch';
 
 const { HashRouter, Route } = require('react-router-dom');
 class Editor extends React.Component {
@@ -27,6 +28,7 @@ class Editor extends React.Component {
 						<Route path="/AVL" render={() => <AVL {...properties.AVL} />} />
 						<Route path="/BubbleSort" render={() => <BubbleSort {...properties.BubbleSort} />} />
 						<Route path="/MergeSort" render={() => <MergeSort {...properties.MergeSort} />} />
+						<Route path="/binarysearch" render={() => <BinarySearch {...properties.BinarySearch}/>}/>
 					</HashRouter>
 				</Col>
 			</Row>

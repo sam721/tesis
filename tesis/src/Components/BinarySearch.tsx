@@ -6,6 +6,9 @@ import Bubblesort from '../Algorithms/BubbleSort';
 import actions from '../Actions/actions';
 import MediaRecorder from '../utils/MediaRecorder';
 import InputArrayModal from './InputArrayModal';
+import InputModal from './InputModal';
+import BinarySearch from '../Algorithms/BinarySearch';
+import Sort from '../Algorithms/BubbleSort-util';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -23,7 +26,8 @@ type Props = {
 }
 
 type State = {
-	show: boolean,
+  show: boolean,
+  showInputModal: boolean,
 	values: Array<number>,
 }
 
@@ -42,8 +46,9 @@ class BubbleSort extends React.Component<Props, State> {
   cy = cytoscape();
 
 	state = {
-		show: false,
-		values: [1,4,8,1,4,3,6,9,10,-1],
+    show: false,
+    showInputModal: false,
+		values: [1,2,3,4,5,6,7,8],
 	}
 
 	layout = {
@@ -92,6 +97,7 @@ class BubbleSort extends React.Component<Props, State> {
 		this.layout = this.cy.elements().makeLayout({
 			name: 'preset',
     });
+    this.cy.center();
     this.layout.run();
     
 		this.props.dispatch({
@@ -99,8 +105,8 @@ class BubbleSort extends React.Component<Props, State> {
 			payload:{
 				options: [
 					{
-						name: 'Ordenar',
-						run: this.runButton,
+						name: 'Buscar',
+						run: () => this.setState({showInputModal: true}),
 					},
 					{
 						name: 'Cambiar arreglo',
@@ -200,14 +206,15 @@ class BubbleSort extends React.Component<Props, State> {
   }
 
 	initialize(){
+    const {values} = this.state;
 		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
-    for(let i = 0; i < this.state.values.length; i++){
-      this.addNode(i.toString(), this.state.values[i]);
+    for(let i = 0; i < values.length; i++){
+      this.addNode(i.toString(), values[i]);
       this.refreshLayout();
     }
 	}
 
-  runButton = () => {
+  runButton = (value:number) => {
     if(this.props.animation){
 			this.props.dispatch({
 				type: actions.ANIMATION_END,
@@ -219,7 +226,7 @@ class BubbleSort extends React.Component<Props, State> {
       this.props.dispatch({
         type: actions.ANIMATION_START,
       })
-      const commands = Bubblesort(this.state.values);
+      const commands = BinarySearch(this.state.values, value);
       resolve(commands);
     }).then((commands: Array<AnimationStep>) => {
       setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
@@ -232,12 +239,19 @@ class BubbleSort extends React.Component<Props, State> {
 	
 
 	changeArray = (values: Array<number>) => {
-		this.setState({values});
+    const sorted = Sort(values);
+		this.setState({values: sorted});
 	}
 
   render(){
     return (
 			<Container fluid={true}>
+        <InputModal
+          show={this.state.showInputModal}
+          handleClose={()=>this.setState({showInputModal: false})}
+          callback={(v:number)=>this.runButton(v)}
+          currentValue={0}
+        />
 				<InputArrayModal 
 					show={this.state.show} 
 					handleClose={this.handleClose} 
@@ -245,11 +259,6 @@ class BubbleSort extends React.Component<Props, State> {
 					currentValues={this.state.values}
 				/>
 				<Row id="canvas" />
-				<ControlBar
-					run={this.runButton}
-				/>
-				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
 			</Container>
 		)
   }

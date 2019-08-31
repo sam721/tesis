@@ -18,6 +18,7 @@ class MenuBar extends React.Component{
     const arrays = [
       <NavLink to={"/bubblesort"}><button className='dropdown-button'>Bubble Sort</button></NavLink>,
       <NavLink to={"/mergesort"}><button className='dropdown-button'>Merge Sort</button></NavLink>,
+      <NavLink to={"/binarysearch"}><button className='dropdown-button'>Busqueda Binaria</button></NavLink>
     ];
     const dataStructures = [
       <NavLink to={"/heap"}><button className='dropdown-button'>Min Heap</button></NavLink>,

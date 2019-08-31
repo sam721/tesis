@@ -18,6 +18,7 @@ const initialState = {
   lines: null,
   run: () => { },
   options: [],
+
 };
 
 const reducer = (state = initialState, action) => {
@@ -107,7 +108,15 @@ const reducer = (state = initialState, action) => {
         pseudo: mergesort,
         options: action.payload.options,
       }
-
+    
+    case actions.SELECT_BINARY_SEARCH:
+      return {
+        ...state,
+        algorithm: 'BinarySearch',
+        selection: null,
+        options: action.payload.options,
+      }
+      
     case actions.NO_SELECTION:
       return {
         ...state,

@@ -162,12 +162,12 @@ class BubbleSort extends React.Component<Props, State> {
 			},
 			position: {
 				x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
-				y: this.cy.height()/2,
+				y: this.cy.height()/4,
 			},
 		});
 		layoutOptions.positions[id] = {
 			x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
-			y: this.cy.height()/2,
+			y: this.cy.height()/4,
 		}
   }
   
