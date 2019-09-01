@@ -195,6 +195,11 @@ class Graph extends React.Component<Props, State>{
 				]
 			}
 		});
+		if(this.props.action === actions.SELECT_DIJKSTRA){
+			this.props.dispatch({
+				type: actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING,
+			});
+		}
 	}
 
 	componentDidUpdate(prevProps:Props){
@@ -258,11 +263,18 @@ class Graph extends React.Component<Props, State>{
 			'background-color': 'white',
 			'color': 'black',
 		});
-
+		this.props.dispatch({
+			type: actions.STARTING_ALGORITHM_EXECUTION_INFO,
+		});
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
-				if(pos === commands.length) return;
+				if(pos === commands.length){
+					this.props.dispatch({
+						type: actions.FINISHED_ALGORITHM_SUCCESS,
+					});
+					return;
+				}
 				if (!this.props.animation) {
 					this.cy.nodes().style(this.nodeStyle);
 					this.cy.edges().style(this.edgeStyle);

@@ -59,8 +59,87 @@ const notificationsReducer = action => {
       createNotification('Error',
       'No se pueden hacer modificaciones mientras se ejecuta el algoritmo',
       'danger');
-    default:
-      console.log('what');
+      break;
+  
+    case actions.EMPTY_HEAP_WARNING:
+      createNotification('Heap vacio',
+      'No se puede extraer el minimo elemento de un heap vacio',
+      'warning');
+      break;
+    
+    case actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING:
+      createNotification('Cuidado con las aristas con peso negativo',
+      'El algoritmo de Dijkstra puede no obtener el camino minimo si hay aristas negativas',
+      'warning');
+      break;
+
+    case actions.AVL_NOT_FOUND_INFO:
+      createNotification('Busqueda terminada',
+      'El elemento no fue encontrado en el arbol AVL',
+      'info');
+      break;
+
+    case actions.STARTING_ALGORITHM_EXECUTION_INFO:
+      createNotification('Ejecucion iniciada',
+      ' ',
+      'info');
+      break;
+
+    case actions.STARTING_GIF_RECORDING_INFO:
+      createNotification('Creacion de GIF iniciada',
+      'La grabacion tendra un minuto maximo de duracion',
+      'info');
+      break;
+    
+    case actions.FINISHED_GIF_RECORDING_INFO:
+      createNotification('Grabacion de GIF terminada',
+      'Procesando GIF para descargar',
+      'info');
+      break;
+
+    case actions.SORTING_BINARY_SEARCH_INFO:
+      createNotification('Solo arreglos ordenados',
+      'Los arreglos se ordenaran para realizar la busqueda binaria',
+      'info');
+      break;
+    
+    case actions.BINARY_SEARCH_NOT_FOUND_INFO:
+      createNotification('Elemento no encontrado',
+      'El elemento no se encuentra en el arreglo',
+      'info');
+      break;
+    
+    case actions.FINISHED_GIF_SUCCESS:
+      createNotification('Creacion de GIF terminada',
+      'GIF listo para descargar',
+      'success');
+      break;
+    
+    case actions.LOAD_GRAPH_SUCCESS:
+      createNotification('Grafo cargado con exito',
+      ' ',
+      'success');
+      break;
+    
+    case actions.PHOTO_SUCCESS:
+      createNotification('Captura realizada','La captura sera descargada a su dispositivo','success');
+      break;
+    
+    case actions.FINISHED_ALGORITHM_SUCCESS:
+      createNotification('Ejecucion terminada exitosamente',' ','success');
+      break;
+
+    case actions.AVL_FOUND_SUCCESS:
+      createNotification('Busqueda terminada',
+      'El elemento fue encontrado en el arbol AVL',
+      'success');
+      break;
+    
+    case actions.BINARY_SEARCH_FOUND_SUCCESS:
+      createNotification('Busqueda terminada',
+      'El elemento fue encontrado en el arreglo',
+      'success');
+      break;
   }
 }
 

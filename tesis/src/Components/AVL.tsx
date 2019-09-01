@@ -586,7 +586,14 @@ class AVL extends React.Component<Props, State>{
   }
   
   async search(value: number){
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
     let promise = new Promise((resolve: (node?: CytoscapeElement | null) => void, reject) => {
+      let found = false;
       const bsearch = (node: CytoscapeElement, prev: CytoscapeElement | null) => {
         if(prev){
           prev.style({
@@ -605,6 +612,7 @@ class AVL extends React.Component<Props, State>{
               'background-color': 'lightgreen',
               'color': 'black',
             });
+            found = true;
             setTimeout(bsearch, 1000/this.props.speed, null, node);
           }else if(node.data('value') < value){
             setTimeout(bsearch, 1000/this.props.speed, right, node);
@@ -612,6 +620,10 @@ class AVL extends React.Component<Props, State>{
             setTimeout(bsearch, 1000/this.props.speed, left, node);
           }
         }else{
+          this.props.dispatch({
+            type: (found ? actions.AVL_FOUND_SUCCESS : actions.AVL_NOT_FOUND_INFO),
+          });
+          
           resolve(prev);
         }
       }
@@ -706,6 +718,12 @@ class AVL extends React.Component<Props, State>{
   }
 
   clearGraph = () => {
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
 		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
   }
 

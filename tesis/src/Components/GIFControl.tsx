@@ -1,11 +1,13 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import actions from '../Actions/actions';
 
 const {connect} = require('react-redux');
 
 type Props = {
   callback: () => void,
   algorithm: string,
+  dispatch: (action: Object) => Object,
 };
 
 type State = {
@@ -43,18 +45,26 @@ class  GIFControl extends React.Component<Props, State>{
       const {counter} = this.state;
       if(counter === 60){
         clearInterval(this.interval);
-        console.log('finished');
         this.setState({counter: 0, recording: false});
         this.props.callback();
+        this.props.dispatch({
+          type: actions.FINISHED_GIF_RECORDING_INFO,
+        });
       }else{
         this.setState({counter: counter+1});
       }
     }
 
     if(!recording){
+      this.props.dispatch({
+        type: actions.STARTING_GIF_RECORDING_INFO,
+      });
       this.interval = window.setInterval(setCounter, 1000);
     }else{
       clearInterval(this.interval);
+      this.props.dispatch({
+        type: actions.FINISHED_GIF_RECORDING_INFO,
+      });
       this.setState({counter: 0, recording: false});
     }
     this.props.callback();

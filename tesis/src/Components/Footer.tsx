@@ -3,6 +3,7 @@ import React from 'react';
 import OptionsMenu from './OptionsMenu';
 import SpeedBar from './SpeedBar';
 import GIFControl from './GIFControl';
+import PhotoControl from './PhotoControl';
 const { connect } = require('react-redux');
 
 type Props = {
@@ -39,7 +40,7 @@ class Footer extends React.Component<Props>{
             <SpeedBar/>
           </Col>
           <Col md={{span:1, offset:6}}>
-            <button className='dropdown-button' onClick={this.props.photo}>Foto</button>
+            <PhotoControl callback={this.props.photo}/>
             </Col>
           <Col md={1}>
             <GIFControl callback={this.props.gif}/>

@@ -240,20 +240,15 @@ class BubbleSort extends React.Component<Props, State> {
 
   render(){
     return (
-			<Container fluid={true}>
+			<>
 				<InputArrayModal 
 					show={this.state.show} 
 					handleClose={this.handleClose} 
 					changeArray={this.changeArray}
 					currentValues={this.state.values}
 				/>
-				<Row id="canvas" />
-				<ControlBar
-					run={this.runButton}
-				/>
-				<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-				<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-			</Container>
+				<div id="canvas" />
+			</>
 		)
   }
 }

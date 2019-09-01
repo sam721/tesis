@@ -321,7 +321,12 @@ class Heap extends React.Component<Props, State>{
 			return;
 		}
 		const n = this.cy.nodes().length;
-		if (n === 0) return;
+		if (n === 0){
+			this.props.dispatch({
+				type: actions.EMPTY_HEAP_WARNING,
+			});
+			return;
+		}
 		const outgoers = this.cy.getElementById("1").outgoers('node');
 		this.removeNode("1");
 		let commands:Array<AnimationStep> = [];

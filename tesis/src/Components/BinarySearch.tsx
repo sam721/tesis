@@ -261,7 +261,7 @@ class BubbleSort extends React.Component<Props, State> {
 					changeArray={this.changeArray}
 					currentValues={this.state.values}
 				/>
-				<Row id="canvas" />
+				<div id="canvas" />
 			</Container>
 		)
   }
