@@ -71,15 +71,17 @@ const Prim = param => {
 
     neighborhood.forEach(edge => {
       if(part_of_tree[edge.id()]) return;
+
+      let t = edge.target().id();
+      if(t === target) t = edge.source().id();
+      if(part_of_tree[t]) return;
+      let w = edge.data('weight');
       commands.push({
         eles: [edge.id()],
         style: [{'line-color':'green'}],
         lines: [11],
       });
       commands.push({lines: [12]});
-      let t = edge.target().id();
-      if(t === target) t = edge.source().id();
-      let w = edge.data('weight');
       if(dist[t] === undefined || dist[t] > w){
         commands.push({
           lines: [13,14],
