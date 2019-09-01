@@ -487,7 +487,12 @@ class AVL extends React.Component<Props, State>{
   }
 
   insert(value: number) {
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
     let id = 0;
 		while (this.cy.getElementById((id.toString())).length > 0) {
 			id++;
@@ -513,6 +518,9 @@ class AVL extends React.Component<Props, State>{
             });
             let [left, right] = getChildren(current);
             if(value === current.data('value')){
+              this.props.dispatch({
+                type: actions.AVL_ELEMENT_ALREADY_INFO,
+              })
               setTimeout(resolve, 1000/this.props.speed, current.id());
               return;
             }

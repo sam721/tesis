@@ -1,7 +1,7 @@
 import React from 'react';
 import actions from '../Actions/actions';
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-
+import {defaultGraphs} from '../resources/default_examples/defaultGraphs';
 import ControlBar from './ControlBar';
 import { Row, Col, Container } from 'react-bootstrap';
 import GraphArray from './GraphArray';
@@ -104,9 +104,11 @@ class Graph extends React.Component<Props, State>{
 		if (this.props.directed) {
 			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_DIRECTED };
 		}
+
+		this._mediaRecorder = new MediaRecorder(props.dispatch);
 	}
 
-	initialize(elements: Array<Object>){
+	initialize(elements: Object){
 		let edgeStyle = Styles.EDGE;
 		if (this.props.weighted) {
 			edgeStyle = { ...edgeStyle, ...Styles.EDGE_WEIGHTED };
@@ -160,7 +162,7 @@ class Graph extends React.Component<Props, State>{
 
 	componentDidMount() {
 		this._isMounted = true;
-		this.initialize([]);
+		this.initialize(defaultGraphs[Math.floor(Math.random()*defaultGraphs.length)].elements);
 		this.props.dispatch({
 			type: this.props.action,
 			payload:{
@@ -269,6 +271,7 @@ class Graph extends React.Component<Props, State>{
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
+				if(!this._isMounted) return;
 				if(pos === commands.length){
 					this.props.dispatch({
 						type: actions.FINISHED_ALGORITHM_SUCCESS,

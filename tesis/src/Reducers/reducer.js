@@ -3,9 +3,10 @@ import animationReducer from './animationReducer';
 import canvasReducer from './canvasReducer';
 import selectionReducer from './selectionReducer';
 import notificationsReducer from './notificationsReducer';
+import { number } from 'prop-types';
 
 const initialState = {
-  algorithm: 'BFS',
+  algorithm: 'none',
   selection: null,
   animation: false,
   speed: 1.0,
@@ -16,7 +17,8 @@ const initialState = {
   run: () => { },
   options: [],
   photo: () => { },
-  gif: () => { },
+  gif: () => {},
+  gifLength: 0,
 };
 
 

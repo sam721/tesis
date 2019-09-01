@@ -1,6 +1,6 @@
 import actions from '../Actions/actions';
 import { store } from 'react-notifications-component';
-
+import React from 'react';
 const createNotification = (title, message, type) => {
   store.addNotification({
     title,
@@ -13,7 +13,8 @@ const createNotification = (title, message, type) => {
     dismiss: {
       duration: 5000,
       onscreen: true,
-    }
+      showIcon: true,
+    },
   });
 }
 
@@ -79,6 +80,12 @@ const notificationsReducer = action => {
       'info');
       break;
 
+    case actions.AVL_ELEMENT_ALREADY_INFO:
+      createNotification('Elemento en el arbol',
+      'El elemento ya se encuentra en el arbol AVL',
+      'info');
+      break;
+
     case actions.STARTING_ALGORITHM_EXECUTION_INFO:
       createNotification('Ejecucion iniciada',
       ' ',
@@ -87,7 +94,7 @@ const notificationsReducer = action => {
 
     case actions.STARTING_GIF_RECORDING_INFO:
       createNotification('Creacion de GIF iniciada',
-      'La grabacion tendra un minuto maximo de duracion',
+      'La grabacion tendra una duracion maxima de 45 segundos',
       'info');
       break;
     
@@ -111,7 +118,7 @@ const notificationsReducer = action => {
     
     case actions.FINISHED_GIF_SUCCESS:
       createNotification('Creacion de GIF terminada',
-      'GIF listo para descargar',
+      'El archivo GIF sera descargado a su dispositivo',
       'success');
       break;
     

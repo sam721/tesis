@@ -1,12 +1,19 @@
 import dataURItoBlob from './dataURItoBlob';
+import actions from '../Actions/actions';
 const gifshot = require('gifshot');
 class MediaRecorder{
 
   _gifBuffer = [];
   _takingGif = false;
   _interval = 0;
+  _dispatch = null;
+  
+  constructor(dispatch = (_action) => {}){
+    this._dispatch = dispatch;
+  }
 
   downloadGif = (buffer, width, height) => {
+    const dispatch = this._dispatch;
     gifshot.createGIF({
       'images': buffer,
       'gifWidth': width,
@@ -24,7 +31,15 @@ class MediaRecorder{
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
+          dispatch({
+            type: actions.FINISHED_GIF_SUCCESS,
+          });
+      
         }else{
+          dispatch({
+            type: actions.FINISHED_GIF_SUCCESS,
+          });
+          
           console.log(obj.error);
         }
       }
@@ -42,11 +57,19 @@ class MediaRecorder{
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }else if(_this._gifBuffer.length < 600) _this._gifBuffer.push(image);
+    }else if(_this._gifBuffer.length < 450){
+      _this._gifBuffer.push(image);
+      _this._dispatch({
+        type: actions.INC_GIF_LENGTH,
+      });
+    }else{
+      _this.takeGif(cy);
+    }
   }
 
   cancelGif(){
     this._takingGif = false;
+    this._dispatch({type: actions.RESET_GIF_LENGTH});
     clearInterval(this._interval);
   }
 
@@ -57,6 +80,7 @@ class MediaRecorder{
     }else{
       clearInterval(this._interval);
       console.log(this._gifBuffer.length);
+      this._dispatch({type: actions.RESET_GIF_LENGTH});
       this.downloadGif(this._gifBuffer, cy.width(), cy.height());
       this._takingGif = false;
       this._gifBuffer = [];

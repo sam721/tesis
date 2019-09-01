@@ -22,6 +22,19 @@ const canvasReducer = (state = {}, action) => {
         loadingGraph: false,
         data: null,
       }
+    
+    case actions.INC_GIF_LENGTH:
+      return {
+        ...state,
+        gifLength: state.gifLength + 1,
+      }
+
+    case actions.RESET_GIF_LENGTH:
+      return {
+        ...state,
+        gifLength: 0,
+      }
+  
     default: 
       return state;
   }
