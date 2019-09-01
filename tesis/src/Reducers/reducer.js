@@ -2,6 +2,7 @@ import algorithmReducer from './algorithmReducer';
 import animationReducer from './animationReducer';
 import canvasReducer from './canvasReducer';
 import selectionReducer from './selectionReducer';
+import notificationsReducer from './notificationsReducer';
 
 const initialState = {
   algorithm: 'BFS',
@@ -25,6 +26,7 @@ const reducer = (state = initialState, action) => {
   finalState = animationReducer(finalState, action);
   finalState = canvasReducer(finalState, action);
   finalState = selectionReducer(finalState, action);
+  notificationsReducer(action);
   return finalState;
 }
 

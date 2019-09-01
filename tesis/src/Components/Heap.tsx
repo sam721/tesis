@@ -115,7 +115,7 @@ class Heap extends React.Component<Props, State>{
 			motionBlurOpacity: 0.2,
 			wheelSensitivity: 1,
 			pixelRatio: '1.0',
-
+			autoungrabify: true,
 		});
 
 		this.layout = this.cy.elements().makeLayout(layoutOptions);
@@ -257,7 +257,12 @@ class Heap extends React.Component<Props, State>{
 	}
 
 	insert(val = 0) {
-		if(this.props.animation) return;
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
 		let commands:Array<AnimationStep> = [];
 		if(this.cy.nodes().length === 31) return;
 		if (this.cy.nodes().length === 0) {
@@ -309,7 +314,12 @@ class Heap extends React.Component<Props, State>{
 	}
 
 	remove = () => {
-		if(this.props.animation) return;
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
 		const n = this.cy.nodes().length;
 		if (n === 0) return;
 		const outgoers = this.cy.getElementById("1").outgoers('node');

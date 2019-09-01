@@ -130,6 +130,7 @@ class AVL extends React.Component<Props, State>{
       motionBlurOpacity: 0.2,
       wheelSensitivity: 1,
       pixelRatio: '1.0',
+      autoungrabify: true,
 
     });
     this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
@@ -251,7 +252,12 @@ class AVL extends React.Component<Props, State>{
   }
 
   handleClickOnNode = (node: CytoscapeElement) => {
-		if (this.props.animation === true) return;
+		if (this.props.animation === true){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      })
+      return;
+    }
     let nodeId = node.id();
     let { selection } = this.props;
     if(selection && selection.type === 'node'){
@@ -615,9 +621,19 @@ class AVL extends React.Component<Props, State>{
     return result;
   }
   remove = () => {
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
     let {selection} = this.props;
-    if(!selection) return;
+    if(!selection){
+      this.props.dispatch({
+        type: actions.NO_ELEMENT_SELECTED_ERROR,
+      });
+      return;
+    }
     let node = this.cy.getElementById(selection.id);
     let anc = null;
     this.props.dispatch({

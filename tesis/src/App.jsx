@@ -1,5 +1,8 @@
 // @flow
 import React from 'react';
+import ReactNotification from 'react-notifications-component'
+import 'react-notifications-component/dist/theme.css'
+
 import './views/css/App.css';
 import './views/css/codeblock.css';
 import { Container, Row, Col } from 'react-bootstrap';
@@ -24,6 +27,7 @@ class App extends React.Component {
       <body>
         <div>
           <Container fluid={true}>
+            <ReactNotification/>
             <MenuBar/>
             <Row>
               <Col>

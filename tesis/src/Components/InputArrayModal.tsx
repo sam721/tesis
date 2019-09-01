@@ -2,12 +2,15 @@ import React, { ReactElement } from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Button, FormControl } from 'react-bootstrap';
 import actions from '../Actions/actions';
+
+const {connect} = require('react-redux');
 //5(3(1(.)(.))(4(.)(.)))(9(7(6(.)(.))(8(.)(.)))(15(11(.)(.))(.)))
 type Props = {
   show: boolean,
   handleClose: () => void,
   changeArray: (values: Array<number>) => void,
   currentValues: Array<number>,
+  dispatch: (action:Object)=>void,
 }
 type State = {
   text: string,
@@ -32,7 +35,7 @@ class InputArrayModal extends React.Component<Props, State>{
     if (text && regex.test(text)) {
       return true;
     } else {
-      console.error('No number');
+      this.props.dispatch({type: actions.INVALID_ARRAY_ERROR})
       return false;
     }
   }
@@ -83,4 +86,4 @@ class InputArrayModal extends React.Component<Props, State>{
   }
 }
 
-export default InputArrayModal;
+export default connect()(InputArrayModal);

@@ -224,7 +224,12 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	clearGraph = () => {
-		if (this.props.animation === true) return;
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
 		this.props.dispatch({
 			type: actions.CLEAR_GRAPH,
 		});
@@ -338,7 +343,9 @@ class Graph extends React.Component<Props, State>{
 		if (this.props.algorithm !== 'Kruskal' && this.props.algorithm !== 'Prim') {
 			console.log(this.props.algorithm);
 			if (!selection || selection.type !== 'node') {
-				console.error('No node selected');
+				this.props.dispatch({
+					type: actions.NO_NODE_SELECTED_ERROR,
+				})
 				return;
 			}
 		}
@@ -363,11 +370,17 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	removeButton = () => {
-		console.log(this.props);
-		if (this.props.animation === true) return;
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
 		let { selection } = this.props;
 		if (!selection) {
-			console.error('No element selected');
+			this.props.dispatch({
+				type: actions.NO_ELEMENT_SELECTED_ERROR,
+			})
 			return;
 		}
 
@@ -550,11 +563,20 @@ class Graph extends React.Component<Props, State>{
 		const {selection} = this.props;
 		if(selection && selection.type === 'edge'){
 			this.setState({showWeightModal: true});
+		}else{
+			this.props.dispatch({
+				type: actions.NO_EDGE_SELECTED_ERROR,
+			})
 		}
 	}
 
 	handleClickViewport = (event: CytoEvent) => {
-		if (this.props.animation === true) return;
+		if (this.props.animation === true){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			})
+			return;
+		}
 
 		let { selection } = this.props;
 		if (event.target === this.cy) {

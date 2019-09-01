@@ -90,7 +90,8 @@ class BubbleSort extends React.Component<Props, State> {
 			motionBlur: false,
 			motionBlurOpacity: 0.2,
 			wheelSensitivity: 1,
-			pixelRatio: '1.0'
+			pixelRatio: '1.0',
+			autoungrabify: true,
 		});
 
 		this.cy.autopanOnDrag({ enabled: true, speed: 0.01 });

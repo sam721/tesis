@@ -10,6 +10,7 @@ type Props = {
   handleClose: () => void,
   callback: (value: number) => void,
   currentValue: number,
+  dispatch: (action:Object) => void,
 }
 
 type storeState = {
@@ -55,7 +56,9 @@ class InputModal extends React.Component<Props, State>{
     if (text && regex.test(text)) {
       return true;
     } else {
-      console.error('No number');
+      this.props.dispatch({
+        type: actions.INVALID_INTEGER_ERROR,
+      })
       return false;
     }
   }
