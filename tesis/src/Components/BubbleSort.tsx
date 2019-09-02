@@ -52,6 +52,11 @@ class BubbleSort extends React.Component<Props, State> {
 	};
 
 	nodeStyle = Styles.NODE;
+	constructor(props:Props){
+    super(props);
+    this._mediaRecorder = new MediaRecorder(props.dispatch);
+	}
+	
   componentDidMount() {
 
 		this._isMounted = true;

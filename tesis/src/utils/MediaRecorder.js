@@ -46,8 +46,7 @@ class MediaRecorder{
     );
   }
   takePicture(cy, _this = null, download = true){
-    console.log('Taking picture');
-    let image = cy.jpg();
+    let image = cy.jpg({quality: 0.5});
     if(download){
       let link = document.createElement('a');
       link.setAttribute('href', image);
@@ -57,7 +56,7 @@ class MediaRecorder{
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    }else if(_this._gifBuffer.length < 450){
+    }else if(_this._gifBuffer.length < 300){
       _this._gifBuffer.push(image);
       _this._dispatch({
         type: actions.INC_GIF_LENGTH,
@@ -76,10 +75,11 @@ class MediaRecorder{
   takeGif(cy){
     if(!this._takingGif){
       this._takingGif = true;
+      this._dispatch({type: actions.STARTING_GIF_RECORDING_INFO});
       this._interval = setInterval(this.takePicture, 100, cy, this, false);
     }else{
       clearInterval(this._interval);
-      console.log(this._gifBuffer.length);
+      this._dispatch({type: actions.FINISHED_GIF_RECORDING_INFO});
       this._dispatch({type: actions.RESET_GIF_LENGTH});
       this.downloadGif(this._gifBuffer, cy.width(), cy.height());
       this._takingGif = false;

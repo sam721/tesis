@@ -28,6 +28,7 @@ class App extends React.Component {
         <div>
           <Container fluid={true}>
             <ReactNotification/>
+            <CodeBlock/>
             <MenuBar/>
             <Row>
               <Col>

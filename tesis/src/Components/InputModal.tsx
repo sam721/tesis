@@ -22,7 +22,6 @@ type State = {
 }
 
 const mapStateToProps = (state:storeState) => {
-  console.log(state.selection);
   return {
     currentValue: (state.selection ? state.selection.weight : 0),
   }

@@ -22,6 +22,7 @@ const algorithmReducer = (state = {}, action) => {
       }
 
     case actions.SELECT_DFS:
+      
       return {
         ...state,
         algorithm: 'DFS',

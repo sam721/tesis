@@ -82,6 +82,11 @@ class Heap extends React.Component<Props, State>{
 
 	heap = new PriorityQueue((x, y) => x <= y);
 
+	constructor(props:Props){
+    super(props);
+    this._mediaRecorder = new MediaRecorder(props.dispatch);
+	}
+	
 	componentDidMount() {
 		this._isMounted = true;
 
