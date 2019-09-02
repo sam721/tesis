@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/tesis/static/css/main.584b5b53.chunk.css",
-    "main.js": "/tesis/static/js/main.38e34ed5.chunk.js",
-    "main.js.map": "/tesis/static/js/main.38e34ed5.chunk.js.map",
+    "main.css": "/tesis/static/css/main.0a1b32f9.chunk.css",
+    "main.js": "/tesis/static/js/main.14f8a276.chunk.js",
+    "main.js.map": "/tesis/static/js/main.14f8a276.chunk.js.map",
     "runtime~main.js": "/tesis/static/js/runtime~main.ca416940.js",
     "runtime~main.js.map": "/tesis/static/js/runtime~main.ca416940.js.map",
-    "static/css/2.3bf07905.chunk.css": "/tesis/static/css/2.3bf07905.chunk.css",
-    "static/js/2.9a41dd40.chunk.js": "/tesis/static/js/2.9a41dd40.chunk.js",
-    "static/js/2.9a41dd40.chunk.js.map": "/tesis/static/js/2.9a41dd40.chunk.js.map",
+    "static/css/2.4d53a501.chunk.css": "/tesis/static/css/2.4d53a501.chunk.css",
+    "static/js/2.96d53828.chunk.js": "/tesis/static/js/2.96d53828.chunk.js",
+    "static/js/2.96d53828.chunk.js.map": "/tesis/static/js/2.96d53828.chunk.js.map",
     "index.html": "/tesis/index.html",
-    "precache-manifest.dd0bf3633b4872d47b08510006a63610.js": "/tesis/precache-manifest.dd0bf3633b4872d47b08510006a63610.js",
+    "precache-manifest.c55df244e1e898fe19e781b9a5647e80.js": "/tesis/precache-manifest.c55df244e1e898fe19e781b9a5647e80.js",
     "service-worker.js": "/tesis/service-worker.js",
-    "static/css/2.3bf07905.chunk.css.map": "/tesis/static/css/2.3bf07905.chunk.css.map",
-    "static/css/main.584b5b53.chunk.css.map": "/tesis/static/css/main.584b5b53.chunk.css.map"
+    "static/css/2.4d53a501.chunk.css.map": "/tesis/static/css/2.4d53a501.chunk.css.map",
+    "static/css/main.0a1b32f9.chunk.css.map": "/tesis/static/css/main.0a1b32f9.chunk.css.map"
   }
 }
