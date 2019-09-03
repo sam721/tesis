@@ -626,7 +626,7 @@ class Graph extends React.Component<Props, State>{
 					handleClose = {() => this.setState({showWeightModal: false})}
 					callback = {(w:number) => this.changeWeight(w)}
 				/>
-				<div id = "canvas"/>
+				<div id = "canvas" className="standard-struct"/>
 				{
 					/*
 				<GraphArray array={this.state.values}/>

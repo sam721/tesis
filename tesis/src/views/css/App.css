@@ -70,7 +70,6 @@
   display: block;
   left: 0;
   z-index: 0;
-  border-style: solid;
 }
 
 .fixed-struct {
@@ -82,7 +81,6 @@
   display: block;
   left: 0;
   z-index: 0;
-  border-style: solid;
 }
 .ControlBar {
   background-color: #ccc;
