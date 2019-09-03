@@ -34,6 +34,24 @@ const animationReducer = (state = {}, action) => {
         speed: action.payload.speed,
       }
 
+    case actions.CHANGE_PSEUDO:
+      return {
+        ...state,
+        pseudo: action.payload.pseudo,
+      }
+    
+    case actions.SHOW_PSEUDO:
+      return {
+        ...state,
+        showPseudo: true,
+      }
+    
+    case actions.CLOSE_PSEUDO:
+      return {
+        ...state,
+        showPseudo: false,
+      }
+      
     case actions.CHANGE_LINE:
       return {
         ...state,

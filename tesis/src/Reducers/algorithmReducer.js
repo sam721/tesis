@@ -5,8 +5,11 @@ import kruskal from '../resources/pseudocodes/kruskal';
 import bubblesort from '../resources/pseudocodes/bubblesort';
 import mergesort from '../resources/pseudocodes/mergesort';
 import prim from '../resources/pseudocodes/prim';
-import actions from '../Actions/actions'
+import {heap} from '../resources/pseudocodes/heap';
+import {avl} from '../resources/pseudocodes/avl';
+import binarySearch from '../resources/pseudocodes/binarySearch';
 
+import actions from '../Actions/actions'
 const algorithmReducer = (state = {}, action) => {
   switch (action.type) {
     case actions.SELECT_BFS:
@@ -77,6 +80,7 @@ const algorithmReducer = (state = {}, action) => {
         algorithm: 'Heap',
         selection: null,
         options: action.payload.options,
+        pseudo: heap,
         photo: action.payload.photo,
         gif: action.payload.gif
       }
@@ -86,6 +90,7 @@ const algorithmReducer = (state = {}, action) => {
         ...state,
         algorithm: 'AVL',
         selection: null,
+        pseudo: avl,
         options: action.payload.options,
         photo: action.payload.photo,
         gif: action.payload.gif
@@ -119,6 +124,7 @@ const algorithmReducer = (state = {}, action) => {
         ...state,
         algorithm: 'BinarySearch',
         selection: null,
+        pseudo: binarySearch,
         options: action.payload.options,
         photo: action.payload.photo,
         gif: action.payload.gif

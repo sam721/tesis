@@ -7,14 +7,14 @@ const BinarySearch = (param, value) => {
   const commands = [];
 
   let lo = 0, hi = n - 1;
-
+  let found = false;
   while(lo <= hi){
     commands.push({
       eles: positions,
       style: defaultStyle,
       duration: 0,
     });
-    const cmd = {eles: [], style: []};
+    const cmd = {eles: [], style: [], lines: [3]};
     for(let i = lo; i <= hi; i++){
       cmd.eles.push(i.toString());
       cmd.style.push({'border-width': 3});
@@ -25,22 +25,26 @@ const BinarySearch = (param, value) => {
     commands.push({
       eles: [mid.toString()],
       style: [{'background-color': 'gray'}],
+      lines: (values[mid] < value ? [7, 8] : (values[mid] > value ? [8, 9] : [4, 5])),
     });
     if(values[mid] === value){
       commands.push({
         eles: [mid.toString()],
         style: [{'background-color': 'lightgreen'}],
+        lines: [4, 5],
       });
+      found = true;
       break;
     }
     commands.push({
       eles: [mid.toString()],
       style: [{'background-color': 'white'}],
-      duration: 0,
+      lines: [],
     });
     if(values[mid] < value) lo = mid + 1;
     else hi = mid - 1;
   }
+  if(!found) commands.push({eles: [], style: [], lines: [10]});
   return commands;
 }
 

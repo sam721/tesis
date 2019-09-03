@@ -12,6 +12,10 @@ class PriorityQueue {
 		return this._data.length === 1;
 	}
 
+	length() {
+		return this._data.length;
+	}
+	
 	top() {
 		if (this.isEmpty()) return null;
 		return this._data[1];
@@ -26,6 +30,7 @@ class PriorityQueue {
 				eles: [pos.toString()],
 				style: [{ 'background-color': 'black', 'color': 'white' }],
 				classes: ['heap-focus'],
+				lines: [4],
 			});
 		}
 		while (pos > 1) {
@@ -37,6 +42,7 @@ class PriorityQueue {
 							eles: [parent.toString()],
 							style: [{ 'background-color': 'Chartreuse', 'color': 'black' }],
 							classes: ['heap-correct'],
+							lines: [-1],
 						}
 					);
 				}
@@ -48,6 +54,7 @@ class PriorityQueue {
 						eles: [parent.toString()],
 						style: [{ 'background-color': '#FF9494', 'color': 'black' }],
 						classes: ['heap-wrong'],
+						lines: [5,6,7],
 					},
 					{
 						eles: [parent.toString(), pos.toString()],
@@ -65,7 +72,8 @@ class PriorityQueue {
 							[
 								'heap-focus',
 								'heap-default',
-							]
+							],
+						lines: [4],
 					}
 				)
 			}
@@ -89,6 +97,7 @@ class PriorityQueue {
 					eles: [pos.toString()],
 					style: [{ 'background-color': 'black', 'color': 'white' }],
 					classes: ['heap-focus'],
+					lines: [5],
 				});
 			}
 
@@ -105,6 +114,7 @@ class PriorityQueue {
 									eles: [(2 * pos).toString()],
 									style: [{ 'background-color': '#FF9494', 'color': 'black' }],
 									classes: ['heap-wrong'],
+									lines: [7, 8],
 								},
 								{
 									eles: [pos.toString(), (2 * pos).toString()],
@@ -119,7 +129,8 @@ class PriorityQueue {
 									classes: [
 										'heap-default',
 										'heap-focus',
-									]
+									],
+									lines: [11,12],
 								}
 							);
 						}
@@ -134,6 +145,7 @@ class PriorityQueue {
 									eles: [(2 * pos).toString()],
 									style: [{ 'background-color': '#FF9494', 'color': 'black' }],
 									classes: ['heap-wrong'],
+									lines: [7, 8],
 								},
 								{
 									eles: [pos.toString(), (2 * pos).toString()],
@@ -148,7 +160,8 @@ class PriorityQueue {
 									classes: [
 										'heap-default',
 										'heap-focus',
-									]
+									],
+									lines: [11, 12],
 								}
 							);
 						}
@@ -161,6 +174,7 @@ class PriorityQueue {
 									eles: [(2 * pos + 1).toString()],
 									style: [{ 'background-color': '#FF9494', 'color': 'black' }],
 									classes: ['heap-wrong'],
+									lines: [9, 10],
 								},
 								{
 									eles: [pos.toString(), (2 * pos + 1).toString()],
@@ -175,7 +189,8 @@ class PriorityQueue {
 									classes: [
 										'heap-default',
 										'heap-focus',
-									]
+									],
+									lines: [11,12],
 								}
 							);
 						}

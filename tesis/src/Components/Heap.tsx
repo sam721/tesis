@@ -12,6 +12,7 @@ import InputHeapModal from './InputHeapModal';
 import MediaRecorder from '../utils/MediaRecorder';
 import { parseHeap } from '../utils/heap-utils';
 import InputModal from './InputModal';
+import {insert, remove} from '../resources/pseudocodes/heap';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -136,7 +137,7 @@ class Heap extends React.Component<Props, State>{
 						run: () => this.setState({showInsertModal: true}),
 					},
 					{
-						name: 'Eliminar',
+						name: 'Extraer minimo',
 						run: this.remove,
 					},
 					{
@@ -163,30 +164,69 @@ class Heap extends React.Component<Props, State>{
     this._isMounted = false;
 		let nodes = this.cy.nodes();
 		nodes.forEach((node: CytoscapeElement) => {
-			let id = node.id();
-			let popper = document.getElementById(id + 'popper');
-			if (popper) {
-				document.body.removeChild(popper);
-			}
+			this.removeNode(node.id());
 		});
 	}
 	
+	createPopper(nodeId: string, value: number){
+		const ele = this.cy.getElementById(nodeId);
+		const position = ele.position();
+		this.cy.add({
+			group: 'nodes',
+			data: {id : nodeId+'-popper', value},
+			position: {
+				x: position.x,
+				y: position.y+30,
+			},
+			style: {
+				'z-index': 0,
+				'border-width': 0,
+				'font-size': 15,
+				'width': 10,
+				'height': 10,
+			}
+		});
+	}
 
+	addNode(node: string, value: number, position?: Object){
+		this.cy.add(
+			{
+				group: 'nodes',
+				data: { id: node.toString(), value },
+				grabbable: false,
+				pannable: false,
+				position,
+			},
+		)
+		this.createPopper(node, parseInt(node));
+	}
 	removeNode = (node: string) => {
 		this.cy.remove('node[id="' + node + '"]');
+		this.cy.remove('node[id="' + node + '-popper"]');
 	}
 
 	executeAnimation = (commands: Array<AnimationStep>) => {
-		this.cy.nodes().style({
-			'background-color': 'white',
-			'color': 'black',
-		});
+		this.cy.nodes().forEach((node: CytoscapeElement) => {
+			if(!node.id().match('-popper')){
+				node.style({
+					'background-color': 'white',
+					'color': 'black',
+				})
+			}
+		})
 
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
 				if (pos === commands.length || !this.props.animation) {
-					this.cy.nodes().style(this.nodeStyle);
+					this.cy.nodes().forEach((node: CytoscapeElement) => {
+						if(!node.id().match('-popper')){
+							node.style({
+								'background-color': 'white',
+								'color': 'black',
+							})
+						}
+					})
 					this.cy.edges().style(this.edgeStyle);
 					
 					let {values} = this.state;
@@ -197,10 +237,11 @@ class Heap extends React.Component<Props, State>{
 					this.props.dispatch({
 						type: actions.ANIMATION_END,
 					});
+
 					this.refreshLayout();
 					return;
 				}
-				let { eles, style, duration, data, classes} = commands[pos++];
+				let { eles, style, duration, data, classes, lines} = commands[pos++];
 				if (style) {
 					eles.forEach((ele, index) => {
 						this.cy.getElementById(ele).style(style[index]);
@@ -223,6 +264,12 @@ class Heap extends React.Component<Props, State>{
 					}
 				})
 				if(this._isMounted) this.setState({values});
+				if(lines != null && this._isMounted){
+					this.props.dispatch({
+						type: actions.CHANGE_LINE,
+						payload: {lines}
+					})
+				}
 				this.refreshLayout();
 				setTimeout(step, ((duration === undefined) ? 1000/this.props.speed : duration)/this.props.speed);
 			}
@@ -253,11 +300,12 @@ class Heap extends React.Component<Props, State>{
 
 		const setSep = (node: CytoscapeElement, nx: number, ny: number, sep: number) => {
 			layoutOptions.positions[node.id()] = { x: nx, y: ny }
+			layoutOptions.positions[node.id()+'-popper'] = { x: nx, y: ny+30}
 			if (node.outgoers('node').length) setSep(node.outgoers('node')[0], nx - sep, ny + 50, sep / 2);
 			if (node.outgoers('node').length === 2) setSep(node.outgoers('node')[1], nx + sep, ny + 50, sep / 2);
 		}
 		const vw = this.cy.width(), vh = this.cy.height();
-		setSep(this.cy.getElementById("1"), vw / 2, vh / 4, sep);
+		setSep(this.cy.getElementById("1"), vw / 3, vh / 4, sep);
 		return true;
 	}
 
@@ -269,27 +317,35 @@ class Heap extends React.Component<Props, State>{
 			return;
 		}
 		let commands:Array<AnimationStep> = [];
-		if(this.cy.nodes().length === 31) return;
-		if (this.cy.nodes().length === 0) {
-			this.cy.add({
-				group: 'nodes',
-				data: { id: "1", value: val },
-				grabbable: false,
-				pannable: false,
-			})
+		if(this.heap.length() === 32) return;
+
+		this.props.dispatch({
+			type: actions.CHANGE_PSEUDO,
+			payload: {
+				pseudo: insert,
+			}
+		});
+
+		this.props.dispatch({
+			type: actions.SHOW_PSEUDO,
+		});
+
+		this.props.dispatch({
+			type: actions.CHANGE_LINE,
+			payload: {
+				lines: [0, 1, 2],
+			}
+		});
+
+		if (this.heap.length()-1 === 0) {
+			
+			this.addNode("1", val);
 			commands = this.heap.push(val, true);
 		} else {
-			let nodeId = this.cy.nodes().length + 1;
+			let nodeId = this.heap.length();
 			console.log(nodeId);
 			let src = this.cy.getElementById(Math.floor(nodeId / 2).toString());
-			this.cy.add(
-				{
-					group: 'nodes',
-					data: { id: nodeId.toString(), value: val },
-					grabbable: false,
-					pannable: false,
-				},
-			)
+			this.addNode(nodeId.toString(), val);
 			this.cy.add(
 				{
 					group: 'edges',
@@ -325,13 +381,21 @@ class Heap extends React.Component<Props, State>{
 			});
 			return;
 		}
-		const n = this.cy.nodes().length;
+		const n = this.heap.length()-1;
 		if (n === 0){
 			this.props.dispatch({
 				type: actions.EMPTY_HEAP_WARNING,
 			});
 			return;
 		}
+
+		this.props.dispatch({
+			type: actions.CHANGE_PSEUDO,
+			payload: {
+				pseudo: remove,
+			}
+		});
+
 		const outgoers = this.cy.getElementById("1").outgoers('node');
 		this.removeNode("1");
 		let commands:Array<AnimationStep> = [];
@@ -342,17 +406,26 @@ class Heap extends React.Component<Props, State>{
 		if(n > 0) values[1] = lastValue;
 		if(this._isMounted) this.setState({values});
 
-		if (n === 1) return;
+		this.props.dispatch({
+			type: actions.SHOW_PSEUDO,
+		});
+
+		this.props.dispatch({
+			type: actions.CHANGE_LINE,
+			payload: {
+				lines: [0, 1, 2, 3],
+			}
+		});
+		
+		if (n === 1) {
+			return;
+		}
 
 		const position = this.cy.getElementById(n.toString()).position();
 		const value = this.cy.getElementById(n.toString()).data('value');
 		this.removeNode(n.toString());
 
-		this.cy.add({
-			group: 'nodes',
-			data: { id: "1", value },
-			position,
-		});
+		this.addNode("1", value, position);
 
 		for (let i = 0; i < outgoers.length; i++) {
 			if (this.cy.getElementById(outgoers[i].id()).length === 0) continue;
@@ -386,14 +459,7 @@ class Heap extends React.Component<Props, State>{
 		this.heap.clear();
 		for(let i = 1; i < values.length; i++){
 			this.heap.push(values[i]);
-			this.cy.add(
-				{
-					group: 'nodes',
-					data: { id: (i).toString(), value: values[i] },
-					grabbable: false,
-					pannable: false,
-				},
-			);
+			this.addNode((i).toString(), values[i]);
 		}
 		for(let i = 1; 2*i < values.length; i++){
 			const left = 2*i, right = 2*i + 1;
@@ -436,15 +502,7 @@ class Heap extends React.Component<Props, State>{
 					handleClose = {() => this.setState({showInsertModal: false})}
 					callback = {(v:number) => this.insert(v)}
 				/>
-				<Container fluid={true}>
-					<Row id="canvas" />
-					<HeapArray array={this.state.values}/>
-					<TreeBar insert={(v: number) => this.insert(v)} remove={() => this.remove()} />
-					<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-					<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-					<button onClick={() => this.setState({show: true})}>Test input heap</button>
-					<button onClick={() => parseHeap(this.state.values)}>Test output heap</button>
-				</Container>
+				<div id="canvas" />
 			</>
 		);
 	}
