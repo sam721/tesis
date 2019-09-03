@@ -3,21 +3,18 @@ import React, { ReactElement } from 'react';
 const { connect } = require('react-redux');
 
 type Props = {
-  code: Array<{text: string, ind: number}>,
+  code: Array<{text: string, ind: number}> | null,
   lines: Array<number>,
-  show: boolean,
 }
 
 type State = {
   pseudo: Array<{text: string, ind: number}> | null,
   lines: Array<number>,
-  showPseudo: boolean,
 }
 const mapStateToProps = (state: State) => {
   return {
     code: state.pseudo,
     lines: state.lines,
-    show: state.showPseudo,
   }
 }
 const CodeLine = (props:{line:{text:string, ind: number}, current: boolean}) => {
@@ -27,7 +24,7 @@ const CodeLine = (props:{line:{text:string, ind: number}, current: boolean}) => 
 
 class CodeBlock extends React.Component<Props>{
   render(){
-    if(this.props.show || true){
+    if(this.props.code){
       const {code, lines} = this.props;
       let codelines = [];
       if(code){
