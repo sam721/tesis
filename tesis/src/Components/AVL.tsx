@@ -140,6 +140,7 @@ class AVL extends React.Component<Props, State>{
       autoungrabify: true,
 
     });
+    this.cy.on('resize', () => this.refreshLayout(false));
     this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
     this.layout = this.cy.elements().makeLayout(layoutOptions);
     this.layout.run();
@@ -307,10 +308,10 @@ class AVL extends React.Component<Props, State>{
 
     return [left, right];
   }
-  refreshLayout() {
+  refreshLayout(animate:boolean = true) {
     this.layoutProcessing();
     this.layout.stop();
-    this.layout = this.cy.elements().makeLayout(layoutOptions);
+    this.layout = this.cy.elements().makeLayout({...layoutOptions, animate});
     this.layout.run();
   }
 

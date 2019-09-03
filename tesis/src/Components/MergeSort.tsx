@@ -170,12 +170,12 @@ class BubbleSort extends React.Component<Props, State> {
         value,
 			},
 			position: {
-				x: this.cy.width()/3 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
+				x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
 				y: this.cy.height()/4,
 			},
 		});
 		layoutOptions.positions[id] = {
-			x: this.cy.width()/3 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
+			x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
 			y: this.cy.height()/4,
 		}
   }
@@ -241,7 +241,7 @@ class BubbleSort extends React.Component<Props, State> {
       this.props.dispatch({
         type: actions.ANIMATION_START,
 			})
-      const commands = Mergesort(this.state.values, this.cy.width()/1.5, this.cy.height());
+      const commands = Mergesort(this.state.values, this.cy.width(), this.cy.height());
       resolve(commands);
     }).then((commands: Array<AnimationStep>) => {
       setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
