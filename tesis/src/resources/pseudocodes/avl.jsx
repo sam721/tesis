@@ -33,6 +33,16 @@ export const balance = [
   { text: 'rotacionIzquierda(u.hijoIzquiedo), rotacionDerecha(u)', ind: 2},
 ];
 
+export const search = [
+  {text: 'buscar(nodo u, entero v):', ind: 0},
+  {text: 'Si u == NULL: retornar Falso', ind: 1},
+  {text: 'Si v == u.valor: retornar Verdadero', ind: 1},
+  {text: 'Si v < u.valor:', ind: 1},
+  {text: 'buscar(u.hijoIzquierdo, v)', ind: 2},
+  {text: 'Sino:', ind: 1},
+  {text: 'buscar(u.hijoDerecho, v)', ind: 2},
+];
+
 export const avl = [
   { text: 'AVL{', ind: 0},
   { text: 'Nodo raiz', ind: 1},

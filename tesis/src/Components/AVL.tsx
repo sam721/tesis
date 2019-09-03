@@ -15,9 +15,7 @@ import { number, string } from 'prop-types';
 import {isLeaf, getChildren, getHeight, lca, parseAVL} from '../utils/avl-utils';
 import {edgeId} from '../utils/cy-utils';
 import MediaRecorder from '../utils/MediaRecorder';
-import {remove, insert, balance} from '../resources/pseudocodes/avl';
-import { toHtml } from '@fortawesome/fontawesome-svg-core';
-import { resolve } from 'q';
+import {remove, insert, balance, search} from '../resources/pseudocodes/avl';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -54,6 +52,7 @@ type State = {
   show: boolean,
   showSearchModal: boolean,
   showInsertModal: boolean,
+  showRemoveModal: boolean,
 }
 
 type Props = {
@@ -91,6 +90,7 @@ class AVL extends React.Component<Props, State>{
     show: false,
     showSearchModal: false,
     showInsertModal: false,
+    showRemoveModal: false,
   }
 
   nodeStyle = Styles.NODE;
@@ -155,7 +155,7 @@ class AVL extends React.Component<Props, State>{
           },
           {
             name: 'Eliminar',
-            run: this.remove,
+            run: () => this.setState({showRemoveModal: true}),
           },
           {
             name: 'Buscar',
@@ -647,7 +647,13 @@ class AVL extends React.Component<Props, State>{
       });
       return;
     }
-    let promise = new Promise((resolve: (node?: CytoscapeElement | null) => void, reject) => {
+    this.props.dispatch({
+      type: actions.CHANGE_PSEUDO,
+      payload:{
+        pseudo: search,
+      }
+    })
+    let promise = new Promise((resolve: (node: CytoscapeElement) => void, reject) => {
       let found = false;
       const bsearch = (node: CytoscapeElement, prev: CytoscapeElement | null) => {
         if(prev){
@@ -668,18 +674,36 @@ class AVL extends React.Component<Props, State>{
               'color': 'black',
             });
             found = true;
+            this.props.dispatch({
+              type: actions.CHANGE_LINE,
+              payload: {lines: [2]}
+            });
             setTimeout(bsearch, 1000/this.props.speed, null, node);
           }else if(node.data('value') < value){
+            this.props.dispatch({
+              type: actions.CHANGE_LINE,
+              payload: {lines: [5,6]}
+            });
             setTimeout(bsearch, 1000/this.props.speed, right, node);
           }else{
+            this.props.dispatch({
+              type: actions.CHANGE_LINE,
+              payload: {lines: [3,4]}
+            });
             setTimeout(bsearch, 1000/this.props.speed, left, node);
           }
         }else{
           this.props.dispatch({
             type: (found ? actions.AVL_FOUND_SUCCESS : actions.AVL_NOT_FOUND_INFO),
           });
-          
-          resolve(prev);
+          if(!found){
+            this.props.dispatch({
+              type: actions.CHANGE_LINE,
+              payload: {lines: [1]},
+            });
+            setTimeout(reject, 1000/ this.props.speed);
+          }
+          setTimeout(resolve, 1000/this.props.speed, prev);
         }
       }
       bsearch(this.cy.getElementById(this.treeRoot), null);
@@ -687,89 +711,85 @@ class AVL extends React.Component<Props, State>{
     let result = await promise;
     return result;
   }
-  remove = () => {
+  remove = (value: number) => {
     if(this.props.animation){
       this.props.dispatch({
         type: actions.ANIMATION_RUNNING_ERROR,
       });
       return;
     }
-    let {selection} = this.props;
-    if(!selection){
+
+    const searchPromise = this.search(value);
+    searchPromise.then((node?: CytoscapeElement) => {
+      if(node === undefined) return;
+      let anc = '';
       this.props.dispatch({
-        type: actions.NO_ELEMENT_SELECTED_ERROR,
+        type: actions.ANIMATION_START,
       });
-      return;
-    }
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: remove,
-      }
-    });
-    let node = this.cy.getElementById(selection.id);
-    let anc = '';
-    this.props.dispatch({
-      type: actions.ANIMATION_START,
-    });
-    if(isLeaf(node)){
-      this.props.dispatch({ type: actions.CHANGE_LINE, payload: {lines: [1]}});
-      if(node.id() !== this.treeRoot) anc = node.data('prev');
-      this.removeNode(node);
-      this.refreshLayout();
-      if(anc !== '') this.balance(this.cy.getElementById(anc)).then(() => {
-        this.props.dispatch({type: actions.ANIMATION_END});
+      this.props.dispatch({
+        type: actions.CHANGE_PSEUDO,
+        payload: { pseudo: remove}
       });
-      else this.props.dispatch({type: actions.ANIMATION_END});
-    }else if(node.outgoers('node').length === 1){
-      this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [3, 4]}});
-      if(node.id() === this.treeRoot){
-        this.treeRoot = node.outgoers('node')[0].id();
-        anc = this.treeRoot;
+      if(isLeaf(node)){
+        this.props.dispatch({ type: actions.CHANGE_LINE, payload: {lines: [1]}});
+        if(node.id() !== this.treeRoot) anc = node.data('prev');
         this.removeNode(node);
         this.refreshLayout();
-      }else{
-        const prev = node.data('prev');
-        const newChild = node.outgoers('node')[0];
-        newChild.data({
-          prev,
-        });
-        this.removeNode(node);
-        this.addEdge(prev, newChild.id());
-        anc = newChild.id();
-        this.refreshLayout();
-      }
-      setTimeout(() => 
-        this.balance(this.cy.getElementById(anc)).then(() => {
+        if(anc !== '') this.balance(this.cy.getElementById(anc)).then(() => {
           this.props.dispatch({type: actions.ANIMATION_END});
-        }),
-        1000/this.props.speed
-      );
-    }else{
-      this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [6]}});
-      let promise = this.inorderSuccessor(node);
-      promise.then((suc: CytoscapeElement) => {
-        this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [7, 8]}});
-        if(!isLeaf(suc)){
-          const right = getChildren(suc)[1];
-          right.data('prev', suc.data('prev'));
-          this.addEdge(suc.data('prev'), right.id());
+        });
+        else this.props.dispatch({type: actions.ANIMATION_END});
+      }else if(node.outgoers('node').length === 1){
+        this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [3, 4]}});
+        if(node.id() === this.treeRoot){
+          this.treeRoot = node.outgoers('node')[0].id();
+          anc = this.treeRoot;
+          this.removeNode(node);
+          this.refreshLayout();
+        }else{
+          let prev = '';
+          prev = node.data('prev');
+          const newChild = node.outgoers('node')[0];
+          newChild.data(prev);
+          this.removeNode(node);
+          this.addEdge(prev, newChild.id());
+          anc = newChild.id();
+          this.refreshLayout();
         }
-        anc = suc.data('prev');
-        this.removeNode(suc);
-        this.refreshLayout();
         setTimeout(() => 
           this.balance(this.cy.getElementById(anc)).then(() => {
             this.props.dispatch({type: actions.ANIMATION_END});
           }),
           1000/this.props.speed
         );
-        node.style(Styles.NODE);
-
-      })
-    }
-    this.props.dispatch({
-      type: actions.NO_SELECTION,
+      }else{
+        this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [6]}});
+        let promise = this.inorderSuccessor(node);
+        promise.then((suc: CytoscapeElement) => {
+          this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [7, 8]}});
+          node.data('value', suc.data('value'));
+          suc.data('value', value);
+          setTimeout(
+            () => {
+                if(!isLeaf(suc)){
+                  const right = getChildren(suc)[1];
+                  right.data('prev', suc.data('prev'));
+                  this.addEdge(suc.data('prev'), right.id());
+                }
+                anc = suc.data('prev');
+                this.removeNode(suc);
+                this.refreshLayout();
+                setTimeout(() => 
+                  this.balance(this.cy.getElementById(anc)).then(() => {
+                    this.props.dispatch({type: actions.ANIMATION_END});
+                  }),
+                  1000/this.props.speed
+                );
+                node.style(Styles.NODE);
+              },
+              1000/this.props.speed);
+        });
+      }
     });
   }
   testRotation(mode: number){
@@ -809,6 +829,11 @@ class AVL extends React.Component<Props, State>{
           show={this.state.showSearchModal} 
           handleClose={() => this.setState({showSearchModal: false})}
           callback={(v:number) => this.search(v)}
+        />
+        <InputModal
+          show={this.state.showRemoveModal}
+          handleClose={() => this.setState({showRemoveModal: false})}
+          callback={(v:number) => this.remove(v)}
         />
         <InputAVLModal 
           show={this.state.show} 
