@@ -61,7 +61,8 @@
   background-color: black;
   color: white;
 }
-#canvas {
+
+.standard-struct {
   width: 100%;
   top: 30px;
   height: 95vh;
@@ -69,8 +70,20 @@
   display: block;
   left: 0;
   z-index: 0;
+  border-style: solid;
 }
 
+.fixed-struct {
+  width: 60%;
+  float: left;
+  top: 30px;
+  height: 95vh;
+  margin: auto;
+  display: block;
+  left: 0;
+  z-index: 0;
+  border-style: solid;
+}
 .ControlBar {
   background-color: #ccc;
   border-radius: 5px;

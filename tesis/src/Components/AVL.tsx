@@ -377,7 +377,7 @@ class AVL extends React.Component<Props, State>{
     }
 
     const vw = this.cy.width(), vh = this.cy.height();
-    setSep(this.cy.getElementById(this.treeRoot), vw / 3, vh / 4);
+    setSep(this.cy.getElementById(this.treeRoot), vw / 2, vh / 4);
     return true;
   }
 
@@ -842,7 +842,7 @@ class AVL extends React.Component<Props, State>{
           addEdge={this.addEdge} 
           clearGraph={this.clearGraph}
         />
-        <div id="canvas" />
+        <div id="canvas" className='fixed-struct'/>
       </>
     );
   }

@@ -502,7 +502,7 @@ class Heap extends React.Component<Props, State>{
 					handleClose = {() => this.setState({showInsertModal: false})}
 					callback = {(v:number) => this.insert(v)}
 				/>
-				<div id="canvas" />
+				<div id="canvas" className='fixed-struct'/>
 			</>
 		);
 	}

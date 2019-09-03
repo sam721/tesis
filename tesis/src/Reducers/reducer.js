@@ -9,7 +9,7 @@ const initialState = {
   algorithm: 'none',
   selection: null,
   animation: false,
-  speed: 1.0,
+  speed: 0.75,
   loadingGraph: false,
   data: null,
   pseudo: null,
