@@ -305,7 +305,7 @@ class Heap extends React.Component<Props, State>{
 			if (node.outgoers('node').length === 2) setSep(node.outgoers('node')[1], nx + sep, ny + 50, sep / 2);
 		}
 		const vw = this.cy.width(), vh = this.cy.height();
-		setSep(this.cy.getElementById("1"), vw / 3, vh / 4, sep);
+		setSep(this.cy.getElementById("1"), vw / 2, vh / 4, sep);
 		return true;
 	}
 

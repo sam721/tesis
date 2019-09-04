@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-
+import { LINE_FOCUS, LINE_STD } from '../Styles/Styles';
 const { connect } = require('react-redux');
 
 type Props = {
@@ -17,9 +17,17 @@ const mapStateToProps = (state: State) => {
     lines: state.lines,
   }
 }
-const CodeLine = (props:{line:{text:string, ind: number}, current: boolean}) => {
-  const {line, current} = props;
-  return <span style={{backgroundColor: (current ? 'lightgray' : 'white'), display: 'block', paddingLeft: (line.ind *5).toString() + '%'}}>{line.text}</span>
+const CodeLine = (props:{line:{text:string, ind: number}, current: boolean, index: number}) => {
+  const {line, current, index} = props;
+  const focus = current ? LINE_FOCUS : LINE_STD;
+  return (
+    <div style={{...focus, paddingRight: '10px'}}>
+      <div className='codeline'>
+        {index}.
+        <span style={{paddingLeft: (line.ind *15).toString() + 'px'}}>{line.text}</span>
+      </div>
+    </div>
+  );
 }
 
 class CodeBlock extends React.Component<Props>{
@@ -29,7 +37,7 @@ class CodeBlock extends React.Component<Props>{
       let codelines = [];
       if(code){
         for(let i = 0; i < code.length; i++){
-          codelines.push(<CodeLine line = {code[i]} current = {lines && lines.includes(i)}/>);
+          codelines.push(<CodeLine index={i+1} line = {code[i]} current = {lines && lines.includes(i)}/>);
         }
       }
       return (

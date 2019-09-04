@@ -37,3 +37,13 @@ export const EDGE_SELECTED = {
   'line-color': 'black',
   'target-arrow-color': 'black',
 }
+
+export const LINE_STD = {
+	//'background-color': '#1E1E1E',
+	'color': '#CECFE6',
+}
+
+export const LINE_FOCUS = {
+	'background-color': '#4C5090',
+	'color': '#CECFE6',
+}
