@@ -19,6 +19,7 @@ const initialState = {
   photo: () => { },
   gif: () => {},
   gifLength: 0,
+  showPseudo: false,
 };
 
 

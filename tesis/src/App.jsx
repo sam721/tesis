@@ -10,17 +10,13 @@ import AlgorithmInfo from './Components/AlgorithmInfo'
 import Editor from './Editor';
 import Sidebar from './Components/Sidebar';
 import CodeBlock from './Components/CodeBlock';
-import { connect } from 'react-redux';
 import BFS from './resources/pseudocodes/BFS';
 import BFS_table from './resources/value_tables/BFS_table';
 
 import Footer from './Components/Footer';
 import MenuBar from './Components/MenuBar';
-const mapStateToProps = state => ({
-  algorithm: state.algorithm,
-})
 
-class App extends React.Component {
+class App extends React.Component{
   
   render() {
     return (
@@ -49,4 +45,4 @@ class App extends React.Component {
   
 }
 
-export default connect(mapStateToProps)(App);
+export default App;

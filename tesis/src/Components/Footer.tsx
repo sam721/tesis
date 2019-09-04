@@ -4,6 +4,7 @@ import OptionsMenu from './OptionsMenu';
 import SpeedBar from './SpeedBar';
 import GIFControl from './GIFControl';
 import PhotoControl from './PhotoControl';
+import actions from '../Actions/actions';
 const { connect } = require('react-redux');
 
 
@@ -23,9 +24,9 @@ const algoDict:({[name: string]: string})= {
 type Props = {
   algorithm: string,
   run: () => void,
-  options: Array<{name: string, run: () => void}>
-  photo: () => {},
-  gif: () => {},
+  options: Array<{name: string, run: () => void}>,
+  dispatch: (action: Object) => void,
+
 }
 
 type State = {
@@ -36,8 +37,7 @@ const mapStateToProps = (state:Props) => {
     algorithm: state.algorithm,
     run: state.run,
     options: state.options,
-    photo: state.photo,
-    gif: state.gif,
+
   }
 }
 
@@ -65,11 +65,8 @@ class Footer extends React.Component<Props, State>{
               <span>Velocidad</span>
               <SpeedBar/>
             </Col>
-            <Col md={{span:1, offset:6}}>
-              <PhotoControl callback={this.props.photo}/>
-              </Col>
-            <Col md={1}>
-              <GIFControl callback={this.props.gif}/>
+            <Col md={{span: 2, offset:6}}>
+              <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
             </Col>
           </Row>
         }

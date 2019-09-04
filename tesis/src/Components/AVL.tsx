@@ -850,7 +850,7 @@ class AVL extends React.Component<Props, State>{
           addEdge={this.addEdge} 
           clearGraph={this.clearGraph}
         />
-        <div id="canvas" className='fixed-struct'/>
+        <div id="canvas" className='standard-struct'/>
       </>
     );
   }

@@ -5,16 +5,19 @@ const { connect } = require('react-redux');
 type Props = {
   code: Array<{text: string, ind: number}> | null,
   lines: Array<number>,
+  show: boolean,
 }
 
 type State = {
   pseudo: Array<{text: string, ind: number}> | null,
   lines: Array<number>,
+  showPseudo: boolean,
 }
 const mapStateToProps = (state: State) => {
   return {
     code: state.pseudo,
     lines: state.lines,
+    show: state.showPseudo,
   }
 }
 const CodeLine = (props:{line:{text:string, ind: number}, current: boolean, index: number}) => {
@@ -32,7 +35,7 @@ const CodeLine = (props:{line:{text:string, ind: number}, current: boolean, inde
 
 class CodeBlock extends React.Component<Props>{
   render(){
-    if(this.props.code){
+    if(this.props.code && this.props.show){
       const {code, lines} = this.props;
       let codelines = [];
       if(code){

@@ -1,10 +1,23 @@
 import {Row, Col} from 'react-bootstrap';
 import React from 'react';
+import PhotoControl from './PhotoControl';
+import GIFControl from './GIFControl';
+const {connect} = require('react-redux');
 const {
 	NavLink,
 	HashRouter
 } = require('react-router-dom');
-class MenuBar extends React.Component{
+
+type Props = {
+  photo: () => void,
+  gif: () => void,
+}
+
+const mapStateToProps = (state:Props) => {
+  return { ...state };
+}
+
+class MenuBar extends React.Component<Props>{
   render(){
     const searchAlgorithms = [
       <NavLink to={"/BFS"}><button className='dropdown-button'>BFS</button></NavLink>,
@@ -60,9 +73,15 @@ class MenuBar extends React.Component{
               </HashRouter>
             </div>
           </Col>
+          <Col md={1}>
+            <PhotoControl callback={this.props.photo}/>
+          </Col>
+          <Col md={1}>
+            <GIFControl callback={this.props.gif}/>
+          </Col>
         </Row>
       </div>
     )
   }
 };
-export default MenuBar;
+export default connect(mapStateToProps)(MenuBar);

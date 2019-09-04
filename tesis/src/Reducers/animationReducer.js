@@ -46,10 +46,10 @@ const animationReducer = (state = {}, action) => {
         showPseudo: true,
       }
     
-    case actions.CLOSE_PSEUDO:
+    case actions.TOGGLE_PSEUDO:
       return {
         ...state,
-        showPseudo: false,
+        showPseudo: !state.showPseudo,
       }
       
     case actions.CHANGE_LINE:
