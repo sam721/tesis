@@ -5,6 +5,7 @@ const mergeSortAnimation = (input, width, height) => {
     const values = [...param];
     const n = values.length;
     const nodes = [], focus = [], nofocus = [], positions = [];
+    const shadows = [], rshadows = [];
     let cmd = {
       nodes: [],
       duration: 1000,
@@ -25,11 +26,20 @@ const mergeSortAnimation = (input, width, height) => {
       nofocus.push({
         'border-width': '1',
       })
+      shadows.push({
+        id: (start+index).toString() + '-' + h.toString(),
+        value: '+',
+        position: {x: p - (n-1)*(35/2) + 35*(index), y: h }
+      });
+      rshadows.push({
+        id: (start+index).toString() + '-' + h.toString(),
+        value: '-',
+      });
     });
     commands.push({nodes, style: focus, positions});
-    commands.push({nodes: [], lines: [1]});
+    commands.push({shadows, duration: 10});
     if(n === 1){
-      commands.push({nodes: [], lines: [2]});
+      commands.push({nodes: [], lines: [1,2], shadows: [{id:start+'-'+h, value: '-'}]});
       return values;
     }
     const mid = Math.floor((n+1)/2);
@@ -43,33 +53,28 @@ const mergeSortAnimation = (input, width, height) => {
     commands.push({nodes, style: focus, duration: 10});
     let li = 0, ri = 0;
     commands.push({nodes: [], lines: [5]}, {nodes: [], lines: [8,9]});
-    for(let i = 0; i < n; i++){
-      commands.push({nodes: [], lines: [10]});
-  
+    for(let i = 0; i < n; i++){  
       const pos = p - (n-1)*(35/2) + 35*i;
       cmd = {
         nodes: [],
         duration: 1000,
       };
-      commands.push({nodes:[], lines: [11]});
-
       if(ri == right.length || (li < left.length && left[li].value<=right[ri].value)){
         cmd.nodes = [{id: left[li].id}];
-        cmd.lines = [12];
+        cmd.lines = [11,12];
         cmd.positions = [{x: pos, y: h}];
         values[i] = left[li++];
       }else{
-        commands.push({nodes: [], lines: [13]});
         cmd.nodes = [{id: right[ri].id}];
         cmd.positions = [{x: pos, y: h}];
         values[i] = right[ri++];
-        cmd.lines=[14];
+        cmd.lines=[13, 14];
       }
       commands.push(cmd);
     }
     commands.push({nodes: [], lines: [15]});
     commands.push({nodes: [], lines: [5]});
-    commands.push({nodes, style: nofocus});
+    commands.push({nodes, style: nofocus, shadows: rshadows});
     return values;
   }
 
@@ -78,8 +83,8 @@ const mergeSortAnimation = (input, width, height) => {
       value, id: index.toString(),
     }
   });
-
-  mergeSort(input, 0, 0, width, height/4);
+  const mid = width/2;
+  mergeSort(input, 0, mid - 35*input.length, mid + 35*input.length, height/4);
   return commands;
 }
 

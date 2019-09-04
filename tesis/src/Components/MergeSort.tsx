@@ -64,7 +64,7 @@ class BubbleSort extends React.Component<Props, State> {
 		stop: () => { },
 	};
 
-	nodeStyle = Styles.NODE;
+	nodeStyle = {...Styles.NODE, shape: 'square', zIndex: 2};
 
 	constructor(props:Props){
     super(props);
@@ -84,10 +84,7 @@ class BubbleSort extends React.Component<Props, State> {
 			style: [ // the stylesheet for the graph
 				{
 					selector: 'node',
-					style: {
-            ...Styles.NODE,
-            shape: 'square',
-          }
+					style: this.nodeStyle,
 				},
 			],
 
@@ -179,7 +176,16 @@ class BubbleSort extends React.Component<Props, State> {
 			y: this.cy.height()/4,
 		}
   }
-  
+	
+	addShadow = (id: string, position: {x: number, y: number}) => {
+		this.cy.add({
+			group: 'nodes',
+			data: { id },
+			style: {'z-index': 1},
+			position,
+		});
+		layoutOptions.positions[id] = position;
+	}
   executeAnimation = (commands: Array<AnimationStep>) => {
 		this.cy.nodes().style({
 			'background-color': 'white',
@@ -197,7 +203,7 @@ class BubbleSort extends React.Component<Props, State> {
 					this.refreshLayout();
 					return;
 				}
-        let {nodes, duration, lines, style, positions} = commands[pos++];
+        let {nodes, duration, lines, style, positions, shadows} = commands[pos++];
         if(nodes){
 					console.log(nodes);
           nodes.forEach((node, index) => {
@@ -206,6 +212,12 @@ class BubbleSort extends React.Component<Props, State> {
 						if(style) ele.style(style[index]);
 						if(positions) layoutOptions.positions[node.id] = positions[index];
           })
+				}
+				if(shadows){
+					shadows.forEach(shadow => {
+						if(shadow.value === '+') this.addShadow(shadow.id, shadow.position);
+						else this.cy.remove('node[id="'+shadow.id+'"]');
+					});
 				}
 				if(this._isMounted && lines != null){
 					this.props.dispatch({

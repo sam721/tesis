@@ -40,4 +40,6 @@ export type AnimationStep = {
 	inst?: Array<{name: string, position?: number, data?: {value: number, class?: string}}>,
 	positions?: Array<{x: number, y: number}>
 	tableValues?: Object,
+
+	shadows?: Array<NODE>,
 }
