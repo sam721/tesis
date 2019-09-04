@@ -31,5 +31,7 @@ export const heap = [
   { text: 'Arreglo A', ind: 1},
   { text: 'insertar(entero v)', ind: 1},
   { text: 'extraer_minimo()', ind: 1},
+  { text: 'flotar(entero i)', ind: 1},
+  { text: 'hundir(entero i)', ind: 1},
   { text: '}', ind: 0},
 ];

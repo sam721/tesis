@@ -6,6 +6,20 @@ import GIFControl from './GIFControl';
 import PhotoControl from './PhotoControl';
 const { connect } = require('react-redux');
 
+
+const algoDict:({[name: string]: string})= {
+  'BFS': 'BFS',
+  'DFS': 'DFS',
+  'Dijkstra': 'Dijkstra',
+  'Prim': 'Prim',
+  'Kruskal': 'Kruskal',
+  'Heap': 'Min Heap',
+  'AVL': 'Arbol AVL',
+  'BubbleSort': 'Bubble Sort',
+  'MergeSort': 'Merge Sort',
+  'BinarySearch': 'Busqueda Binaria',
+}
+
 type Props = {
   algorithm: string,
   run: () => void,
@@ -14,6 +28,9 @@ type Props = {
   gif: () => {},
 }
 
+type State = {
+  showActions: boolean,
+}
 const mapStateToProps = (state:Props) => {
   return {
     algorithm: state.algorithm,
@@ -24,7 +41,10 @@ const mapStateToProps = (state:Props) => {
   }
 }
 
-class Footer extends React.Component<Props>{
+class Footer extends React.Component<Props, State>{
+  state = {
+    showActions: true,
+  }
   render(){
     return(
       <div className='footer'>
@@ -32,10 +52,13 @@ class Footer extends React.Component<Props>{
           <Row>
             <Col md={2}>
               <div className="dropup">
-                <button className='dropdown-button'>Acciones</button>
-                <div className='actions-menu'>
-                  <OptionsMenu op={this.props.options}/>
-                </div>
+                <button className='dropdown-button' onClick={() => this.setState({showActions: !this.state.showActions})}>{algoDict[this.props.algorithm]}</button>
+                { 
+                  this.state.showActions && 
+                  <div className='actions-menu'>
+                    <OptionsMenu op={this.props.options}/>
+                  </div>
+                }
               </div>
             </Col>
             <Col md={2}>
