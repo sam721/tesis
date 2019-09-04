@@ -188,14 +188,14 @@ class Heap extends React.Component<Props, State>{
 		});
 	}
 
-	addNode(node: string, value: number, position?: Object){
+	addNode(node: string, value: number, position: {x: number, y: number} = {x: 0, y: 0}){
 		this.cy.add(
 			{
 				group: 'nodes',
 				data: { id: node.toString(), value },
 				grabbable: false,
 				pannable: false,
-				position,
+				position: {x: position. x, y: position.y },
 			},
 		)
 		this.createPopper(node, parseInt(node));
@@ -345,7 +345,7 @@ class Heap extends React.Component<Props, State>{
 			let nodeId = this.heap.length();
 			console.log(nodeId);
 			let src = this.cy.getElementById(Math.floor(nodeId / 2).toString());
-			this.addNode(nodeId.toString(), val);
+			this.addNode(nodeId.toString(), val, src.position());
 			this.cy.add(
 				{
 					group: 'edges',

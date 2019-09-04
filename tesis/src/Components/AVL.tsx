@@ -185,24 +185,14 @@ class AVL extends React.Component<Props, State>{
     });
     
     this._isMounted = false;
-		let nodes = this.cy.nodes();
-		nodes.forEach((node: CytoscapeElement) => {
-			let id = node.id();
-			let popper = document.getElementById(id + 'popper');
-			if (popper) {
-				document.body.removeChild(popper);
-			}
-		});
+
   }
   componentDidUpdate(){
     layoutOptions.animationDuration = 500/this.props.speed;
   }
 
   removeNodePopper(node: string) {
-		let nodePopper = document.getElementById(node + 'popper');
-		if (nodePopper) {
-			document.body.removeChild(nodePopper);
-		}
+    this.cy.remove(this.cy.getElementById(node + '-popper'));
 	}
 
   removeNode = (node: CytoscapeElement) => {
@@ -215,6 +205,26 @@ class AVL extends React.Component<Props, State>{
     this.cy.remove('edge[id="'+edgeId(source, target)+'"]');
   }
 
+  createPopper(nodeId: string){
+		const ele = this.cy.getElementById(nodeId);
+		const position = ele.position();
+		this.cy.add({
+			group: 'nodes',
+			data: {id : nodeId+'-popper', value: 0},
+			position: {
+				x: position.x,
+				y: position.y+30,
+			},
+			style: {
+				'z-index': 0,
+				'border-width': 0,
+				'font-size': 15,
+				'width': 10,
+				'height': 10,
+			}
+		});
+  }
+  
   addNode = (id: string, value: number, height:number=0, balance:number=0, position:{x:number, y:number}={x:0,y:0}) => {
     this.cy.add({
       group: 'nodes',
@@ -229,6 +239,7 @@ class AVL extends React.Component<Props, State>{
         y: position.y,
       }
     });
+    this.createPopper(id);
     /*
     let node = this.cy.getElementById(id);
 
@@ -343,8 +354,8 @@ class AVL extends React.Component<Props, State>{
       if(right) hright = dfs(right, depth+1, x+1);
 
       let bal = hright - hleft;
-      let nodeDom = document.getElementById(node.id() + 'popper');
-      if (nodeDom) nodeDom.innerHTML = bal.toString();
+      let popper = this.cy.getElementById(node.id() + '-popper');
+      popper.data('value', bal);
       return Math.max(hleft, hright)+1;
     }
 
@@ -376,6 +387,7 @@ class AVL extends React.Component<Props, State>{
 
     const setSep = (node: CytoscapeElement, nx: number, ny: number) => {
       layoutOptions.positions[node.id()] = { x: node.data('X')*24 + nx, y: ny }
+      layoutOptions.positions[node.id()+'-popper'] =  { x: node.data('X')*24 + nx, y: ny + 30};
       let [left, right] = getChildren(node);
       if (left) setSep(left, nx, ny + 50);
       if (right) setSep(right, nx, ny + 50);
@@ -543,10 +555,8 @@ class AVL extends React.Component<Props, State>{
       }
     });
     let id = 0;
-		while (this.cy.getElementById((id.toString())).length > 0) {
-			id++;
-    }
-    let n = this.cy.nodes().length + 1;
+    while(this.cy.getElementById(id.toString()).length > 0) id++;
+    let n = id + 1;
     let newNode:CytoscapeElement;
     new Promise((resolve : (found: String | null) => void, reject) => {
       this.props.dispatch({
@@ -609,7 +619,6 @@ class AVL extends React.Component<Props, State>{
           });
         });
       }else{
-        this.removeNode(newNode);
         this.cy.getElementById(found).style({
           'background-color': 'white',
           'color': 'black',
@@ -619,7 +628,6 @@ class AVL extends React.Component<Props, State>{
         });
       }
     })
-
   }
 
   async inorderSuccessor(node: CytoscapeElement){
