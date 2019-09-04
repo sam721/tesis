@@ -26,7 +26,7 @@ class App extends React.Component {
     return (
       <body>
         <div>
-          <Container fluid={true}>
+          <Container>
             <ReactNotification/>
             <CodeBlock/>
             <MenuBar/>

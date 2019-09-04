@@ -162,7 +162,7 @@ class Graph extends React.Component<Props, State>{
 
 	componentDidMount() {
 		this._isMounted = true;
-		this.initialize(defaultGraphs[Math.floor(Math.random()*defaultGraphs.length)].elements);
+		this.initialize([]);
 		this.props.dispatch({
 			type: this.props.action,
 			payload:{

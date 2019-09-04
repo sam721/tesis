@@ -20,6 +20,10 @@
   color: white;
 }
 
+#canvas{
+  background-color: white;
+}
+
 .App-link {
   color: #61dafb;
 }
@@ -73,16 +77,6 @@
 }
 
 .fixed-struct {
-  width: 100%;
-  top: 30px;
-  height: 95vh;
-  margin: auto;
-  display: block;
-  left: 0;
-  z-index: 0;
-}
-
-.fixed-structa {
   width: 70%;
   float: left;
   top: 30px;
@@ -169,8 +163,12 @@
   height: 40px;
 }
 
-.dropdown-button:hover, .dropdown-button:focus{
+.dropdown-button:hover{
   background-color: #4C5090;
+  outline: none;
+}
+.dropdown-button:focus{
+  background-color: #2B3B6B;
   outline: none;
 }
 .dropup{
@@ -195,15 +193,20 @@
 
 .actions-menu button{
   display: block;
-  background-color: black;
+  background-color: #121558;
   color: white;
   width: 100%;
-  border: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: white;
   text-decoration: none;
 }
 
 .actions-menu button:hover{
-  background-color: gray;
+  background-color: #4C5090;
   font-style: bold;
 }
 
@@ -259,5 +262,6 @@
 }
 .dropdown:hover .dropdown-menu{
   display: block;
-  top: 28px;
+  top: 95%;
+  padding: 0;
 }

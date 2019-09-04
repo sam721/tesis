@@ -46,7 +46,7 @@ class MediaRecorder{
     );
   }
   takePicture(cy, _this = null, download = true){
-    let image = cy.jpg({quality: 0.5});
+    let image = cy.jpg();
     if(download){
       let link = document.createElement('a');
       link.setAttribute('href', image);
@@ -76,7 +76,7 @@ class MediaRecorder{
     if(!this._takingGif){
       this._takingGif = true;
       this._dispatch({type: actions.STARTING_GIF_RECORDING_INFO});
-      this._interval = setInterval(this.takePicture, 100, cy, this, false);
+      this._interval = setInterval(this.takePicture, 300, cy, this, false);
     }else{
       clearInterval(this._interval);
       this._dispatch({type: actions.FINISHED_GIF_RECORDING_INFO});
