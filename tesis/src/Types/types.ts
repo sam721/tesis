@@ -8,6 +8,7 @@ export interface CytoscapeElement {
 					((styleSheet: Object) => void)
 	outgoers: (selector?: string) => Array<CytoscapeElement>,
 	data: ((selector: string, value?: any) => any)
+	position: () => {x:number, y:number},
 }
 
 export interface CytoEvent extends Event {

@@ -215,7 +215,7 @@ class AVL extends React.Component<Props, State>{
     this.cy.remove('edge[id="'+edgeId(source, target)+'"]');
   }
 
-  addNode = (id: string, value: number, height:number=0, balance:number=0) => {
+  addNode = (id: string, value: number, height:number=0, balance:number=0, position:{x:number, y:number}={x:0,y:0}) => {
     this.cy.add({
       group: 'nodes',
       data: {
@@ -223,6 +223,10 @@ class AVL extends React.Component<Props, State>{
         value,
         height,
         balance,
+      },
+      position: {
+        x: position.x,
+        y: position.y,
       }
     });
     /*
@@ -542,9 +546,8 @@ class AVL extends React.Component<Props, State>{
 		while (this.cy.getElementById((id.toString())).length > 0) {
 			id++;
     }
-    this.addNode(id.toString(), value);
-    let n = this.cy.nodes().length;
-    let newNode = this.cy.getElementById(id.toString());
+    let n = this.cy.nodes().length + 1;
+    let newNode:CytoscapeElement;
     new Promise((resolve : (found: String | null) => void, reject) => {
       this.props.dispatch({
         type: actions.ANIMATION_START,
@@ -579,6 +582,8 @@ class AVL extends React.Component<Props, State>{
           }else{
             this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [1, 2]}});
             if(prev){
+              this.addNode(id.toString(), value, 0, 0, prev.position());
+              newNode = this.cy.getElementById(id.toString());
               this.addEdge(prev.id(), newNode.id());
               /*newNode.data(
                 'prev', prev.id(),
@@ -590,6 +595,8 @@ class AVL extends React.Component<Props, State>{
         }
         insertion(this.cy.getElementById(this.treeRoot), null);
       }else{
+        this.addNode(id.toString(), value);
+        newNode = this.cy.getElementById(id.toString());
         this.treeRoot = id.toString();
         this.refreshLayout();
         resolve(null);
