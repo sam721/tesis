@@ -35,10 +35,11 @@ class UploadGraphModal extends React.Component<Props>{
     return (
       <>
         <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Header className='modal-header' closeButton>
+            <Modal.Title>Seleccione un archivo</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            <p>El archivo debe contener un grafo valido, previamente descargado </p>
             <input type="file" id="graphUploadInput"/>
           </Modal.Body>
           <Modal.Footer>

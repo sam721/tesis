@@ -123,7 +123,7 @@ class Heap extends React.Component<Props, State>{
 			pixelRatio: '1.0',
 			autoungrabify: true,
 		});
-
+		this.cy.on('resize', () => this.refreshLayout(false));
 		this.layout = this.cy.elements().makeLayout(layoutOptions);
 		this.layout.run();
 		this.props.dispatch({
@@ -278,10 +278,10 @@ class Heap extends React.Component<Props, State>{
 		animation();
 	}
 
-	refreshLayout() {
+	refreshLayout(animate:boolean=true) {
 		this.layoutProcessing();
 		this.layout.stop();
-		this.layout = this.cy.elements().makeLayout(layoutOptions);
+		this.layout = this.cy.elements().makeLayout({...layoutOptions, animate});
 		this.layout.run();
 	}
 

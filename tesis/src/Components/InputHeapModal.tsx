@@ -66,10 +66,11 @@ class InputHeapModal extends React.Component<Props, State>{
     const {show, handleClose} = this.props;
     return (
       <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+        <Modal.Header className='modal-header' closeButton>
+          <Modal.Title>Seleccione un archivo</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <p>El archivo debe contener un Heap valido, previamente descargado</p>
           <input type="file" id="HeapUploadInput"/>
         </Modal.Body>
         <Modal.Footer>

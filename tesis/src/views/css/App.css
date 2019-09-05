@@ -268,3 +268,8 @@
   top: 95%;
   padding: 0;
 }
+
+.modal-header{
+  background-color: #121558;
+  color: white;
+}

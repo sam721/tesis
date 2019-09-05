@@ -62,10 +62,12 @@ class InputArrayModal extends React.Component<Props, State>{
     const {show, handleClose} = this.props;
     return (
       <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+        <Modal.Header className='modal-header' closeButton>
+          <Modal.Title>Introduzca un arreglo de enteros</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <p>Debe estar representado por numeros separados por coma</p>
+          <p>Cada numero debe estar entre -999 y 999</p>
           <input 
             type="text" 
             ref={this.setStepInputRef} 

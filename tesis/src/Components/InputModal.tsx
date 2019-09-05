@@ -84,11 +84,15 @@ class InputModal extends React.Component<Props, State>{
     return (
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Introduzca un numero entero</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <p>El numero debe estar entre -999 y 999</p>
           <input 
-            type="text" 
+            id="IntInput"
+            type="number" 
+            min={-999}
+            max={999}
             ref={this.setStepInputRef} 
             value={this.state.text}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e)}

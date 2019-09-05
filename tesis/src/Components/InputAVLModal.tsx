@@ -58,10 +58,11 @@ class InputAVLModal extends React.Component<Props, State>{
     const {show, handleClose} = this.props;
     return (
       <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+        <Modal.Header className='modal-header' closeButton>
+          <Modal.Title>Seleccione un archivo</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <p>El archivo debe contener un arbol AVL valido, previamente descargado</p>
           <input type="file" id="AVLUploadInput"/>
         </Modal.Body>
         <Modal.Footer>
