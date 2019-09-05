@@ -227,6 +227,7 @@ class Graph extends React.Component<Props, State>{
 				data: {
 					id: edge.id(),
 					source: edge.source().id(), target: edge.target().id(),
+					weight: edge.data('weight'),
 				}
 			})
 		});

@@ -100,7 +100,7 @@ class MediaRecorder{
     document.body.removeChild(link);
   }
 
-  readJson(cy){
+  readJson(){
     /*
     const graph = prompt("Insertar grafo en formato JSON");
     if(graph){

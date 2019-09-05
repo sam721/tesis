@@ -83,7 +83,7 @@ class InputModal extends React.Component<Props, State>{
     const {show, handleClose} = this.props;
     return (
       <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
+        <Modal.Header className='modal-header' closeButton>
           <Modal.Title>Introduzca un numero entero</Modal.Title>
         </Modal.Header>
         <Modal.Body>
