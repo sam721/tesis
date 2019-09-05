@@ -114,7 +114,7 @@ export function validateAVL(text, addNode, addEdge, clearGraph){
 
 export function parseAVL(root){
   let output = "";
-
+  if(root.length === 0) return output;
   const recursion = node => {
     if(!node){
       output += ".";
