@@ -26,7 +26,8 @@ type Props = {
   run: () => void,
   options: Array<{name: string, run: () => void}>,
   dispatch: (action: Object) => void,
-
+  undo: () => void,
+  redo: () => void,
 }
 
 type State = {
@@ -37,7 +38,8 @@ const mapStateToProps = (state:Props) => {
     algorithm: state.algorithm,
     run: state.run,
     options: state.options,
-
+    undo: state.undo,
+    redo: state.redo,
   }
 }
 
@@ -65,7 +67,13 @@ class Footer extends React.Component<Props, State>{
               <span>Velocidad</span>
               <SpeedBar/>
             </Col>
-            <Col md={{span: 2, offset:6}}>
+            <Col md={1}>
+              <button className='dropdown-button' onClick={this.props.undo}>Deshacer</button>
+            </Col>
+            <Col md={1}>
+              <button className='dropdown-button' onClick={this.props.redo}>Rehacer</button>
+            </Col>
+            <Col md={{span: 2, offset:4}}>
               <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
             </Col>
           </Row>

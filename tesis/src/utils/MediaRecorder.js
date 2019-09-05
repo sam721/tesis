@@ -87,12 +87,9 @@ class MediaRecorder{
     }
   }
 
-  takeJson(cy){
-    const graphCy = cy.json();
-    const graph = JSON.stringify({
-      elements: graphCy.elements,
-    });
-    
+  takeJson(elements){
+   
+    const graph = JSON.stringify(elements); 
     let link = document.createElement('a');
     link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(graph));
     link.setAttribute('download', 'graph.json');

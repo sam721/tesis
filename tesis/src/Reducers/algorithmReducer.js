@@ -22,6 +22,8 @@ const algorithmReducer = (state = {}, action) => {
         options: action.payload.options,
         photo: action.payload.photo,
         gif: action.payload.gif,
+        undo: action.payload.undo,
+        redo: action.payload.redo,
       }
 
     case actions.SELECT_DFS:

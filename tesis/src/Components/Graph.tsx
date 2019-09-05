@@ -8,6 +8,7 @@ import GraphArray from './GraphArray';
 import MediaRecorder from '../utils/MediaRecorder';
 import MyModal from './UploadGraphModal';
 import InputModal from './InputModal';
+import { timingSafeEqual } from 'crypto';
 
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
@@ -18,6 +19,7 @@ const autopanOnDrag = require('cytoscape-autopan-on-drag');
 autopanOnDrag(cytoscape);
 
 type Props = {
+	
 	dispatch: (action: Object) => Object,
 
 	weighted: Boolean,
@@ -93,6 +95,10 @@ class Graph extends React.Component<Props, State>{
 
 	nodeStyle = Styles.NODE;
 	edgeStyle = Styles.EDGE;
+
+	undo: Array<Array<Object>> = [];
+	redo: Array<Array<Object>> = [];
+	
 	cy = cytoscape();
 
 
@@ -108,7 +114,8 @@ class Graph extends React.Component<Props, State>{
 		this._mediaRecorder = new MediaRecorder(props.dispatch);
 	}
 
-	initialize(elements: Object){
+	initialize(elements: Array<Object>){
+		console.log(elements);
 		let edgeStyle = Styles.EDGE;
 		if (this.props.weighted) {
 			edgeStyle = { ...edgeStyle, ...Styles.EDGE_WEIGHTED };
@@ -160,6 +167,77 @@ class Graph extends React.Component<Props, State>{
 		this.layout.run();
 	}
 
+	handleUndo = () => {
+		if(this.undo.length === 0){
+			return;
+		}
+		
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+
+		const currentElements = this.exportGraph();
+		let elements = this.undo.pop();
+		console.log(elements);
+		this.redo.push(currentElements);
+		
+		if(elements !== undefined) this.initialize(elements);
+		
+	}
+
+	handleRedo = () => {
+		if(this.redo.length === 0){
+			return;
+		}
+
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+		
+		const currentElements = this.exportGraph();
+		const elements = this.redo.pop();
+		this.undo.push(currentElements);
+		if(elements !== undefined) this.initialize(elements);
+	}
+
+	exportGraph(){
+		const elements:Array<Object> = [];
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			elements.push({
+				group: 'nodes',
+				data: {
+					id: node.id(),
+					value: node.data('value'),
+				},
+				position: {
+					x: node.position().x,
+					y: node.position().y,
+				}
+			})
+		});
+		this.cy.edges().forEach((edge:CytoscapeElement) => {
+			elements.push({
+				group: 'edges',
+				data: {
+					id: edge.id(),
+					source: edge.source().id(), target: edge.target().id(),
+				}
+			})
+		});
+		return elements;
+	}
+
+	pushState(){
+		this.redo = [];
+		this.undo.push(this.exportGraph());
+	}
+
 	componentDidMount() {
 		this._isMounted = true;
 		this.initialize([]);
@@ -169,6 +247,8 @@ class Graph extends React.Component<Props, State>{
 				run: this.runButton,
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
+				undo: this.handleUndo,
+				redo: this.handleRedo,
 				options: [
 					{
 						name: 'Ejecutar',
@@ -188,7 +268,7 @@ class Graph extends React.Component<Props, State>{
 					},
 					{
 						name: 'Descargar grafo',
-						run: () => this._mediaRecorder.takeJson(this.cy),
+						run: () => this._mediaRecorder.takeJson(this.exportGraph()),
 					},
 					{
 						name: 'Subir grafo',
@@ -206,9 +286,11 @@ class Graph extends React.Component<Props, State>{
 
 	componentDidUpdate(prevProps:Props){
 		if(!prevProps.loadingGraph && this.props.loadingGraph){
-			const elements = JSON.parse(this.props.data).elements;
-			if(elements)
-				this.initialize(JSON.parse(this.props.data).elements);
+			const elements = JSON.parse(this.props.data);
+			if(elements){
+				this.pushState();
+				this.initialize(elements);
+			}
 			this.props.dispatch({
 				type: actions.FINISHED_LOAD,
 			});
@@ -240,6 +322,7 @@ class Graph extends React.Component<Props, State>{
 		this.props.dispatch({
 			type: actions.CLEAR_GRAPH,
 		});
+		this.pushState();
 		let nodes = this.cy.nodes();
 		for (let i = 0; i < nodes.length; i++) {
 			this.removeNode(nodes[i].id());
@@ -398,7 +481,7 @@ class Graph extends React.Component<Props, State>{
 			})
 			return;
 		}
-
+		this.pushState();
 		if (selection.type === 'node') {
 			this.removeNode(selection.id);
 		} else if (selection.type === 'edge') {
@@ -509,6 +592,7 @@ class Graph extends React.Component<Props, State>{
 			id++;
 		}
 		let nodeId = getNodeIdString(id.toString());
+		this.pushState();
 		this.cy.add({
 			group: 'nodes',
 			data: { id: nodeId, value: id },
@@ -538,13 +622,16 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	removePoppers(){
+		
 		const nodes = this.cy.nodes();
 		nodes.forEach((node:CytoscapeElement) => {
 			this.removeNode(node.id()+'-popper');
 		})
+		
 	}
 
 	createEdge(x: string, y: string) {
+		this.pushState();
 		this.cy.add({
 			group: 'edges',
 			data: {

@@ -20,6 +20,9 @@ const initialState = {
   gif: () => {},
   gifLength: 0,
   showPseudo: false,
+
+  undo: () => {},
+  redo: () => {},
 };
 
 
