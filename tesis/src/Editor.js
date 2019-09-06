@@ -7,6 +7,7 @@ import properties from './algorithm-properties';
 import BubbleSort from './Components/BubbleSort';
 import MergeSort from './Components/MergeSort';
 import BinarySearch from './Components/BinarySearch';
+import LinkedList from './Components/LinkedList';
 
 const { HashRouter, Route } = require('react-router-dom');
 class Editor extends React.Component {
@@ -29,6 +30,10 @@ class Editor extends React.Component {
 						<Route path="/BubbleSort" render={() => <BubbleSort {...properties.BubbleSort} />} />
 						<Route path="/MergeSort" render={() => <MergeSort {...properties.MergeSort} />} />
 						<Route path="/binarysearch" render={() => <BinarySearch {...properties.BinarySearch}/>}/>
+						<Route path="/SingleLinkedList" render={() => <LinkedList {...properties.SingleLinkedList}/>}/>
+						<Route path="/DoubleLinkedList" render={() => <LinkedList {...properties.DoubleLinkedList}/>}/>
+						<Route path="/Queue" render={() => <LinkedList {...properties.Queue}/>}/>
+						<Route path="/Stack" render={() => <LinkedList {...properties.Stack}/>}/>
 					</HashRouter>
 				</Col>
 			</Row>

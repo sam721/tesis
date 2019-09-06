@@ -48,7 +48,24 @@ const properties = {
   },
   BinarySearch: {
     action: actions.SELECT_BINARY_SEARCH,
-  }
+  },
+  SingleLinkedList: {
+    action: actions.SELECT_LINKED_LIST,
+    type: actions.SELECT_SINGLE_LINKED_LIST,
+  },
+  DoubleLinkedList: {
+    action: actions.SELECT_LINKED_LIST,
+    type: actions.SELECT_DOUBLE_LINKED_LIST,
+  },
+  Stack: {
+    action: actions.SELECT_LINKED_LIST,
+    type: actions.SELECT_STACK,
+  },
+  Queue: {
+    action: actions.SELECT_LINKED_LIST,
+    type: actions.SELECT_QUEUE,
+  },
+
 }
 
 export default properties;

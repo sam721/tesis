@@ -149,6 +149,44 @@ const algorithmReducer = (state = {}, action) => {
         undo: () => {},
         redo: () => {},
       }
+
+    case actions.SELECT_LINKED_LIST:
+      const nextState = {
+        ...state,
+        selection: null,
+        options: action.payload.options,
+        photo: action.payload.photo,
+        gif: action.payload.gif,
+        undo: () => {},
+        redo: () => {},
+      }
+      switch(action.payload.type){
+        case actions.SELECT_SINGLE_LINKED_LIST:
+          return {
+            ...nextState,
+            algorithm: 'SingleLinkedList',
+            pseudo: [],
+          }
+        case actions.SELECT_DOUBLE_LINKED_LIST:
+          return {
+            ...nextState,
+            algorithm: 'DoubleLinkedList',
+            pseudo: [],
+          }
+        case actions.SELECT_QUEUE:
+          return {
+            ...nextState,
+            algorithm: 'Queue',
+            pseudo: [],
+          }
+        case actions.SELECT_STACK:
+          return {
+            ...nextState,
+            algorithm: 'Stack',
+            pseudo: [],
+          }
+      }
+      
     default:
       return state;
   }

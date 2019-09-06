@@ -19,6 +19,10 @@ const algoDict:({[name: string]: string})= {
   'BubbleSort': 'Bubble Sort',
   'MergeSort': 'Merge Sort',
   'BinarySearch': 'Busqueda Binaria',
+  'SingleLinkedList': 'Lista enlazada',
+  'DoubleLinkedList': 'Dipolo',
+  'Queue': 'Cola',
+  'Stack': 'Pila',
 }
 
 type Props = {
@@ -48,6 +52,7 @@ class Footer extends React.Component<Props, State>{
     showActions: true,
   }
   render(){
+    console.log(this.props.algorithm);
     return(
       <div className='footer'>
         {this.props.algorithm !== 'none' && 

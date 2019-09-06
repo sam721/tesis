@@ -8,7 +8,6 @@ import GraphArray from './GraphArray';
 import MediaRecorder from '../utils/MediaRecorder';
 import MyModal from './UploadGraphModal';
 import InputModal from './InputModal';
-import { timingSafeEqual } from 'crypto';
 
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');

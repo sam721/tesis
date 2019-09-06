@@ -34,6 +34,10 @@ class MenuBar extends React.Component<Props>{
       <NavLink to={"/binarysearch"}><button className='dropdown-button'>Busqueda Binaria</button></NavLink>
     ];
     const dataStructures = [
+      <NavLink to={"/SingleLinkedList"}><button className='dropdown-button'>Lista enlazada</button></NavLink>,
+      <NavLink to={"/Queue"}><button className='dropdown-button'>Cola</button></NavLink>,
+      <NavLink to={"/Stack"}><button className='dropdown-button'>Pila</button></NavLink>,
+      <NavLink to={"/DoublelinkedList"}><button className='dropdown-button'>Dipolo</button></NavLink>,
       <NavLink to={"/heap"}><button className='dropdown-button'>Min Heap</button></NavLink>,
       <NavLink to={"/AVL"}><button className='dropdown-button'>Arbol AVL</button></NavLink>,
     ];
