@@ -92,7 +92,9 @@ const algorithmReducer = (state = {}, action) => {
         options: action.payload.options,
         pseudo: heap,
         photo: action.payload.photo,
-        gif: action.payload.gif
+        gif: action.payload.gif,
+        undo: action.payload.undo,
+        redo: action.payload.redo,
       }
 
     case actions.SELECT_AVL:
@@ -103,7 +105,9 @@ const algorithmReducer = (state = {}, action) => {
         pseudo: avl,
         options: action.payload.options,
         photo: action.payload.photo,
-        gif: action.payload.gif
+        gif: action.payload.gif,
+        undo: action.payload.undo,
+        redo: action.payload.redo,
       }
 
     case actions.SELECT_BUBBLESORT:

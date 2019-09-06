@@ -13,6 +13,7 @@ const canvasReducer = (state = {}, action) => {
       return {
         ...state,
         loadingGraph: true,
+        animation: false,
         data: action.payload.data,
       }
 

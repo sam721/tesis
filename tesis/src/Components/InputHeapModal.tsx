@@ -2,11 +2,15 @@ import React, { ReactElement } from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Button, FormControl } from 'react-bootstrap';
 import { validateHeap } from '../utils/heap-utils';
+import actions from '../Actions/actions';
 
+const { connect } = require('react-redux');
 type Props = {
   show: boolean,
   changeArray: (values: Array<number>) => void;
   handleClose: () => void,
+  dispatch: (action:Object)=>void,
+
 }
 type State = {
   text: string,
@@ -48,9 +52,15 @@ class InputHeapModal extends React.Component<Props, State>{
       if(validateHeap(values)){
         this.props.changeArray(values);
         this.props.handleClose();
+      }else{
+        this.props.dispatch({
+          type: actions.INVALID_HEAP_ERROR,
+        });
       }
     } else {
-      console.error('No number');
+      this.props.dispatch({
+        type: actions.INVALID_HEAP_ERROR,
+      });
       return false;
     }
   }
@@ -86,4 +96,4 @@ class InputHeapModal extends React.Component<Props, State>{
   }
 }
 
-export default InputHeapModal;
+export default connect()(InputHeapModal);

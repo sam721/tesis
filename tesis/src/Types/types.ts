@@ -4,8 +4,7 @@ export type CytoscapeLayout = {
 }
 export interface CytoscapeElement {
 	id: () => string,
-	style: 	(() => Object) | 
-					((styleSheet: Object) => void)
+	style: ((styleSheet?: Object) => void | Object)
 	outgoers: (selector?: string) => Array<CytoscapeElement>,
 	data: ((selector: string, value?: any) => any)
 	position: () => {x:number, y:number},

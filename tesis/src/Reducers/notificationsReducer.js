@@ -56,6 +56,18 @@ const notificationsReducer = action => {
       'danger');
       break;
     
+    case actions.INVALID_HEAP_ERROR:
+      createNotification('Error',
+      'El archivo proporcionado no representa un Heap valido. Intente con otro archivo',
+      'danger');
+      break;
+
+    case actions.INVALID_AVL_ERROR:
+      createNotification('Error',
+      'El archivo proporcionado no representa un AVL valido. Intente con otro archivo',
+      'danger');
+      break;
+    
     case actions.ANIMATION_RUNNING_ERROR:
       createNotification('Error',
       'No se pueden hacer modificaciones mientras se ejecuta el algoritmo',

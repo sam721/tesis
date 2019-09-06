@@ -44,9 +44,13 @@ type Element = {
 }
 
 type State = {
-	values: Array<Element>,
 	show: boolean,
 	showInsertModal: boolean,
+}
+
+type stackState = {
+	heap: Array<number>,
+	elements: Array<Object>,
 }
 
 type Props = {
@@ -66,8 +70,10 @@ class Heap extends React.Component<Props, State>{
 	_isMounted = false;
 	_mediaRecorder = new MediaRecorder();
 
+	undo: Array<stackState>=[];
+	redo: Array<stackState>=[];
+
 	state = {
-		values: [{value: 0, class: 'heap-default'}],
 		show: false,
 		showInsertModal: false,
 	}
@@ -88,15 +94,16 @@ class Heap extends React.Component<Props, State>{
     this._mediaRecorder = new MediaRecorder(props.dispatch);
 	}
 	
-	componentDidMount() {
-		this._isMounted = true;
+	initialize(state: stackState){
+		const {heap, elements} = state;
 
+		this.heap._data = [...heap];
 		let edgeStyle = Styles.EDGE;
 		this.cy = cytoscape({
 
 			container: document.getElementById('canvas'), // container to render in
 
-			elements: [],
+			elements,
 
 			style: [ // the stylesheet for the graph
 				{
@@ -123,14 +130,36 @@ class Heap extends React.Component<Props, State>{
 			pixelRatio: '1.0',
 			autoungrabify: true,
 		});
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			if(node.id().match('-popper')){
+				node.style(
+					{
+						'z-index': 0,
+						'border-width': 0,
+						'font-size': 15,
+						'width': 10,
+						'height': 10,
+					}
+				)
+			}
+		});
 		this.cy.on('resize', () => this.refreshLayout(false));
-		this.layout = this.cy.elements().makeLayout(layoutOptions);
+		this.layout = this.cy.elements().makeLayout({...layoutOptions, animate: false});
 		this.layout.run();
+
+		this.refreshLayout();
+	}
+	
+	componentDidMount() {
+		this._isMounted = true;
+		this.initialize({heap: [0], elements: []});
 		this.props.dispatch({
 			type: this.props.action,
 			payload: {
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
+				undo: this.handleUndo,
+				redo: this.handleRedo,
 				options: [
 					{
 						name: 'Insertar',
@@ -141,12 +170,18 @@ class Heap extends React.Component<Props, State>{
 						run: this.remove,
 					},
 					{
+						name: 'Limpiar canvas',
+						run: () => this.heap.length() > 1 && this.changeArray([0]),
+					},
+					{
 						name: 'Subir Heap',
 						run: () => this.setState({show: true}),
 					},
 					{
 						name: 'Descargar Heap',
-						run: () => parseHeap(this.state.values),
+						run: () => {
+							if(!this.props.animation) parseHeap(this.heap._data)
+						}
 					}
 				]
 			}
@@ -168,6 +203,88 @@ class Heap extends React.Component<Props, State>{
 		});
 	}
 	
+	handleUndo = () => {
+		if(this.undo.length === 0){
+			return;
+		}
+		
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
+		const currentElements = this.exportGraph();
+		
+		let state = this.undo.pop();
+		if(state !== undefined){
+			this.redo.push({heap: [...this.heap._data], elements: currentElements});
+			this.initialize(state);
+		}
+	}
+
+	handleRedo = () => {
+		if(this.redo.length === 0){
+			return;
+		}
+
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+		
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
+		const currentElements = this.exportGraph();
+		
+		let state = this.redo.pop();
+		if(state !== undefined){
+			this.undo.push({heap: [...this.heap._data], elements: currentElements});
+			this.initialize(state);
+		}
+	}
+
+	pushState(){
+		this.redo = [];
+		this.undo.push({ heap: [...this.heap._data], elements: this.exportGraph()});
+	}
+	exportGraph(){
+		const elements:Array<Object> = [];
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			elements.push({
+				group: 'nodes',
+				data: {
+					id: node.id(),
+					value: node.data('value'),
+				},
+				position: {
+					x: node.position().x,
+					y: node.position().y,
+				},
+			})
+		});
+		this.cy.edges().forEach((edge:CytoscapeElement) => {
+			elements.push({
+				group: 'edges',
+				data: {
+					id: edge.id(),
+					source: edge.source().id(), target: edge.target().id(),
+					weight: edge.data('weight'),
+				}
+			})
+		});
+		return elements;
+	}
+
 	createPopper(nodeId: string, value: number){
 		const ele = this.cy.getElementById(nodeId);
 		const position = ele.position();
@@ -214,7 +331,6 @@ class Heap extends React.Component<Props, State>{
 				})
 			}
 		})
-
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
@@ -228,11 +344,6 @@ class Heap extends React.Component<Props, State>{
 						}
 					})
 					this.cy.edges().style(this.edgeStyle);
-					
-					let {values} = this.state;
-
-					values = values.map(ele => { return {...ele, class:'heap-default'}});
-					if(this._isMounted) this.setState({values});
 
 					this.props.dispatch({
 						type: actions.ANIMATION_END,
@@ -248,22 +359,15 @@ class Heap extends React.Component<Props, State>{
 					});
 				}
 
-				const {values} = this.state;
 
 				eles.forEach((ele, index) => {
 					if(data !== undefined){
 						this.cy.getElementById(ele).data(data[index]);
+						console.log(ele, data[index]);
 						const id = parseInt(ele, 10);
-						const {values} = this.state;
-						values[id].value = data[index].value;
-						if(this._isMounted) this.setState({values});
 					}
-					if(classes !== undefined){
-						const id = parseInt(ele, 10);
-						values[id].class = classes[index];
-					}
+
 				})
-				if(this._isMounted) this.setState({values});
 				if(lines != null && this._isMounted){
 					this.props.dispatch({
 						type: actions.CHANGE_LINE,
@@ -327,16 +431,14 @@ class Heap extends React.Component<Props, State>{
 		});
 
 		this.props.dispatch({
-			type: actions.SHOW_PSEUDO,
-		});
-
-		this.props.dispatch({
 			type: actions.CHANGE_LINE,
 			payload: {
 				lines: [0, 1, 2],
 			}
 		});
 
+		this.pushState();
+		console.log(this.heap.length());
 		if (this.heap.length()-1 === 0) {
 			
 			this.addNode("1", val);
@@ -354,10 +456,6 @@ class Heap extends React.Component<Props, State>{
 			)
 			commands = this.heap.push(val, true);
 		}
-
-		const {values} = this.state;
-		values.push({value: val, class: 'heap-default'});
-		if(this._isMounted) this.setState({values});
 
 		this.refreshLayout();
 		let animationPromise = new Promise((resolve, reject) => {
@@ -396,19 +494,11 @@ class Heap extends React.Component<Props, State>{
 			}
 		});
 
+		this.pushState();
+
 		const outgoers = this.cy.getElementById("1").outgoers('node');
 		this.removeNode("1");
 		let commands:Array<AnimationStep> = [];
-
-		const {values} = this.state;
-		const lastValue = values[n];
-		values.pop();
-		if(n > 0) values[1] = lastValue;
-		if(this._isMounted) this.setState({values});
-
-		this.props.dispatch({
-			type: actions.SHOW_PSEUDO,
-		});
 
 		this.props.dispatch({
 			type: actions.CHANGE_LINE,
@@ -417,6 +507,8 @@ class Heap extends React.Component<Props, State>{
 			}
 		});
 		
+		commands = this.heap.pop(true);
+
 		if (n === 1) {
 			return;
 		}
@@ -434,7 +526,6 @@ class Heap extends React.Component<Props, State>{
 				data: { id: "1-" + outgoers[i].id(), source: "1", target: outgoers[i].id() }
 			});
 		}
-		commands = this.heap.pop(true);
 		console.log(commands);
 		this.refreshLayout();
 
@@ -453,6 +544,8 @@ class Heap extends React.Component<Props, State>{
 	}
 
 	changeArray(values: Array<number>){
+		this.pushState();
+
 		this.cy.nodes().forEach((node:CytoscapeElement) => {
 			this.cy.remove(node);
 		});
@@ -482,11 +575,6 @@ class Heap extends React.Component<Props, State>{
 				});
 			}
 		}
-		const stateValues = Array(values.length);
-		values.forEach((value, i) => {
-			stateValues[i] = {value, class: 'heap-default'}
-		});
-		this.setState({values: stateValues});
 		this.refreshLayout();
 	}
 	render() {

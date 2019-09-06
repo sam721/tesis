@@ -55,6 +55,11 @@ type State = {
   showRemoveModal: boolean,
 }
 
+type stackState = {
+  root: string,
+  elements: Array<Object>,
+}
+
 type Props = {
   action: string,
   animation: boolean,
@@ -93,6 +98,9 @@ class AVL extends React.Component<Props, State>{
     showRemoveModal: false,
   }
 
+  undo:Array<stackState>=[];
+  redo:Array<stackState>=[];
+
   nodeStyle = Styles.NODE;
   edgeStyle = Styles.EDGE;
   cy = cytoscape();
@@ -106,49 +114,14 @@ class AVL extends React.Component<Props, State>{
   
   componentDidMount() {
     this._isMounted = true;
-
-    let edgeStyle = Styles.EDGE;
-    this.cy = cytoscape({
-
-      container: document.getElementById('canvas'), // container to render in
-
-      elements: [],
-
-      style: [ // the stylesheet for the graph
-        {
-          selector: 'node',
-          style: Styles.NODE,
-        },
-
-        {
-          selector: 'edge',
-          style: edgeStyle,
-        }
-      ],
-
-      headless: false,
-      styleEnabled: true,
-      hideEdgesOnViewport: false,
-      hideLabelsOnViewport: false,
-      userPanningEnabled: false,
-      zoomingEnabled: false,
-      textureOnViewport: false,
-      motionBlur: false,
-      motionBlurOpacity: 0.2,
-      wheelSensitivity: 1,
-      pixelRatio: '1.0',
-      autoungrabify: true,
-
-    });
-    this.cy.on('resize', () => this.refreshLayout(false));
-    this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
-    this.layout = this.cy.elements().makeLayout(layoutOptions);
-    this.layout.run();
+    this.initialize({ root: '', elements: []});
     this.props.dispatch({
       type: this.props.action,
       payload:{
         photo: () => this._mediaRecorder.takePicture(this.cy),
-				gif: () => this._mediaRecorder.takeGif(this.cy),
+        gif: () => this._mediaRecorder.takeGif(this.cy),
+        undo: this.handleUndo,
+        redo: this.handleRedo,
         options: [
           {
             name: 'Insertar',
@@ -179,6 +152,147 @@ class AVL extends React.Component<Props, State>{
     })
   }
 
+  initialize(state: stackState){
+    const {root, elements} = state;    
+		let edgeStyle = Styles.EDGE;
+    this.cy = cytoscape({
+
+      container: document.getElementById('canvas'), // container to render in
+
+      elements,
+
+      style: [ // the stylesheet for the graph
+        {
+          selector: 'node',
+          style: Styles.NODE,
+        },
+
+        {
+          selector: 'edge',
+          style: edgeStyle,
+        }
+      ],
+
+      headless: false,
+      styleEnabled: true,
+      hideEdgesOnViewport: false,
+      hideLabelsOnViewport: false,
+      userPanningEnabled: false,
+      zoomingEnabled: false,
+      textureOnViewport: false,
+      motionBlur: false,
+      motionBlurOpacity: 0.2,
+      wheelSensitivity: 1,
+      pixelRatio: '1.0',
+      autoungrabify: true,
+
+    });
+    this.cy.nodes().forEach((node:CytoscapeElement) => {
+			if(node.id().match('-popper')){
+				node.style(
+					{
+						'z-index': 0,
+						'border-width': 0,
+						'font-size': 15,
+						'width': 10,
+						'height': 10,
+					}
+				)
+			}
+    });
+    this.treeRoot = root;
+		this.cy.on('resize', () => this.refreshLayout(false));
+		this.layout = this.cy.elements().makeLayout({...layoutOptions, animate: false});
+		this.layout.run();
+
+		this.refreshLayout();
+  }
+  
+  handleUndo = () => {
+		if(this.undo.length === 0){
+			return;
+		}
+		
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
+		const currentElements = this.exportGraph();
+		let state = this.undo.pop();
+		if(state !== undefined){
+		  this.redo.push({ root: this.treeRoot, elements: currentElements});
+		  this.initialize(state);
+    }
+	}
+
+	handleRedo = () => {
+		if(this.redo.length === 0){
+			return;
+		}
+		
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
+		const currentElements = this.exportGraph();
+		let state = this.redo.pop();
+		if(state !== undefined){
+		  this.undo.push({ root: this.treeRoot, elements: currentElements});
+		  this.initialize(state);
+    }
+	}
+
+	exportGraph(){
+		const elements:Array<Object> = [];
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			elements.push({
+				group: 'nodes',
+				data: {
+					id: node.id(),
+          value: node.data('value'),
+          prev: node.data('prev'),
+          height: node.data('height'),
+          balance: node.data('balance'),
+				},
+				position: {
+					x: node.position().x,
+					y: node.position().y,
+				}
+			})
+		});
+		this.cy.edges().forEach((edge:CytoscapeElement) => {
+			elements.push({
+				group: 'edges',
+				data: {
+					id: edge.id(),
+					source: edge.source().id(), target: edge.target().id(),
+					weight: edge.data('weight'),
+				}
+			})
+		});
+		return elements;
+	}
+
+	pushState(){
+    console.log('pushed');
+		this.redo = [];
+		this.undo.push({root: this.treeRoot, elements: this.exportGraph()});
+  }
+  
   componentWillUnmount(){
     this.props.dispatch({
       type: actions.ANIMATION_END,
@@ -273,36 +387,6 @@ class AVL extends React.Component<Props, State>{
     //this.refreshLayout();
   }
 
-  handleClickOnNode = (node: CytoscapeElement) => {
-		if (this.props.animation === true){
-      this.props.dispatch({
-        type: actions.ANIMATION_RUNNING_ERROR,
-      })
-      return;
-    }
-    let nodeId = node.id();
-    let { selection } = this.props;
-    if(selection && selection.type === 'node'){
-      let prevNode = selection.id;
-      this.cy.getElementById(prevNode).style(Styles.NODE);
-      if(prevNode === nodeId){
-        this.props.dispatch({
-          type: actions.NO_SELECTION,
-        });
-        return;
-      }
-    }
-    node.style(Styles.NODE_SELECTED);
-    this.props.dispatch({
-      type: actions.SELECTION,
-      payload: {
-        selection: {
-          id: nodeId, type: 'node'
-        }
-      }
-    })
-  }
-
   isLeaf(node: CytoscapeElement){
     return node.outgoers('node').length === 0;
   }
@@ -338,6 +422,8 @@ class AVL extends React.Component<Props, State>{
     if(right) this.propagate(right, val);
   }
   layoutProcessing() {
+
+    if(this.treeRoot === '') return;
     const levels:{[lvl: number]: Array<string>} = {};
 
     const dfs = (node: CytoscapeElement, depth: number, x: number) => {
@@ -554,9 +640,10 @@ class AVL extends React.Component<Props, State>{
         pseudo: insert,
       }
     });
+
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
-    let n = id + 1;
+    let n = this.cy.nodes().length/2 + 1;
     let newNode:CytoscapeElement;
     new Promise((resolve : (found: String | null) => void, reject) => {
       this.props.dispatch({
@@ -592,6 +679,7 @@ class AVL extends React.Component<Props, State>{
           }else{
             this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [1, 2]}});
             if(prev){
+              this.pushState();
               this.addNode(id.toString(), value, 0, 0, prev.position());
               newNode = this.cy.getElementById(id.toString());
               this.addEdge(prev.id(), newNode.id());
@@ -605,6 +693,7 @@ class AVL extends React.Component<Props, State>{
         }
         insertion(this.cy.getElementById(this.treeRoot), null);
       }else{
+        this.pushState();
         this.addNode(id.toString(), value);
         newNode = this.cy.getElementById(id.toString());
         this.treeRoot = id.toString();
@@ -656,13 +745,16 @@ class AVL extends React.Component<Props, State>{
     return result;
   }
   
-  async search(value: number){
+  async search(value: number, stopAnimation: boolean = true){
     if(this.props.animation){
       this.props.dispatch({
         type: actions.ANIMATION_RUNNING_ERROR,
       });
       return;
     }
+    this.props.dispatch({
+      type: actions.ANIMATION_START,
+    });
     this.props.dispatch({
       type: actions.CHANGE_PSEUDO,
       payload:{
@@ -712,11 +804,19 @@ class AVL extends React.Component<Props, State>{
           this.props.dispatch({
             type: (found ? actions.AVL_FOUND_SUCCESS : actions.AVL_NOT_FOUND_INFO),
           });
+
+          if(stopAnimation){
+            this.props.dispatch({
+              type: actions.ANIMATION_END,
+            });
+          }
+
           if(!found){
             this.props.dispatch({
               type: actions.CHANGE_LINE,
               payload: {lines: [1]},
             });
+
             setTimeout(reject, 1000/ this.props.speed);
           }
           setTimeout(resolve, 1000/this.props.speed, prev);
@@ -735,7 +835,7 @@ class AVL extends React.Component<Props, State>{
       return;
     }
 
-    const searchPromise = this.search(value);
+    const searchPromise = this.search(value, false);
     searchPromise.then((node?: CytoscapeElement) => {
       if(node === undefined) return;
       let anc = '';
@@ -746,6 +846,8 @@ class AVL extends React.Component<Props, State>{
         type: actions.CHANGE_PSEUDO,
         payload: { pseudo: remove}
       });
+
+      this.pushState();
       if(isLeaf(node)){
         this.props.dispatch({ type: actions.CHANGE_LINE, payload: {lines: [1]}});
         if(node.id() !== this.treeRoot) anc = node.data('prev');
@@ -806,6 +908,10 @@ class AVL extends React.Component<Props, State>{
               1000/this.props.speed);
         });
       }
+    }).catch(() => {
+      this.props.dispatch({
+        type: actions.ANIMATION_END,
+      });
     });
   }
   testRotation(mode: number){
@@ -830,6 +936,7 @@ class AVL extends React.Component<Props, State>{
       });
       return;
     }
+    this.pushState();
 		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
   }
 
@@ -844,7 +951,7 @@ class AVL extends React.Component<Props, State>{
         <InputModal 
           show={this.state.showSearchModal} 
           handleClose={() => this.setState({showSearchModal: false})}
-          callback={(v:number) => this.search(v)}
+          callback={(v:number) => this.search(v).catch(() => {})}
         />
         <InputModal
           show={this.state.showRemoveModal}

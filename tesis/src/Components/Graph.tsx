@@ -179,6 +179,10 @@ class Graph extends React.Component<Props, State>{
 			return;
 		}
 
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
 		const currentElements = this.exportGraph();
 		let elements = this.undo.pop();
 		console.log(elements);
@@ -200,6 +204,10 @@ class Graph extends React.Component<Props, State>{
 			return;
 		}
 		
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
 		const currentElements = this.exportGraph();
 		const elements = this.redo.pop();
 		this.undo.push(currentElements);
@@ -648,6 +656,8 @@ class Graph extends React.Component<Props, State>{
 		const { selection } = this.props;
 		if (selection.type === 'edge') {
 			const { id } = selection;
+			if(this.cy.getElementById(id).data('weight') === weight) return;
+			this.pushState();
 			this.cy.getElementById(id).data('weight', weight);
 			this.props.dispatch({
 				type: actions.SELECTION,
