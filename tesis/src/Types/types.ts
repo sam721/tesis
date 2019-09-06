@@ -30,8 +30,8 @@ export type NODE = {
 }
 
 export type AnimationStep = {
-	eles: Array<string>,
-	style: Array<Object>,
+	eles?: Array<string>,
+	style?: Array<Object>,
 	lines?: Array<number>,
 	distance?: Array<string>,
 	duration?: number,
@@ -39,7 +39,7 @@ export type AnimationStep = {
 	data?: Array<{value: number, class?: string}>,
 
 	nodes?: Array<NODE>,
-	inst?: Array<{name: string, position?: number, data?: {value?: number, id?: string, source?: string, target?: string, class?: string}}>,
+	inst?: Array<{name: string, position?: number, data?: {value?: number, id?: string, source?: string, target?: string, class?: string, pos?: number}}>,
 	positions?: Array<{x: number, y: number}>
 	tableValues?: Object,
 

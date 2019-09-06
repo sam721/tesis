@@ -31,7 +31,8 @@ class LinkedListSimulator {
         data: {
           id, value, source,
         }
-      }]
+      }],
+      duration: 10,
     });
     console.log(commands);
     return commands;
@@ -56,7 +57,8 @@ class LinkedListSimulator {
         inst: [{
           name: 'pop_back',
           data: { id, value: this.length()-1},
-        }]
+        }],
+        duration: 10,
       }
     );
     return commands;
@@ -74,7 +76,8 @@ class LinkedListSimulator {
         data: {
           id, value, target,
         }
-      }]
+      }],
+      duration: 10,
     }]
     return commands;
   }
@@ -88,7 +91,8 @@ class LinkedListSimulator {
         inst: [{
           name: 'pop_front',
           data: { id },
-        }]
+        }],
+        duration: 10,
       }
     ];
     //this._data.shift();
@@ -122,26 +126,142 @@ class LinkedListSimulator {
     return commands;
   }
 
-  delete_position(pos){
+  insert_before(nodeId, newId, value, slow = false){
     const n = this.length();
     const commands = [];
-    if(pos >= n) return commands;
-    for(let i = 0; i <= pos; i++){
+    let i;
+    for(i = 0; i < n; i++){
       const id = this._data[i].id;
-      commands.push(
+      if(slow){
+        commands.push(
+          {
+            eles: [id],
+            style: [{ 'background-color': 'black', 'color': 'white'}],
+            duration: 1000,
+          },
+          {
+            eles: [id],
+            style: [{ 'background-color': 'white', 'color': 'black'}],
+            duration: 10,
+          }
+        );
+      }
+      if(nodeId === id) break;
+    }
+    if(i === n) return commands;
+    const pos = i;
+    let prev = '', next = nodeId;
+    if(pos - 1 >= 0) prev = this._data[pos-1].id;
+    if(pos - 1 >= 0){
+      commands.push({
+        inst: [
+          {
+            name: 'remove_edge',
+            data: {source: prev, target: next}
+          }
+        ]
+      });
+    }
+    commands.push({
+      inst: [
         {
-          eles: [id],
-          style: [{ 'background-color': 'black', 'color': 'white'}],
-          duration: 1000,
+          name: 'add_node_before',
+          data: {id: newId, value, pos},
         },
         {
-          eles: [id],
-          style: [{ 'background-color': 'white', 'color': 'black'}],
-          duration: 10,
-        }
-      );
+          name: 'add_edge',
+          data: {source: prev, target: newId},
+        },
+        {
+          name: 'add_edge',
+          data: {source: newId, target: next},
+        },
+      ],
+      duration: 10,
+    });
+    return commands;
+  }
+
+  insert_after(nodeId, newId, value, slow = false){
+    const n = this.length();
+    const commands = [];
+    let i;
+    for(i = 0; i < n; i++){
+      const id = this._data[i].id;
+      if(slow){
+        commands.push(
+          {
+            eles: [id],
+            style: [{ 'background-color': 'black', 'color': 'white'}],
+            duration: 1000,
+          },
+          {
+            eles: [id],
+            style: [{ 'background-color': 'white', 'color': 'black'}],
+            duration: 10,
+          }
+        );
+      }
+      if(nodeId === id) break;
     }
-    const id = this._data[pos].id;
+    if(i === n) return commands;
+    const pos = i;
+    let prev = nodeId, next = '';
+    if(pos + 1 < this.length()) next = this._data[pos+1].id;
+    if(pos + 1 < this.length()){
+      commands.push({
+        inst: [
+          {
+            name: 'remove_edge',
+            data: {source: prev, target: next}
+          }
+        ]
+      });
+    }
+    commands.push({
+      inst: [
+        {
+          name: 'add_node',
+          data: {id: newId, value, pos},
+        },
+        {
+          name: 'add_edge',
+          data: {source: prev, target: newId},
+        },
+        {
+          name: 'add_edge',
+          data: {source: newId, target: next},
+        },
+      ],
+      duration: 10,
+    });
+
+    return commands;
+  }
+  delete_position(nodeId, slow = false){
+    const n = this.length();
+    const commands = [];
+    let i;
+    for(i = 0; i < n; i++){
+      const id = this._data[i].id;
+      if(slow){
+        commands.push(
+          {
+            eles: [id],
+            style: [{ 'background-color': 'black', 'color': 'white'}],
+            duration: 1000,
+          },
+          {
+            eles: [id],
+            style: [{ 'background-color': 'white', 'color': 'black'}],
+            duration: 10,
+          }
+        );
+      }
+      if(nodeId === id) break;
+    }
+    if(i === n) return commands;
+    const pos = i;
     let source, target;
     if(pos > 0 && pos + 1 < this.length()){
       source = this._data[pos-1].id;
@@ -150,8 +270,9 @@ class LinkedListSimulator {
     commands.push({
       inst: [{
         name: 'remove',
-        data: {id, value: pos, source, target}
-      }]
+        data: {id: nodeId, value: pos, source, target}
+      }],
+      duration: 10,
     });
     return commands;
   }

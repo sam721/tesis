@@ -157,8 +157,8 @@ const algorithmReducer = (state = {}, action) => {
         options: action.payload.options,
         photo: action.payload.photo,
         gif: action.payload.gif,
-        undo: () => {},
-        redo: () => {},
+        undo: action.payload.undo,
+        redo: action.payload.redo,
       }
       switch(action.payload.type){
         case actions.SELECT_SINGLE_LINKED_LIST:

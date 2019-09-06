@@ -382,9 +382,9 @@ class Graph extends React.Component<Props, State>{
 					return;
 				}
 				let { eles, distance, style, duration, inst, lines} = commands[pos++];
-				if (style) {
+				if (eles) {
 					eles.forEach((ele, index) => {
-						this.cy.getElementById(ele).style(style[index]);
+						if(style) this.cy.getElementById(ele).style(style[index]);
 					});
 				}
 				if(eles){

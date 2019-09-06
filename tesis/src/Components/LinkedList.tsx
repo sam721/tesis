@@ -2,7 +2,7 @@ import React from 'react';
 import MediaRecorder from '../utils/MediaRecorder';
 import LinkedListSimulator from '../Algorithms/DS/LinkedListSimulator';
 import actions from '../Actions/actions';
-import { AnimationStep } from '../Types/types';
+import { AnimationStep, CytoscapeElement, CytoEvent } from '../Types/types';
 import InputModal from './InputModal';
 const cytoscape = require('cytoscape');
 const Styles = require('../Styles/Styles');
@@ -47,11 +47,14 @@ type Props = {
 type State = {
   showPushFrontModal: boolean,
   showPushBackModal: boolean,
+  showPushAfterModal: boolean,
+  showPushBeforeModal: boolean,
   showDeleteModal: boolean,
 }
 type storeState = {
   animation: boolean,
   speed: number,
+  selection: Object,
 }
 
 type stackState = {
@@ -64,6 +67,7 @@ const mapStateToProps = (state: storeState) => {
   return {
     animation: state.animation,
     speed: state.speed,
+    selection: state.selection,
   }
 }
 class LinkedList extends React.Component<Props, State>{
@@ -79,10 +83,14 @@ class LinkedList extends React.Component<Props, State>{
 		stop: () => { },
   };
   
+  doublyLinked = false;
+
   state = {
     showDeleteModal: false,
+    showPushBeforeModal: false,
     showPushBackModal: false,
     showPushFrontModal: false,
+    showPushAfterModal: false,
   }
 
   cy = cytoscape();
@@ -129,33 +137,55 @@ class LinkedList extends React.Component<Props, State>{
       pixelRatio: '1.0',
       autoungrabify: true,
     });
+
+    this.list._data = list;
+    this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
+    this.cy.on('resize', () => this.refreshLayout(false))
     this.layout = this.cy.elements().makeLayout(layoutOptions);
     this.layout.run();
-    this.cy.center();
+    this.refreshLayout();
   }  
 
   componentDidMount(){
     this._isMounted = true;
     this.initialize({list: [], elements: []});
     let options:Array<{name: string, run: () => void}> = [];
-    if(this.props.type === actions.SELECT_SINGLE_LINKED_LIST){
+    if(this.props.type === actions.SELECT_SINGLE_LINKED_LIST || this.props.type === actions.SELECT_DOUBLE_LINKED_LIST){
+      this.doublyLinked = this.props.type === actions.SELECT_DOUBLE_LINKED_LIST;
       options = [
-
         {
-          name: 'Insertar',
+          name: 'Insertar al frente',
+          run: () => this.setState({showPushFrontModal: true}),
+        },
+        {
+          name: 'Insertar al final',
           run: () => this.setState({showPushBackModal: true}),
         },
         {
-          name: 'Eliminar primero',
+          name: 'Extraer frente',
           run: () => this.popFront(),
         },
         {
-          name: 'Eliminar ultimo',
-          run: () => this.popBack(true),
+          name: 'Extraer final',
+          run: () => this.popBack(!this.doublyLinked),
         },
         {
-          name: 'Eliminar posicion',
-          run: () => this.setState({showDeleteModal: true}),
+          name: 'Insertar antes de',
+          run: () => 
+            this.props.selection  
+            ? this.setState({showPushBeforeModal: true})
+            : alert('NOTIFICATION HERE')
+        },
+        {
+          name: 'Insertar despues de',
+          run: () => 
+            this.props.selection  
+            ? this.setState({showPushAfterModal: true})
+            : alert('NOTIFICATION HERE')
+        },
+        {
+          name: 'Eliminar nodo',
+          run: () => this.remove(!this.doublyLinked),
         }
       ]
     }else if(this.props.type === actions.SELECT_STACK){
@@ -186,7 +216,7 @@ class LinkedList extends React.Component<Props, State>{
 			payload:{
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
-				undo: (this.handleUndo),
+				undo: this.handleUndo,
 				redo: this.handleRedo,
         options,
         type: this.props.type,
@@ -200,25 +230,132 @@ class LinkedList extends React.Component<Props, State>{
     const mid = this.cy.width()/2;
     for(let i = 0; i < n; i++){
       const {id} = this.list._data[i];
-      console.log(this.list._data[i]);
       layoutOptions.positions[id] = {
         x: mid - (n-1)*(35) + 70*i,
         y: this.cy.height()/4,
       }
     }
   }
-  refreshLayout() {
+  refreshLayout(animate:boolean=true) {
     this.layout.stop();
     this.layoutProcessing();
-		this.layout = this.cy.elements().makeLayout(layoutOptions);
+		this.layout = this.cy.elements().makeLayout({...layoutOptions, animate});
 		this.layout.run();
   }
   
-  handleUndo = () => {}
-  handleRedo = () => {}
-  pushState(){}
-  
+  handleClickOnNode = (node: CytoscapeElement) => {
+		if (this.props.animation === true) return;
+    let nodeId = node.id();
+    let { selection } = this.props;
+    if(selection && selection.type === 'node'){
+      const prev = this.cy.getElementById(selection.id);
+      prev.style(this.nodeStyle);
+      if(selection.id === nodeId){
+        this.props.dispatch({
+          type: actions.NO_SELECTION,
+        });
+        return;
+      }
+    }
+    node.style(Styles.NODE_SELECTED);
+    this.props.dispatch({
+      type: actions.SELECTION,
+      payload: {
+        selection: {
+          id: nodeId, type: 'node'
+        }
+      }
+    });
+	}
 
+ 	
+	handleUndo = () => {
+		if(this.undo.length === 0){
+			return;
+		}
+		
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
+		const currentElements = this.exportGraph();
+		
+    let state = this.undo.pop();
+
+    if(state !== undefined){
+			this.redo.push({list: [...this.list._data], elements: currentElements});
+			this.initialize(state);
+		}
+	}
+
+	handleRedo = () => {
+		if(this.redo.length === 0){
+			return;
+		}
+
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+		
+		this.props.dispatch({
+			type: actions.NO_SELECTION,
+		});
+
+		const currentElements = this.exportGraph();
+		
+		let state = this.redo.pop();
+		if(state !== undefined){
+			this.undo.push({list: [...this.list._data], elements: currentElements});
+			this.initialize(state);
+		}
+	}
+
+  pushState(){
+    this.redo = [];
+    this.undo.push({
+      list: [...this.list._data],
+      elements: this.exportGraph(),
+    });
+  }
+  
+  exportGraph(){
+		const elements:Array<Object> = [];
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			elements.push({
+				group: 'nodes',
+				data: {
+					id: node.id(),
+					value: node.data('value'),
+				},
+				position: {
+					x: node.position().x,
+					y: node.position().y,
+				}
+			})
+		});
+		this.cy.edges().forEach((edge:CytoscapeElement) => {
+			elements.push({
+				group: 'edges',
+				data: {
+					id: edge.id(),
+					source: edge.source().id(), target: edge.target().id(),
+					weight: edge.data('weight'),
+				}
+			})
+		});
+		return elements;
+  }
+  
   executeAnimation = (commands: Array<AnimationStep>) => {
 		this.cy.nodes().style({
 			'background-color': 'white',
@@ -230,6 +367,9 @@ class LinkedList extends React.Component<Props, State>{
 			let step = () => {
 				if(!this._isMounted) return;
 				if(pos === commands.length){
+          this.props.dispatch({
+						type: actions.ANIMATION_END,
+					});
 					return;
 				}
 				if (!this.props.animation) {
@@ -241,9 +381,9 @@ class LinkedList extends React.Component<Props, State>{
 					return;
 				}
 				let { eles, style, duration, inst, lines} = commands[pos++];
-				if (style) {
+				if (eles) {
 					eles.forEach((ele, index) => {
-						this.cy.getElementById(ele).style(style[index]);
+						if(style) this.cy.getElementById(ele).style(style[index]);
 					});
         }
         
@@ -265,13 +405,14 @@ class LinkedList extends React.Component<Props, State>{
               }
             }else if(ele.name === 'push_back'){
               if(id != null && value != null){
-                this.addNode(id, value);
+                const n = this.list.length();
+                this.addNode(id, value, {x: this.cy.width()/2 + n*35, y: this.cy.height()/4 - 70});
                 this.list._data.push({id, value});
                 if(source != null) this.addEdge(source, id);
               }
             }else if(ele.name === 'push_front'){
               if(id != null && value != null){
-                this.addNode(id, value);
+                this.addNode(id, value, {x: this.cy.width()/2 - this.list.length()*35, y: this.cy.height()/4 - 70});
                 this.list._data.unshift({id, value});
                 if(target != null) this.addEdge(id, target);
               }
@@ -285,6 +426,44 @@ class LinkedList extends React.Component<Props, State>{
                 this.removeNode(id);
                 this.list._data.pop();
               }
+            }else if(ele.name === 'add_node_before'){
+              let {id, value, pos} = ele.data;
+              if(id != null && value != null && pos != null){
+                const x = this.cy.width()/2 - (this.list.length()-1)*(35) + 70*pos;
+                this.addNode(id, value, {x, y: this.cy.height()/4 - 70});
+                if(pos === 0) this.list._data.unshift({id, value});
+                else{
+
+                  let rest = this.list._data.splice(pos);
+                  this.list._data.push({id, value});
+                  this.list._data = this.list._data.concat(...rest);
+                }
+              }
+            }else if(ele.name === 'add_node'){
+              let {id, value, pos} = ele.data;
+              if(id != null && value != null && pos != null){
+                const x = this.cy.width()/2 - (this.list.length()-1)*(35) + 70*pos;
+                this.addNode(id, value, {x, y: this.cy.height()/4 - 70});
+                pos++;
+                if(pos === this.list.length()) this.list._data.push({id, value});
+                else{
+                  let rest = this.list._data.splice(pos);
+                  this.list._data.push({id, value});
+                  this.list._data = this.list._data.concat(...rest);
+                }
+              }
+            }else if(ele.name === 'add_edge'){
+              let {source, target} = ele.data;
+              if(source && target){
+                console.log('ADD', source, target);
+                this.addEdge(source, target);
+              }
+            }else if(ele.name === 'remove_edge'){
+              let {source, target} = ele.data;
+              if(source && target){
+                this.removeEdge(source+'-'+target);
+                if(this.doublyLinked) this.removeEdge(target+'-'+source);
+              }
             }
 					});
 				}
@@ -295,17 +474,19 @@ class LinkedList extends React.Component<Props, State>{
 					})
 				}
         this.refreshLayout();
-        console.log(duration);
 				setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 			}
 			step();
     }
-    console.log(commands);
 		animation();
   }
   
   removeNode = (node: string) => {
 		this.cy.remove('node[id="' + node + '"]');
+  }
+  
+  removeEdge = (edge: string) => {
+		this.cy.remove('edge[id="' + edge + '"]');
   }
   
   addNode(id: string, value: number, position: {x: number, y: number} = {x: 0, y: 0}){
@@ -332,11 +513,23 @@ class LinkedList extends React.Component<Props, State>{
 				source: x,
 				target: y,
 			}
-		});
+    });
+    if(this.doublyLinked){
+      this.cy.add({
+        group: 'edges',
+        data: {
+          id: y + '-' + x,
+          source: y,
+          target: x,
+        }
+      });
+    }
   }
   
   pushBack(value: number = 0, slow:boolean = false){
 
+    if(this.props.animation) return;
+    this.pushState();
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     
@@ -353,6 +546,9 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   pushFront(value: number = 0){
+    if(this.props.animation) return;
+    this.pushState();
+
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     
@@ -368,6 +564,9 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   popFront(){
+    if(this.props.animation) return;
+    this.pushState();
+
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
       this.props.dispatch({
 				type: actions.ANIMATION_START,
@@ -380,6 +579,9 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   popBack(slow:boolean=false){
+    if(this.props.animation) return;
+    this.pushState();
+
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
       this.props.dispatch({
 				type: actions.ANIMATION_START,
@@ -391,22 +593,55 @@ class LinkedList extends React.Component<Props, State>{
     })
   }
 
-  search(){
+  remove(slow = false){
+    if(this.props.animation) return;
+    const {selection} = this.props;
 
-  }
+    if(!selection) {
+      alert('PUT NOTIFICATION HERE: NODE REQUIRED');
+      return;
+    }
 
-  remove(pos:number){
+    if(this.props.animation) return;
+    this.pushState();
+
+    const nodeId = selection.id;
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
       this.props.dispatch({
 				type: actions.ANIMATION_START,
       });
-      const commands = this.list.delete_position(pos);
+      const commands = this.list.delete_position(nodeId, slow);
       resolve(commands);
     }).then((commands: Array<AnimationStep>) => {
       this.executeAnimation(commands);
     })
   }
 
+  insert(value:number = 0, where:string, slow = false){
+    if(this.props.animation) return;
+    const {selection} = this.props;
+    if(!selection) {
+      alert('PUT NOTIFICATION HERE: NODE REQUIRED');
+      return;
+    }
+    this.pushState();
+    const nodeId = selection.id;
+
+    let id = 0;
+    while(this.cy.getElementById(id.toString()).length > 0) id++;
+
+    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
+      this.props.dispatch({
+				type: actions.ANIMATION_START,
+      });
+      let commands;
+      if(where === 'before') commands = this.list.insert_before(nodeId, id.toString(), value, slow);
+      else commands = this.list.insert_after(nodeId, id.toString(), value, slow);
+      resolve(commands);
+    }).then((commands: Array<AnimationStep>) => {
+      this.executeAnimation(commands);
+    })
+  }
   render(){
     return(
       <>
@@ -421,9 +656,14 @@ class LinkedList extends React.Component<Props, State>{
           callback={(v:number) => this.pushBack(v, this.props.type === actions.SELECT_SINGLE_LINKED_LIST)}
         />
         <InputModal 
-          show={this.state.showDeleteModal}
-          handleClose={() => this.setState({showDeleteModal: false})}
-          callback={(v:number) => this.remove(v)}
+          show={this.state.showPushBeforeModal}
+          handleClose={() => this.setState({showPushBeforeModal: false})}
+          callback={(v:number) => this.insert(v, 'before', this.props.type === actions.SELECT_SINGLE_LINKED_LIST)}
+        />
+        <InputModal 
+          show={this.state.showPushAfterModal}
+          handleClose={() => this.setState({showPushAfterModal: false})}
+          callback={(v:number) => this.insert(v, 'after', this.props.type === actions.SELECT_SINGLE_LINKED_LIST)}
         />
         <div id="canvas" className='standard-struct'/>
       </>

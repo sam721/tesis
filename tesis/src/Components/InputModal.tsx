@@ -76,7 +76,7 @@ class InputModal extends React.Component<Props, State>{
   }
 
   handleCancel = () => {
-    this.setState({text: this.props.currentValue.toString()});
+    if(this.props.currentValue) this.setState({text: this.props.currentValue.toString()});
     this.props.handleClose();
   }
   render(){

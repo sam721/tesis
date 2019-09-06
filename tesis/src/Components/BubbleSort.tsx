@@ -181,16 +181,17 @@ class BubbleSort extends React.Component<Props, State> {
 					return;
 				}
 				let { eles, style, duration, data, lines} = commands[pos++];
-				if (style) {
+				if (eles) {
 					eles.forEach((ele, index) => {
-						this.cy.getElementById(ele).style(style[index]);
+						if(style) this.cy.getElementById(ele).style(style[index]);
+					});
+					eles.forEach((ele, index) => {
+						if(data !== undefined){
+							this.cy.getElementById(ele).data(data[index]);
+						}
 					});
 				}
-				eles.forEach((ele, index) => {
-					if(data !== undefined){
-						this.cy.getElementById(ele).data(data[index]);
-					}
-				});
+				
 				if(this._isMounted && lines != null){
 					this.props.dispatch({
 						type: actions.CHANGE_LINE,

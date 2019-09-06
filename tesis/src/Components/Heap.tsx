@@ -353,21 +353,19 @@ class Heap extends React.Component<Props, State>{
 					return;
 				}
 				let { eles, style, duration, data, classes, lines} = commands[pos++];
-				if (style) {
+				if (eles) {
 					eles.forEach((ele, index) => {
-						this.cy.getElementById(ele).style(style[index]);
+						if(style) this.cy.getElementById(ele).style(style[index]);
 					});
+					eles.forEach((ele, index) => {
+						if(data !== undefined){
+							this.cy.getElementById(ele).data(data[index]);
+							console.log(ele, data[index]);
+							const id = parseInt(ele, 10);
+						}
+	
+					})
 				}
-
-
-				eles.forEach((ele, index) => {
-					if(data !== undefined){
-						this.cy.getElementById(ele).data(data[index]);
-						console.log(ele, data[index]);
-						const id = parseInt(ele, 10);
-					}
-
-				})
 				if(lines != null && this._isMounted){
 					this.props.dispatch({
 						type: actions.CHANGE_LINE,
