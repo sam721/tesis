@@ -119,7 +119,9 @@ const algorithmReducer = (state = {}, action) => {
         pseudo: bubblesort,
         options: action.payload.options,
         photo: action.payload.photo,
-        gif: action.payload.gif
+        gif: action.payload.gif,
+        undo: () => {},
+        redo: () => {},
       }
 
     case actions.SELECT_MERGESORT:
@@ -130,7 +132,9 @@ const algorithmReducer = (state = {}, action) => {
         pseudo: mergesort,
         options: action.payload.options,
         photo: action.payload.photo,
-        gif: action.payload.gif
+        gif: action.payload.gif,
+        undo: () => {},
+        redo: () => {},
       }
 
     case actions.SELECT_BINARY_SEARCH:
@@ -141,7 +145,9 @@ const algorithmReducer = (state = {}, action) => {
         pseudo: binarySearch,
         options: action.payload.options,
         photo: action.payload.photo,
-        gif: action.payload.gif
+        gif: action.payload.gif,
+        undo: () => {},
+        redo: () => {},
       }
     default:
       return state;
