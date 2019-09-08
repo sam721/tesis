@@ -174,14 +174,14 @@ class LinkedList extends React.Component<Props, State>{
           run: () => 
             this.props.selection  
             ? this.setState({showPushBeforeModal: true})
-            : alert('NOTIFICATION HERE')
+            : this.props.dispatch({type: actions.NO_NODE_SELECTED_ERROR})
         },
         {
           name: 'Insertar despues de',
           run: () => 
             this.props.selection  
             ? this.setState({showPushAfterModal: true})
-            : alert('NOTIFICATION HERE')
+            : this.props.dispatch({type: actions.NO_NODE_SELECTED_ERROR})
         },
         {
           name: 'Eliminar nodo',
@@ -565,6 +565,12 @@ class LinkedList extends React.Component<Props, State>{
 
   popFront(){
     if(this.props.animation) return;
+    if(this.list.length() === 0){
+      this.props.dispatch({
+        type: actions.EMPTY_LIST_WARNING,
+      });
+      return;
+    }
     this.pushState();
 
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
@@ -580,6 +586,12 @@ class LinkedList extends React.Component<Props, State>{
 
   popBack(slow:boolean=false){
     if(this.props.animation) return;
+    if(this.list.length() === 0){
+      this.props.dispatch({
+        type: actions.EMPTY_LIST_WARNING,
+      });
+      return;
+    }
     this.pushState();
 
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
@@ -598,7 +610,9 @@ class LinkedList extends React.Component<Props, State>{
     const {selection} = this.props;
 
     if(!selection) {
-      alert('PUT NOTIFICATION HERE: NODE REQUIRED');
+      this.props.dispatch({
+        type: actions.NO_NODE_SELECTED_ERROR,
+      });
       return;
     }
 
@@ -621,7 +635,9 @@ class LinkedList extends React.Component<Props, State>{
     if(this.props.animation) return;
     const {selection} = this.props;
     if(!selection) {
-      alert('PUT NOTIFICATION HERE: NODE REQUIRED');
+      this.props.dispatch({
+        type: actions.NO_NODE_SELECTED_ERROR,
+      });
       return;
     }
     this.pushState();

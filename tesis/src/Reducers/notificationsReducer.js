@@ -40,7 +40,7 @@ const notificationsReducer = action => {
 
     case actions.INVALID_INTEGER_ERROR: 
       createNotification('Error',
-      'Debe ingresar un numero entero',
+      'Debe ingresar un numero entero entre -999 y 999',
       'danger');
       break;
 
@@ -71,9 +71,15 @@ const notificationsReducer = action => {
     case actions.ANIMATION_RUNNING_ERROR:
       createNotification('Error',
       'No se pueden hacer modificaciones mientras se ejecuta el algoritmo',
-      'danger');
+      'warning');
       break;
-  
+    
+    case actions.EMPTY_LIST_WARNING:
+      createNotification('La lista se encuentra vacia',
+      'No se pudo realizar la accion',
+      'warning');
+      break;
+
     case actions.EMPTY_HEAP_WARNING:
       createNotification('Heap vacio',
       'No se puede extraer el minimo elemento de un heap vacio',
