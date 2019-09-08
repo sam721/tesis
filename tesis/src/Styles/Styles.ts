@@ -28,6 +28,12 @@ export const EDGE_DIRECTED = {
 	'target-arrow-color': '#ccc',
   'target-arrow-shape': 'triangle',
 }
+
+export const EDGE_DOUBLE = {
+	'source-arrow-color': '#ccc',
+	'source-arrow-shape': 'triangle',
+}
+
 export const EDGE_WEIGHTED = {
 	'label': 'data(weight)',
 	'text-margin-y': '-10.0',

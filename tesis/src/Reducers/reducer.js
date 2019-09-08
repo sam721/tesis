@@ -19,7 +19,7 @@ const initialState = {
   photo: () => { },
   gif: () => {},
   gifLength: 0,
-  showPseudo: false,
+  showPseudo: true,
 
   undo: () => {},
   redo: () => {},

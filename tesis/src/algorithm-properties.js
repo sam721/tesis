@@ -4,6 +4,7 @@ import Dijkstra from './Algorithms/Dijkstra';
 import Prim from './Algorithms/Prim';
 import Kruskal from './Algorithms/Kruskal';
 
+import pseudocodes from './resources/pseudocodes/list';
 import actions from './Actions/actions';
 const properties = {
   BFS: {
@@ -52,18 +53,22 @@ const properties = {
   SingleLinkedList: {
     action: actions.SELECT_LINKED_LIST,
     type: actions.SELECT_SINGLE_LINKED_LIST,
+    pseudoset: pseudocodes.singlySet,
   },
   DoubleLinkedList: {
     action: actions.SELECT_LINKED_LIST,
     type: actions.SELECT_DOUBLE_LINKED_LIST,
+    pseudoset: pseudocodes.doublySet,
   },
   Stack: {
     action: actions.SELECT_LINKED_LIST,
     type: actions.SELECT_STACK,
+    pseudoset: pseudocodes.stackSet,
   },
   Queue: {
     action: actions.SELECT_LINKED_LIST,
     type: actions.SELECT_QUEUE,
+    pseudoset: pseudocodes.queueSet,
   },
 
 }

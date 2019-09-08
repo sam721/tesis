@@ -9,6 +9,7 @@ import {heap} from '../resources/pseudocodes/heap';
 import {avl} from '../resources/pseudocodes/avl';
 import binarySearch from '../resources/pseudocodes/binarySearch';
 
+import listPseudo from '../resources/pseudocodes/list';
 import actions from '../Actions/actions'
 const algorithmReducer = (state = {}, action) => {
   switch (action.type) {
@@ -165,25 +166,25 @@ const algorithmReducer = (state = {}, action) => {
           return {
             ...nextState,
             algorithm: 'SingleLinkedList',
-            pseudo: [],
+            pseudo: listPseudo.singlySet.main,
           }
         case actions.SELECT_DOUBLE_LINKED_LIST:
           return {
             ...nextState,
             algorithm: 'DoubleLinkedList',
-            pseudo: [],
+            pseudo: listPseudo.doublySet.main,
           }
         case actions.SELECT_QUEUE:
           return {
             ...nextState,
             algorithm: 'Queue',
-            pseudo: [],
+            pseudo: listPseudo.queueSet.main,
           }
         case actions.SELECT_STACK:
           return {
             ...nextState,
             algorithm: 'Stack',
-            pseudo: [],
+            pseudo: listPseudo.stackSet.main,
           }
       }
       

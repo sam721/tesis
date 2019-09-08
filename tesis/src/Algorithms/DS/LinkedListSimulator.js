@@ -1,10 +1,13 @@
+import actions from "../../Actions/actions";
+
 // Simple array used to create commands for Linked List Animation
 
 class LinkedListSimulator {
   _data = [];
-  _type;
-  constructor(type){
-    this._type = type;
+
+  constructor(data = [], type = 'none'){
+    this._data = [...data];
+    this.type = type;
   }
   length(){
     return this._data.length;
@@ -14,16 +17,30 @@ class LinkedListSimulator {
     const {id, value} = element;
     let source = undefined;
     const commands = [];
+    let lines;
+    if(this.length() === 0){
+      commands.push({lines: [2,3]});
+    }else{
+      if(this.type === actions.SELECT_QUEUE){
+        lines = [4, 5, 6];
+      }else if(this.type === actions.SELECT_DOUBLE_LINKED_LIST){
+        lines = [4, 5, 6, 7];
+      }
+    }
     if(slow){
       for(let i = 0; i < this.length(); i++){
         const {id} = this._data[i];
         commands.push(
-          { eles: [id], style: [{'background-color': 'black', 'color': 'white'}] },
+          { eles: [id], style: [{'background-color': 'black', 'color': 'white'}], lines: [6, 7]},
           { eles: [id], style: [{'background-color': 'white', 'color': 'black'}], duration: 10 },
         )
       }
     }
-    if(this.length()) source = this._data[this.length()-1].id;
+    if(this.length()){
+      source = this._data[this.length()-1].id;
+    }
+
+    if(this.type === actions.SELECT_SINGLE_LINKED_LIST) lines = [8];
     commands.push({
       eles: [], style: [],
       inst: [{
@@ -32,7 +49,7 @@ class LinkedListSimulator {
           id, value, source,
         }
       }],
-      duration: 10,
+      lines,
     });
     console.log(commands);
     return commands;
@@ -44,13 +61,27 @@ class LinkedListSimulator {
     if(slow){
       for(let i = 0; i < this.length(); i++){
         const {id} = this._data[i];
+        let lines;
+        if(this.length() === 1) lines = [2, 3, 4, 5];
+        else lines = [7, 8, 9];
         commands.push(
-          { eles: [id], style: [{'background-color': 'black', 'color': 'white'}] },
+          { eles: [id], style: [{'background-color': 'black', 'color': 'white'}], lines},
           { eles: [id], style: [{'background-color': 'white', 'color': 'black'}], duration: 10 },
         )
       }
     }
     const {id} = this._data[this.length()-1];
+    let lines;
+    if(this.type === actions.SELECT_SINGLE_LINKED_LIST && this.length() > 1) lines = [10, 11];
+    else if(this.type === actions.SELECT_DOUBLE_LINKED_LIST){
+      commands.push({
+        eles: [id], 
+        style: [{'background-color': 'black', 'color':'white'}], 
+        lines: [2, 3],
+      });
+      if(this.length() === 1) lines = [4, 5];
+      else lines = [6,7];
+    }
     commands.push(
       {
         eles: [], style: [],
@@ -58,7 +89,7 @@ class LinkedListSimulator {
           name: 'pop_back',
           data: { id, value: this.length()-1},
         }],
-        duration: 10,
+        lines,
       }
     );
     return commands;
@@ -68,7 +99,14 @@ class LinkedListSimulator {
     const {id, value} = element;
     let target = undefined;
     if(this.length()) target = this._data[0].id;
-    //this._data.unshift(element);
+    let lines;
+    if(this.length() === 0){
+      lines = [2,3];
+    }else{
+      if(this.type === actions.SELECT_SINGLE_LINKED_LIST) lines = [4,5,6];
+      else if(this.type === actions.SELECT_DOUBLE_LINKED_LIST) lines = [4,5,6,7];
+      else if(this.type === actions.SELECT_STACK) lines = [4,5,6];
+    }
     const commands = [{
       eles: [], style: [],
       inst: [{
@@ -77,7 +115,7 @@ class LinkedListSimulator {
           id, value, target,
         }
       }],
-      duration: 10,
+      lines,
     }]
     return commands;
   }
@@ -85,16 +123,30 @@ class LinkedListSimulator {
   pop_front(){
     if(this.length() === 0) return [{eles: [], style: []}];
     const {id} = this._data[0];
-    const commands = [
+    let lines;
+    const commands = [];
+    if(this.type === actions.SELECT_SINGLE_LINKED_LIST || this.type === actions.SELECT_STACK) lines = [2,3,4];
+    else if(this.type === actions.SELECT_DOUBLE_LINKED_LIST){
+      commands.push({
+        eles: [id], style: [{'background-color': 'black', 'color': 'white'}],
+        lines: [2, 3],
+      });
+      if(this.length() === 1) lines = [4, 5];
+      else lines = [6, 7];
+    }else{
+      if(this.length() === 1) lines = [3,4];
+      else lines = [5,6];
+    }
+    commands.push(
       {
         eles: [], style: [],
         inst: [{
           name: 'pop_front',
           data: { id },
         }],
-        duration: 10,
+        lines,
       }
-    ];
+    );
     //this._data.shift();
     return commands;
   }
@@ -132,12 +184,13 @@ class LinkedListSimulator {
     let i;
     for(i = 0; i < n; i++){
       const id = this._data[i].id;
+      if(nodeId === id) break;
       if(slow){
         commands.push(
           {
             eles: [id],
             style: [{ 'background-color': 'black', 'color': 'white'}],
-            duration: 1000,
+            lines: [7, 8],
           },
           {
             eles: [id],
@@ -146,20 +199,30 @@ class LinkedListSimulator {
           }
         );
       }
-      if(nodeId === id) break;
+      
     }
     if(i === n) return commands;
     const pos = i;
     let prev = '', next = nodeId;
-    if(pos - 1 >= 0) prev = this._data[pos-1].id;
+    let lines;
+    if(this.type === actions.SELECT_SINGLE_LINKED_LIST){
+      if(pos === 0) lines = [2, 3, 4];
+      else lines = [9, 10];
+    }else{
+      if(pos === 0) lines = [5, 6];
+      else lines = [7, 8];
+    }
     if(pos - 1 >= 0){
+      prev = this._data[pos-1].id;
       commands.push({
         inst: [
           {
             name: 'remove_edge',
             data: {source: prev, target: next}
           }
-        ]
+        ],
+        lines: (this.type === actions.SELECT_DOUBLE_LINKED_LIST ? [2, 3, 4] : undefined),
+        duration: 500,
       });
     }
     commands.push({
@@ -177,7 +240,7 @@ class LinkedListSimulator {
           data: {source: newId, target: next},
         },
       ],
-      duration: 10,
+      lines,
     });
     return commands;
   }
@@ -193,7 +256,7 @@ class LinkedListSimulator {
           {
             eles: [id],
             style: [{ 'background-color': 'black', 'color': 'white'}],
-            duration: 1000,
+            duration: 500,
           },
           {
             eles: [id],
@@ -205,6 +268,7 @@ class LinkedListSimulator {
       if(nodeId === id) break;
     }
     if(i === n) return commands;
+
     const pos = i;
     let prev = nodeId, next = '';
     if(pos + 1 < this.length()) next = this._data[pos+1].id;
@@ -213,11 +277,18 @@ class LinkedListSimulator {
         inst: [
           {
             name: 'remove_edge',
-            data: {source: prev, target: next}
+            data: {source: prev, target: next},
+            duration: 500,
           }
-        ]
+        ],
+        lines: (this.type === actions.SELECT_DOUBLE_LINKED_LIST ? [2, 3, 4] : [2, 3]),
       });
     }
+    let lines;
+    if(this.type === actions.SELECT_DOUBLE_LINKED_LIST){
+      lines = (pos === this.length() - 1 ? [5, 6] : [7, 8]);
+    }else lines = [4];
+    
     commands.push({
       inst: [
         {
@@ -233,9 +304,9 @@ class LinkedListSimulator {
           data: {source: newId, target: next},
         },
       ],
-      duration: 10,
+      lines,
+      duration: 500,
     });
-
     return commands;
   }
   delete_position(nodeId, slow = false){
@@ -245,11 +316,15 @@ class LinkedListSimulator {
     for(i = 0; i < n; i++){
       const id = this._data[i].id;
       if(slow){
+        let lines;
+        if(nodeId === id && i === 0) lines = [1, 2];
+        else lines = [6, 7, 8];
         commands.push(
           {
             eles: [id],
             style: [{ 'background-color': 'black', 'color': 'white'}],
-            duration: 1000,
+            duration: 500,
+            lines,
           },
           {
             eles: [id],
@@ -267,12 +342,31 @@ class LinkedListSimulator {
       source = this._data[pos-1].id;
       target = this._data[pos+1].id;
     }
+    let lines;
+    if(this.type === actions.SELECT_SINGLE_LINKED_LIST){
+      if(pos === 0) lines = [3];
+      else lines = [9, 10];
+    }else if(this.type === actions.SELECT_DOUBLE_LINKED_LIST){
+      let caseLines;
+      if(this.length() === 1) caseLines = [2, 3];
+      else if(pos === 0) caseLines = [4, 5];
+      else if(pos === this.length() - 1) caseLines = [6, 7];
+      else caseLines = [8, 9];
+      commands.push({
+        eles: [nodeId], style: [{'background-color': 'black', 'color': 'white'}],
+        lines: caseLines,
+      });
+
+      lines = [10];
+    }
+
     commands.push({
       inst: [{
         name: 'remove',
         data: {id: nodeId, value: pos, source, target}
       }],
-      duration: 10,
+      lines,
+      duration: 500,
     });
     return commands;
   }

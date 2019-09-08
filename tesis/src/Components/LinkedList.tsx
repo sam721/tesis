@@ -4,9 +4,21 @@ import LinkedListSimulator from '../Algorithms/DS/LinkedListSimulator';
 import actions from '../Actions/actions';
 import { AnimationStep, CytoscapeElement, CytoEvent } from '../Types/types';
 import InputModal from './InputModal';
+
 const cytoscape = require('cytoscape');
 const Styles = require('../Styles/Styles');
 const { connect } = require('react-redux');
+
+type pseudoSet = {
+  main: Array<{text: string, ind: number}>,
+  pushFront: Array<{text: string, ind: number}>,
+  pushBack: Array<{text: string, ind: number}>,
+  popFront: Array<{text: string, ind: number}>,
+  popBack: Array<{text: string, ind: number}>,
+  insertBefore: Array<{text: string, ind: number}>,
+  insertAfter: Array<{text: string, ind: number}>,
+  remove: Array<{text: string, ind: number}>,
+}
 
 type options = {
   name: string,
@@ -41,7 +53,9 @@ type Props = {
 
   options: Array<{name: string, run: () => void}>,
 	loadingGraph: Boolean,
-	data: string,
+  data: string,
+  
+  pseudoset: pseudoSet,
 }
 
 type State = {
@@ -95,10 +109,13 @@ class LinkedList extends React.Component<Props, State>{
 
   cy = cytoscape();
 
-  nodeStyle = {...Styles.NODE, shape: 'square'};
-  edgeStyle = {...Styles.EDGE, ...Styles.EDGE_DIRECTED};
+  nodeStyle = {...Styles.NODE, shape: 'square'};  
+  edgeStyle = {};
   initialize(state: stackState){
 
+    this.edgeStyle = {...Styles.EDGE, ...Styles.EDGE_DIRECTED};
+
+    if(this.doublyLinked) this.edgeStyle = {...this.edgeStyle, ...Styles.EDGE_DOUBLE}
     const {list, elements} = state;
 		this.cy = cytoscape({
 
@@ -143,23 +160,34 @@ class LinkedList extends React.Component<Props, State>{
     this.cy.on('resize', () => this.refreshLayout(false))
     this.layout = this.cy.elements().makeLayout(layoutOptions);
     this.layout.run();
-    this.refreshLayout();
+    this.refreshLayout(false);
   }  
 
+  componentDidUpdate(){
+    layoutOptions.animationDuration = 500/this.props.speed;
+  }
   componentDidMount(){
     this._isMounted = true;
+    this.doublyLinked = this.props.type === actions.SELECT_DOUBLE_LINKED_LIST;
+
+    this.list.type = this.props.type;
     this.initialize({list: [], elements: []});
     let options:Array<{name: string, run: () => void}> = [];
     if(this.props.type === actions.SELECT_SINGLE_LINKED_LIST || this.props.type === actions.SELECT_DOUBLE_LINKED_LIST){
-      this.doublyLinked = this.props.type === actions.SELECT_DOUBLE_LINKED_LIST;
       options = [
         {
           name: 'Insertar al frente',
-          run: () => this.setState({showPushFrontModal: true}),
+          run: () => 
+              this.props.animation
+              ? this.props.dispatch({type: actions.ANIMATION_RUNNING_ERROR})
+              : this.setState({showPushFrontModal: true}),
         },
         {
           name: 'Insertar al final',
-          run: () => this.setState({showPushBackModal: true}),
+          run: () => 
+              this.props.animation
+              ? this.props.dispatch({type: actions.ANIMATION_RUNNING_ERROR})
+              : this.setState({showPushBackModal: true}),
         },
         {
           name: 'Extraer frente',
@@ -192,22 +220,28 @@ class LinkedList extends React.Component<Props, State>{
       options = [
         {
           name: 'Apilar',
-          run: () => this.setState({showPushBackModal: true}),
+          run: () => 
+              this.props.animation
+              ? this.props.dispatch({type: actions.ANIMATION_RUNNING_ERROR})
+              : this.setState({showPushFrontModal: true}),
         },
         {
           name: 'Desapilar',
-          run: () => this.popBack(),
+          run: () => this.popFront(),
         }
       ]
     }else if(this.props.type === actions.SELECT_QUEUE){
       options = [
         {
           name: 'Encolar',
-          run: () => this.setState({showPushFrontModal: true}),
+          run: () =>
+              this.props.animation
+              ? this.props.dispatch({type: actions.ANIMATION_RUNNING_ERROR}) 
+              : this.setState({showPushBackModal: true}),
         },
         {
           name: 'Desencolar',
-          run: () => this.popBack(),
+          run: () => this.popFront(),
         }
       ]
     }
@@ -474,7 +508,7 @@ class LinkedList extends React.Component<Props, State>{
 					})
 				}
         this.refreshLayout();
-				setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+				setTimeout(step, ((duration === undefined) ? 500 : duration)/(this.props.speed));
 			}
 			step();
     }
@@ -505,30 +539,34 @@ class LinkedList extends React.Component<Props, State>{
   }
   
   addEdge(x: string, y: string) {
-		//this.pushState();
+    //this.pushState();
 		this.cy.add({
 			group: 'edges',
 			data: {
 				id: x + '-' + y,
 				source: x,
-				target: y,
-			}
+        target: y,
+        weight: 'sig',
+      },
     });
-    if(this.doublyLinked){
-      this.cy.add({
-        group: 'edges',
-        data: {
-          id: y + '-' + x,
-          source: y,
-          target: x,
-        }
-      });
-    }
   }
   
   pushBack(value: number = 0, slow:boolean = false){
 
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
+
+    this.props.dispatch({
+      type: actions.CHANGE_PSEUDO,
+      payload: {
+        pseudo: this.props.pseudoset.pushBack,
+      }
+    });
+
     this.pushState();
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
@@ -546,8 +584,21 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   pushFront(value: number = 0){
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
+
     this.pushState();
+
+    this.props.dispatch({
+      type: actions.CHANGE_PSEUDO,
+      payload: {
+        pseudo: this.props.pseudoset.pushFront,
+      }
+    });
 
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
@@ -564,13 +615,27 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   popFront(){
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
+
     if(this.list.length() === 0){
       this.props.dispatch({
         type: actions.EMPTY_LIST_WARNING,
       });
       return;
     }
+
+    this.props.dispatch({
+      type: actions.CHANGE_PSEUDO,
+      payload: {
+        pseudo: this.props.pseudoset.popFront,
+      }
+    });
+
     this.pushState();
 
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
@@ -585,13 +650,27 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   popBack(slow:boolean=false){
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
+
     if(this.list.length() === 0){
       this.props.dispatch({
         type: actions.EMPTY_LIST_WARNING,
       });
       return;
     }
+
+    this.props.dispatch({
+      type: actions.CHANGE_PSEUDO,
+      payload: {
+        pseudo: this.props.pseudoset.popBack,
+      }
+    });
+
     this.pushState();
 
     new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
@@ -606,7 +685,13 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   remove(slow = false){
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
+
     const {selection} = this.props;
 
     if(!selection) {
@@ -617,6 +702,14 @@ class LinkedList extends React.Component<Props, State>{
     }
 
     if(this.props.animation) return;
+
+    this.props.dispatch({
+      type: actions.CHANGE_PSEUDO,
+      payload: {
+        pseudo: this.props.pseudoset.remove,
+      }
+    });
+
     this.pushState();
 
     const nodeId = selection.id;
@@ -632,7 +725,13 @@ class LinkedList extends React.Component<Props, State>{
   }
 
   insert(value:number = 0, where:string, slow = false){
-    if(this.props.animation) return;
+    if(this.props.animation){
+      this.props.dispatch({
+        type: actions.ANIMATION_RUNNING_ERROR,
+      });
+      return;
+    }
+
     const {selection} = this.props;
     if(!selection) {
       this.props.dispatch({
@@ -640,6 +739,14 @@ class LinkedList extends React.Component<Props, State>{
       });
       return;
     }
+
+    this.props.dispatch({
+      type: actions.CHANGE_PSEUDO,
+      payload: {
+        pseudo: (where === 'before' ? this.props.pseudoset.insertBefore : this.props.pseudoset.insertAfter),
+      }
+    });
+
     this.pushState();
     const nodeId = selection.id;
 
@@ -679,7 +786,7 @@ class LinkedList extends React.Component<Props, State>{
         <InputModal 
           show={this.state.showPushAfterModal}
           handleClose={() => this.setState({showPushAfterModal: false})}
-          callback={(v:number) => this.insert(v, 'after', this.props.type === actions.SELECT_SINGLE_LINKED_LIST)}
+          callback={(v:number) => this.insert(v, 'after')}
         />
         <div id="canvas" className='standard-struct'/>
       </>

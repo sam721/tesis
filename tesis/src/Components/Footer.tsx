@@ -20,7 +20,7 @@ const algoDict:({[name: string]: string})= {
   'MergeSort': 'Merge Sort',
   'BinarySearch': 'Busqueda Binaria',
   'SingleLinkedList': 'Lista enlazada',
-  'DoubleLinkedList': 'Dipolo',
+  'DoubleLinkedList': 'Lista doble',
   'Queue': 'Cola',
   'Stack': 'Pila',
 }

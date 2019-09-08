@@ -26,7 +26,7 @@ const CodeLine = (props:{line:{text:string, ind: number}, current: boolean, inde
   return (
     <div style={{...focus, paddingRight: '10px'}}>
       <div className='codeline'>
-        {index}.
+        {(index<10?'\u00A0': '')+index}.
         <span style={{paddingLeft: (line.ind *15).toString() + 'px'}}>{line.text}</span>
       </div>
     </div>
