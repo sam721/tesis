@@ -13,8 +13,34 @@ export const NODE = {
 	'z-index': 1,
 };
 
+export const NODE_GRAY = {
+	'background-color': 'gray',
+	'color': 'black',
+}
+
+export const NODE_RED = {
+	'background-color': 'red',
+	'color': 'black',
+}
+
+export const NODE_BLACK = {
+	'background-color': 'black',
+	'color': 'white',
+}
+
+export const NODE_CORRECT = {
+	'background-color': 'Chartreuse',
+	'color': 'black',
+}
+
+export const NODE_WRONG = {
+	'background-color': '#FF9494',
+	'color': 'black',
+}
+
 export const NODE_SELECTED = {
-  'background-color': '#00FFFF',
+	'background-color': '#2B3B6B',
+	'color': 'white',
 }
 
 export const EDGE = {
@@ -24,8 +50,29 @@ export const EDGE = {
 	'line-style': 'solid',
 }
 
+export const EDGE_VISITED = {
+	'line-color': '#2B3B6B',
+	'target-arrow-color': '#2B3B6B',
+}
+
+export const EDGE_TRAVERSE = {
+	'line-color': 'green',
+	'target-arrow-color': 'green',
+}
+
+export const EDGE_NO_MST = {
+	'line-style': 'dashed', 
+	'line-color': '#eee'
+}
+
+export const EDGE_MST = {
+	'line-style': 'solid', 
+	'line-color': 'black'
+}
+
 export const EDGE_DIRECTED = {
 	'target-arrow-color': '#ccc',
+	'line-color': '#ccc',
   'target-arrow-shape': 'triangle',
 }
 

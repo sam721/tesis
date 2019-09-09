@@ -66,7 +66,7 @@ class InputArrayModal extends React.Component<Props, State>{
           <Modal.Title>Introduzca un arreglo de enteros</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Debe estar representado por numeros separados por coma</p>
+          <p>Debe estar representado por maximo 16 numeros separados por coma</p>
           <p>Cada numero debe estar entre -999 y 999</p>
           <input 
             type="text" 

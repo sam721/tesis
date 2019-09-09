@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 type Props = {
   op: Array<{name: string, run: () => void}>,
 }

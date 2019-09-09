@@ -87,7 +87,7 @@ class Heap extends React.Component<Props, State>{
 	edgeStyle = Styles.EDGE;
 	cy = cytoscape();
 
-	heap = new PriorityQueue((x, y) => x <= y);
+	heap = new PriorityQueue((x, y) => x < y, (x, y) => x === y);
 
 	constructor(props:Props){
     super(props);

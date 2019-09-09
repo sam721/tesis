@@ -1,24 +1,25 @@
 import Queue from './DS/Queue'
-
+const Styles = require('../Styles/Styles');
 const BFS = param => {
 	const { cy, selection } = param;
 	const source = selection.id;
 
-	let color = {};
+	let color = {}, level = {};
 	let q = new Queue();
 
 	let commands = [{lines: [1,2], duration: 1000}];
 	q.push(source);
+	level[source] = 0;
 	commands.push(
 		{
 			eles: [source],
-			style: [{ 'background-color': 'gray', 'color': 'black' }],
+			style: [Styles.NODE_GRAY],
 			inst: [
 				{
-					name: 'push',
+					name: 'update_level',
 					data: {
-						value: cy.getElementById(source).data('value'),
-						class: 'heap-default',
+						id: source,
+						value: 0,
 					}
 				}
 			],
@@ -34,7 +35,7 @@ const BFS = param => {
 		commands.push(
 			{
 				eles: [current.id()],
-				style: [{ 'background-color': 'black', 'color': 'white' }],
+				style: [Styles.NODE_BLACK],
 				lines: [6,7],
 				inst: [
 					{
@@ -50,7 +51,7 @@ const BFS = param => {
 					{
 						eles: [edge.id()],
 						style: [
-							{ 'line-color': 'green', 'target-arrow-color': 'green' }
+							Styles.EDGE_TRAVERSE 
 						],
 						lines: [8],
 					},
@@ -59,15 +60,17 @@ const BFS = param => {
 
 				if (color[next.id()] === undefined) {
 					color[next.id()] = 'gray';
+					level[next.id()] = level[current.id()]+1;
 					commands.push(
 						{
 							eles: [next.id()],
-							style: [{'background-color': 'gray', 'color': 'black'}],
+							style: [Styles.NODE_GRAY],
 							inst: [
 								{
-									name: 'push',
+									name: 'update_level',
 									data: {
-										value: next.data('value'),
+										id: next.id(),
+										value: level[next.id()],
 										class: 'heap-default',
 									}
 								}
@@ -77,7 +80,7 @@ const BFS = param => {
 						{
 							eles: [edge.id()],
 							style: [
-								{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }
+								Styles.EDGE_VISITED,
 							],
 							duration: 10,
 						}
@@ -87,7 +90,7 @@ const BFS = param => {
 					commands.push({
 						eles: [edge.id()],
 						style: [
-							{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }
+							Styles.EDGE_VISITED,
 						],
 						duration: 10,
 					});

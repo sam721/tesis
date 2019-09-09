@@ -1,5 +1,6 @@
 import PriorityQueue from './DS/PriorityQueue';
 
+const Styles = require('../Styles/Styles');
 const Prim = param => {
   const {cy} = param;
 
@@ -17,7 +18,7 @@ const Prim = param => {
     },
     {
       eles: edges.map(x => x.data('id')),
-      style: Array(cy.edges().length).fill({'line-style': 'dashed', 'line-color': '#eee'}),
+      style: Array(cy.edges().length).fill(Styles.EDGE_NO_MST),
       duration: 1000,
       lines: [1,2,3,4,5],
     }
@@ -42,7 +43,7 @@ const Prim = param => {
       {
         eles: [target],
         style: [
-          {'background-color': 'red', 'color': 'black'},
+          Styles.NODE_RED,
         ],
         duration: 1000,
         lines: [7,8],
@@ -60,7 +61,7 @@ const Prim = param => {
     if(edgeId !== 'NONE'){
       commands.push({
         eles: [edgeId],
-        style: [{'line-color': 'black', 'line-style': 'solid'}],
+        style: [Styles.EDGE_MST],
         lines: [9, 10],
       });
       part_of_tree[edgeId] = true;
@@ -78,7 +79,7 @@ const Prim = param => {
       let w = edge.data('weight');
       commands.push({
         eles: [edge.id()],
-        style: [{'line-color':'green'}],
+        style: [Styles.EDGE_TRAVERSE],
         lines: [11],
       });
       commands.push({lines: [12]});
@@ -86,7 +87,7 @@ const Prim = param => {
         commands.push({
           lines: [13,14],
           eles: [t],
-          style: [{'background-color': 'gray'}],
+          style: [Styles.NODE_GRAY],
           distance: [w],
           inst: [{
             name: 'change_element',
@@ -104,12 +105,12 @@ const Prim = param => {
           weight: w,
         })
       }
-      let col;
-      if(part_of_tree[edge.id()]) col = 'black';
-      else col = '#ccc';
+      let nextStyle;
+      if(part_of_tree[edge.id()]) nextStyle=Styles.EDGE_MST;
+      else nextStyle=Styles.EDGE_NO_MST;
       commands.push({
         eles: [edge.id()],
-        style: [{'line-color':col}],
+        style: [nextStyle],
         duration: 10,
       });
     });

@@ -52,9 +52,21 @@ class BubbleSort extends React.Component<Props, State> {
 	};
 
 	nodeStyle = Styles.NODE;
+	options:Array<{name: string, run: () => void}>;
+
 	constructor(props:Props){
     super(props);
-    this._mediaRecorder = new MediaRecorder(props.dispatch);
+		this._mediaRecorder = new MediaRecorder(props.dispatch);
+		this.options = [
+			{
+				name: 'Ordenar',
+				run: this.runButton,
+			},
+			{
+				name: 'Cambiar arreglo',
+				run: () => this.setState({show: true}),
+			}
+		]
 	}
 	
   componentDidMount() {
@@ -105,16 +117,7 @@ class BubbleSort extends React.Component<Props, State> {
 			payload:{
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
-				options: [
-					{
-						name: 'Ordenar',
-						run: this.runButton,
-					},
-					{
-						name: 'Cambiar arreglo',
-						run: () => this.setState({show: true}),
-					}
-				],
+				options: this.options,
 			}
     })
 		
@@ -125,7 +128,19 @@ class BubbleSort extends React.Component<Props, State> {
 		if(prevState.values !== this.state.values){
 			this.initialize();
 		}
+		if(prevProps.animation && !this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: { options: this.options}
+			});
+		}else if(!prevProps.animation && this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: { options: [{name: 'Volver a edicion', run: this.runButton}]}
+			});
+		}
 	}
+
 	componentWillUnmount(){
     this.props.dispatch({
       type: actions.ANIMATION_END,
@@ -168,14 +183,22 @@ class BubbleSort extends React.Component<Props, State> {
 			'background-color': 'white',
 			'color': 'black',
 		});
-    
+		
+		this.props.dispatch({
+			type: actions.STARTING_BUBBLESORT_INFO,
+		});
+
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
-				if (pos === commands.length || !this.props.animation) {
+				if(!this.props.animation){
+					this.cy.nodes().style(this.nodeStyle);
+					return;
+				}
+				if (pos === commands.length) {
 					this.cy.nodes().style(this.nodeStyle);
 					this.props.dispatch({
-						type: actions.ANIMATION_END,
+						type: actions.ARRAY_SORTED_SUCCESS,
 					});
 					this.refreshLayout();
 					return;

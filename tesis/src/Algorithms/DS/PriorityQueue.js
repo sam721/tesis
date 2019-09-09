@@ -1,3 +1,4 @@
+const Styles = require('../../Styles/Styles')
 class PriorityQueue {
 	_data = [0];
 	_comp = null;
@@ -28,19 +29,19 @@ class PriorityQueue {
 		if (animation) {
 			commands.push({
 				eles: [pos.toString()],
-				style: [{ 'background-color': 'black', 'color': 'white' }],
+				style: [Styles.NODE_BLACK],
 				classes: ['heap-focus'],
 				lines: [4],
 			});
 		}
 		while (pos > 1) {
 			let parent = Math.floor(pos / 2);
-			if (this._comp(this._data[parent], this._data[pos])) {
+			if (this._comp(this._data[parent], this._data[pos]) || this._eq(this._data[parent], this._data[pos])) {
 				if (animation) {
 					commands.push(
 						{
 							eles: [parent.toString()],
-							style: [{ 'background-color': 'Chartreuse', 'color': 'black' }],
+							style: [Styles.NODE_CORRECT],
 							classes: ['heap-correct'],
 							lines: [-1],
 						}
@@ -52,7 +53,7 @@ class PriorityQueue {
 				commands.push(
 					{
 						eles: [parent.toString()],
-						style: [{ 'background-color': '#FF9494', 'color': 'black' }],
+						style: [Styles.NODE_WRONG],
 						classes: ['heap-wrong'],
 						lines: [5,6,7],
 					},
@@ -60,8 +61,8 @@ class PriorityQueue {
 						eles: [parent.toString(), pos.toString()],
 						style:
 							[
-								{ 'background-color': 'black', 'color': 'white' },
-								{ 'background-color': 'white', 'color': 'black' }
+								Styles.NODE_BLACK,
+								Styles.NODE,
 							],
 						data:
 							[
@@ -95,7 +96,7 @@ class PriorityQueue {
 			if (animation) {
 				commands.push({
 					eles: [pos.toString()],
-					style: [{ 'background-color': 'black', 'color': 'white' }],
+					style: [Styles.NODE_BLACK],
 					classes: ['heap-focus'],
 					lines: [5],
 				});
@@ -112,15 +113,15 @@ class PriorityQueue {
 							commands.push(
 								{
 									eles: [(2 * pos).toString()],
-									style: [{ 'background-color': '#FF9494', 'color': 'black' }],
+									style: [Styles.NODE_WRONG],
 									classes: ['heap-wrong'],
 									lines: [7, 8],
 								},
 								{
 									eles: [pos.toString(), (2 * pos).toString()],
 									style: [
-										{ 'background-color': 'white', 'color': 'black' },
-										{ 'background-color': 'black', 'color': 'white' }
+										Styles.NODE,
+										Styles.NODE_BLACK,
 									],
 									data: [
 										{ 'value': this._data[2 * pos] },
@@ -138,20 +139,20 @@ class PriorityQueue {
 						pos = 2 * pos;
 					} else break;
 				} else {
-					if (this._comp(l, r) && this._comp(l, x)) {
+					if ((this._comp(l, r) || this._eq(l, r)) && this._comp(l, x)) {
 						if (animation) {
 							commands.push(
 								{
 									eles: [(2 * pos).toString()],
-									style: [{ 'background-color': '#FF9494', 'color': 'black' }],
+									style: [Styles.NODE_WRONG],
 									classes: ['heap-wrong'],
 									lines: [7, 8],
 								},
 								{
 									eles: [pos.toString(), (2 * pos).toString()],
 									style: [
-										{ 'background-color': 'white', 'color': 'black' },
-										{ 'background-color': 'black', 'color': 'white' }
+										Styles.NODE,
+										Styles.NODE_BLACK,
 									],
 									data: [
 										{ 'value': this._data[2 * pos] },
@@ -167,20 +168,20 @@ class PriorityQueue {
 						}
 						[this._data[2 * pos], this._data[pos]] = [this._data[pos], this._data[2 * pos]];
 						pos = 2 * pos;
-					} else if (!this._comp(l, r) && this._comp(r, x)) {
+					} else if ((this._comp(r, l) || this._eq(r, l)) && this._comp(r, x)) {
 						if (animation) {
 							commands.push(
 								{
 									eles: [(2 * pos + 1).toString()],
-									style: [{ 'background-color': '#FF9494', 'color': 'black' }],
+									style: [Styles.NODE_WRONG],
 									classes: ['heap-wrong'],
 									lines: [9, 10],
 								},
 								{
 									eles: [pos.toString(), (2 * pos + 1).toString()],
 									style: [
-										{ 'background-color': 'white', 'color': 'black' },
-										{ 'background-color': 'black', 'color': 'white' }
+										Styles.NODE,
+										Styles.NODE_BLACK,
 									],
 									data: [
 										{ 'value': this._data[2 * pos + 1] },

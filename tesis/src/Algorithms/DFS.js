@@ -1,14 +1,15 @@
-const dfs = (cy, source, commands, visited) => {
+const Styles = require('../Styles/Styles');
+const dfs = (cy, source, depth, commands, visited) => {
 
 	visited[source.id()] = true;
-
+	
 	commands.push({
 		eles: [source.id()],
-		style: [{ 'background-color': 'gray', 'color': 'black' }],
+		style: [Styles.NODE_GRAY],
 		inst: [
 			{
-				name: 'push',
-				data: {value: source.data('value'), class: 'heap-default'}
+				name: 'update_level',
+				data: {id: source.id(), value: depth}
 			}
 		],
 		lines: [1],
@@ -19,7 +20,7 @@ const dfs = (cy, source, commands, visited) => {
 			commands.push(
 				{
 					eles: [edge.id()],
-					style: [{ 'line-color': 'green', 'target-arrow-color': 'green' }],
+					style: [Styles.EDGE_TRAVERSE],
 					lines: [2],
 				},
 			);
@@ -30,15 +31,15 @@ const dfs = (cy, source, commands, visited) => {
 					},
 					{
 						eles: [edge.id()],
-						style: [{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }],
+						style: [Styles.EDGE_VISITED],
 						duration: 10,
 					},
 				);
-				dfs(cy, next, commands, visited);
+				dfs(cy, next, depth+1, commands, visited);
 			}else{
 				commands.push({
 					eles: [edge.id()],
-					style: [{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }],
+					style: [Styles.EDGE_VISITED],
 					duration: 10,
 				});
 			}
@@ -46,7 +47,7 @@ const dfs = (cy, source, commands, visited) => {
 	);
 	commands.push({
 		eles: [source.id()],
-		style: [{ 'background-color': 'black', 'color': 'white' }],
+		style: [Styles.NODE_BLACK],
 		inst: [{name: 'pop'}],
 		lines: [5],
 	})
@@ -59,7 +60,7 @@ const DFS = param => {
 		{lines: [8,9,10]},
 	];
 	let visited = {};
-	dfs(cy, cy.getElementById(source), commands, visited);
+	dfs(cy, cy.getElementById(source), 0, commands, visited);
 	return commands;
 }
 

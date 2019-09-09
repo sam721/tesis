@@ -1,6 +1,7 @@
 import DisjointSet from './DS/DisjointSet';
 import PriorityQueue from './DS/PriorityQueue';
 
+const Styles = require('../Styles/Styles');
 const Kruskal = param => {
   const {cy} = param;
 
@@ -14,7 +15,7 @@ const Kruskal = param => {
   const commands = [
     {
       eles: edges.map(x => x.data('id')),
-      style: Array(cy.edges().length).fill({'line-style': 'dashed', 'line-color': '#eee'}),
+      style: Array(cy.edges().length).fill(Styles.EDGE_NO_MST),
       duration: 1000,
       lines: [1,2],
     }
@@ -29,7 +30,7 @@ const Kruskal = param => {
     const x = edge.source().id(), y = edge.target().id();
     commands.push({
       eles: [edge.id()],
-      style: [{'line-color': 'green'}],
+      style: [Styles.NODE_TRAVERSE],
       duration: 1000,
       lines: [3],
     })
@@ -41,9 +42,9 @@ const Kruskal = param => {
         {
           eles: [edge.id(), source.id(), target.id()],
           style: [
-            {'line-style': 'solid', 'line-color': 'black'},
-            {'background-color': 'red'},
-            {'background-color': 'red'},
+            Styles.EDGE_MST,
+            Styles.NODE_RED,
+            Styles.NODE_RED,
           ],
           duration: 1000,
           lines: [4,5],
@@ -53,7 +54,7 @@ const Kruskal = param => {
     }else{
       commands.push({
         eles: [edge.id()],
-        style: [{'line-color': '#ccc'}],
+        style: [Styles.EDGE_NO_MST],
         duration: 1000,
         lines: null,
       })

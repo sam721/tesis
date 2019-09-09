@@ -105,8 +105,6 @@ class AVL extends React.Component<Props, State>{
   edgeStyle = Styles.EDGE;
   cy = cytoscape();
 
-  heap = new PriorityQueue((x, y) => x <= y);
-
   constructor(props:Props){
     super(props);
     this._mediaRecorder = new MediaRecorder(props.dispatch);

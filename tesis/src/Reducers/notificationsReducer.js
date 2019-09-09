@@ -45,8 +45,8 @@ const notificationsReducer = action => {
       break;
 
     case actions.INVALID_ARRAY_ERROR:
-      createNotification('Error',
-      'El arreglo debe contener numeros enteros separados por comas',
+      createNotification('Arreglo invalido',
+      'Verifique que el arreglo cumpla con los requerimientos',
       'danger');
       break;
 
@@ -93,8 +93,8 @@ const notificationsReducer = action => {
       break;
 
     case actions.AVL_NOT_FOUND_INFO:
-      createNotification('Busqueda terminada',
-      'El elemento no fue encontrado en el arbol AVL',
+      createNotification('El elemento no fue encontrado en el arbol AVL',
+      'Debe volver a la edicion para modificar el arreglo',
       'info');
       break;
 
@@ -104,9 +104,51 @@ const notificationsReducer = action => {
       'info');
       break;
 
-    case actions.STARTING_ALGORITHM_EXECUTION_INFO:
-      createNotification('Ejecucion iniciada',
-      ' ',
+    case actions.STARTING_BFS_INFO:
+      createNotification('',
+      'Realizando BFS desde el nodo seleccionado',
+      'info');
+      break;
+
+    case actions.STARTING_DFS_INFO:
+      createNotification('',
+      'Realizando DFS desde el nodo seleccionado',
+      'info');
+      break;
+    
+    case actions.STARTING_DIJKSTRA_INFO:
+      createNotification('',
+      'Calculando caminos de peso minimo desde el nodo seleccionado mediante Dijkstra',
+      'info');
+      break;
+    
+    case actions.STARTING_KRUSKAL_INFO:
+      createNotification('',
+      'Obteniendo arbol recubridor minimo mediante el algoritmo de Kruskal',
+      'info');
+      break;
+    
+    case actions.STARTING_PRIM_INFO:
+      createNotification('',
+      'Obteniendo arbol recubridor minimo mediante el algoritmo de Prim',
+      'info');
+      break;
+    
+    case actions.STARTING_BUBBLESORT_INFO:
+      createNotification('',
+      'Ordenando el arreglo mediante ordenamiento burbuja',
+      'info');
+      break;
+
+    case actions.STARTING_MERGESORT_INFO:
+      createNotification('',
+      'Ordenando el arreglo mediante ordenamiento por mezcla',
+      'info');
+      break;
+
+    case actions.STARTING_BINARYSEARCH_INFO:
+      createNotification('',
+      'Realizando busqueda binaria sobre el arreglo',
       'info');
       break;
 
@@ -129,8 +171,8 @@ const notificationsReducer = action => {
       break;
     
     case actions.BINARY_SEARCH_NOT_FOUND_INFO:
-      createNotification('Elemento no encontrado',
-      'El elemento no se encuentra en el arreglo',
+      createNotification('El elemento no se encuentra en el arreglo',
+      'Debe volver a la edicion para modificar el arreglo',
       'info');
       break;
     
@@ -151,7 +193,9 @@ const notificationsReducer = action => {
       break;
     
     case actions.FINISHED_ALGORITHM_SUCCESS:
-      createNotification('Ejecucion terminada exitosamente',' ','success');
+      createNotification('Ejecucion terminada exitosamente',
+      'Debe volver a la edicion para modificar el grafo',
+      'success');
       break;
 
     case actions.AVL_FOUND_SUCCESS:
@@ -160,9 +204,15 @@ const notificationsReducer = action => {
       'success');
       break;
     
+    case actions.ARRAY_SORTED_SUCCESS:
+      createNotification('El arreglo fue ordenado exitosamente',
+      'Debe volver a la edicion para modificar el arreglo',
+      'success');
+      break;
+
     case actions.BINARY_SEARCH_FOUND_SUCCESS:
-      createNotification('Busqueda terminada',
-      'El elemento fue encontrado en el arreglo',
+      createNotification('El elemento fue encontrado en el arreglo',
+      'Debe volver a la edicion para modificar el arreglo',
       'success');
       break;
   }

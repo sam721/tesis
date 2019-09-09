@@ -98,6 +98,7 @@ class Graph extends React.Component<Props, State>{
 	undo: Array<Array<Object>> = [];
 	redo: Array<Array<Object>> = [];
 	
+	options: Array<{name: string, run: () => void}>;
 	cy = cytoscape();
 
 
@@ -111,6 +112,32 @@ class Graph extends React.Component<Props, State>{
 		}
 
 		this._mediaRecorder = new MediaRecorder(props.dispatch);
+		this.options = [
+			{
+				name: 'Ejecutar',
+				run: this.runButton,
+			},
+			{
+				name: 'Eliminar',
+				run: this.removeButton,
+			},
+			{
+				name: 'Cambiar peso',
+				run: this.weightButton,
+			},
+			{
+				name: 'Limpiar canvas',
+				run: this.clearGraph,
+			},
+			{
+				name: 'Descargar grafo',
+				run: () => this._mediaRecorder.takeJson(this.exportGraph()),
+			},
+			{
+				name: 'Subir grafo',
+				run: () => this.setState({showModal: true}),
+			}
+		];
 	}
 
 	initialize(elements: Array<Object>){
@@ -257,32 +284,7 @@ class Graph extends React.Component<Props, State>{
 				gif: () => this._mediaRecorder.takeGif(this.cy),
 				undo: this.handleUndo,
 				redo: this.handleRedo,
-				options: [
-					{
-						name: 'Ejecutar',
-						run: this.runButton,
-					},
-					{
-						name: 'Eliminar',
-						run: this.removeButton,
-					},
-					{
-						name: 'Cambiar peso',
-						run: this.weightButton,
-					},
-					{
-						name: 'Limpiar canvas',
-						run: this.clearGraph,
-					},
-					{
-						name: 'Descargar grafo',
-						run: () => this._mediaRecorder.takeJson(this.exportGraph()),
-					},
-					{
-						name: 'Subir grafo',
-						run: () => this.setState({showModal: true}),
-					}
-				]
+				options: this.options,
 			}
 		});
 		if(this.props.action === actions.SELECT_DIJKSTRA){
@@ -303,7 +305,25 @@ class Graph extends React.Component<Props, State>{
 				type: actions.FINISHED_LOAD,
 			});
 		}
+		if(!prevProps.animation && this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: {
+					options: [
+						{ name: 'Regresar a edicion', run: this.runButton}
+					]
+				}
+			})
+		}else if(prevProps.animation && !this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: {
+					options: this.options,
+				}
+			});
+		}
 	}
+	
 	componentWillUnmount() {
 		this.props.dispatch({
 			type: actions.ANIMATION_END,
@@ -356,8 +376,14 @@ class Graph extends React.Component<Props, State>{
 			'background-color': 'white',
 			'color': 'black',
 		});
+		let notification;
+		if(this.props.algorithm === 'BFS') notification = actions.STARTING_BFS_INFO;
+		else if(this.props.algorithm === 'DFS') notification = actions.STARTING_DFS_INFO;
+		else if(this.props.algorithm === 'Dijkstra') notification = actions.STARTING_DIJKSTRA_INFO;
+		else if(this.props.algorithm === 'Kruskal') notification = actions.STARTING_KRUSKAL_INFO;
+		else if(this.props.algorithm === 'Prim') notification = actions.STARTING_PRIM_INFO;
 		this.props.dispatch({
-			type: actions.STARTING_ALGORITHM_EXECUTION_INFO,
+			type: notification,
 		});
 		let animation = () => {
 			let pos = 0;
@@ -413,6 +439,15 @@ class Graph extends React.Component<Props, State>{
 							if(position != null) values[position] = ele.data;
 						}else if(ele.name === 'fill'){
 							values.fill(ele.data);
+						}else if(ele.name === 'update_level'){
+							const {data} = ele;
+							if(data){
+								const id = data.id, value = data.value;
+								if(id != null && value != null){
+									this.cy.getElementById(id+'-popper').style({visibility: 'visible'});
+									this.cy.getElementById(id+'-popper').data('value', value);
+								}
+							}
 						}
 					});
 					if(this._isMounted){
@@ -695,7 +730,7 @@ class Graph extends React.Component<Props, State>{
 			if (selection) {
 				let previous = this.cy.getElementById(selection.id);
 				if (selection.type === 'node') {
-					previous.style('background-color', 'white');
+					previous.style(Styles.NODE);
 				} else if (selection.type === 'edge') {
 					previous.style(this.edgeStyle);
 				}

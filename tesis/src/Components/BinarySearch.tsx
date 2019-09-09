@@ -7,7 +7,7 @@ import actions from '../Actions/actions';
 import MediaRecorder from '../utils/MediaRecorder';
 import InputArrayModal from './InputArrayModal';
 import InputModal from './InputModal';
-import BinarySearch from '../Algorithms/BinarySearch';
+import BinarySearchAlgo from '../Algorithms/BinarySearch';
 import Sort from '../Algorithms/BubbleSort-util';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
@@ -38,7 +38,7 @@ const mapStateToProps = (state: storeState) => {
   }
 }
 
-class BubbleSort extends React.Component<Props, State> {
+class BinarySearch extends React.Component<Props, State> {
 	_isMounted = false;
 	
 	_mediaRecorder = new MediaRecorder();
@@ -57,9 +57,20 @@ class BubbleSort extends React.Component<Props, State> {
 	};
 
 	nodeStyle = Styles.NODE;
+	options:Array<{name: string, run: () => void}>;
 	constructor(props:Props){
     super(props);
-    this._mediaRecorder = new MediaRecorder(props.dispatch);
+		this._mediaRecorder = new MediaRecorder(props.dispatch);
+		this.options = [
+			{
+				name: 'Buscar',
+				run: () => this.setState({showInputModal: true}),
+			},
+			{
+				name: 'Cambiar arreglo',
+				run: () => this.setState({show: true}),
+			}
+		]
 	}
 	
   componentDidMount() {
@@ -111,16 +122,7 @@ class BubbleSort extends React.Component<Props, State> {
 			payload:{
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
-				options: [
-					{
-						name: 'Buscar',
-						run: () => this.setState({showInputModal: true}),
-					},
-					{
-						name: 'Cambiar arreglo',
-						run: () => this.setState({show: true}),
-					}
-				],
+				options: this.options,
 			}
     })
 		
@@ -131,6 +133,19 @@ class BubbleSort extends React.Component<Props, State> {
 		if(prevState.values !== this.state.values){
 			this.initialize();
 		}
+
+		if(prevProps.animation && !this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: { options: this.options}
+			});
+		}else if(!prevProps.animation && this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: { options: [{name: 'Volver a edicion', run: this.runButton}]}
+			});
+		}
+
 	}
 	componentWillUnmount(){
     this.props.dispatch({
@@ -169,20 +184,30 @@ class BubbleSort extends React.Component<Props, State> {
 		});
   }
   
-  executeAnimation = (commands: Array<AnimationStep>) => {
+  executeAnimation = (commands: Array<AnimationStep>, found?:boolean) => {
 		this.cy.nodes().style({
 			'background-color': 'white',
 			'color': 'black',
 		});
-    
+		
+		this.props.dispatch({
+			type: actions.STARTING_BINARY_SEARCH_INFO,
+		});
+
+
 		let animation = () => {
 			let pos = 0;
 			let step = () => {
-				if (pos === commands.length || !this.props.animation) {
+				if(!this.props.animation){
 					this.cy.nodes().style(this.nodeStyle);
+					return;
+				}
+				if (pos === commands.length) {
+					
 					this.props.dispatch({
-						type: actions.ANIMATION_END,
+						type: found ? actions.BINARY_SEARCH_FOUND_SUCCESS : actions.BINARY_SEARCH_NOT_FOUND_INFO,
 					});
+
 					this.refreshLayout();
 					return;
 				}
@@ -231,14 +256,15 @@ class BubbleSort extends React.Component<Props, State> {
 			this.initialize();
 			return;
 		}
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => { 
+    new Promise((resolve: (values: {commands: Array<AnimationStep>, found:boolean}) => void, reject) => { 
       this.props.dispatch({
         type: actions.ANIMATION_START,
       })
-      const commands = BinarySearch(this.state.values, value);
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
+			const commands = BinarySearchAlgo(this.state.values, value);
+			const found = this.cy.nodes('[value = '+value+']').length > 0;
+      resolve({commands, found});
+    }).then((values: {commands: Array<AnimationStep>, found:boolean})=> {
+      setTimeout(this.executeAnimation, 1000/this.props.speed, values.commands, values.found);
     })
 	}
 
@@ -254,7 +280,7 @@ class BubbleSort extends React.Component<Props, State> {
 
   render(){
     return (
-			<Container fluid={true}>
+			<>
         <InputModal
           show={this.state.showInputModal}
           handleClose={()=>this.setState({showInputModal: false})}
@@ -268,9 +294,9 @@ class BubbleSort extends React.Component<Props, State> {
 					currentValues={this.state.values}
 				/>
 				<div id="canvas" className='standard-struct'/>
-			</Container>
+			</>
 		)
   }
 }
 
-export default connect(mapStateToProps)(BubbleSort);
+export default connect(mapStateToProps)(BinarySearch);

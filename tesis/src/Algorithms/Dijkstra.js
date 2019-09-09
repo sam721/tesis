@@ -1,12 +1,15 @@
 import PriorityQueue from './DS/PriorityQueue';
-
+const Styles = require('../Styles/Styles');
 const Dijkstra = (param) => {
   const { cy, selection } = param;
   const source = selection.id;
   let comp = (x, y) => {
     return x.distance < y.distance;
   }
-  let pq = new PriorityQueue(comp);
+  let eq = (x, y) => {
+    return x.distance === y.distance;
+  }
+  let pq = new PriorityQueue(comp, eq);
   let dist = {};
   let visited = {};
   const commands = [];
@@ -43,7 +46,7 @@ const Dijkstra = (param) => {
       {
         eles: [id],
         distance: [distance.toString()],
-        style: [{ "background-color": 'red', 'color': 'black' }],
+        style: [Styles.NODE_RED],
         duration: 1000,
         inst: [{
           name: 'change_element',
@@ -63,7 +66,7 @@ const Dijkstra = (param) => {
         commands.push(
           {
             eles: [edge.id()],
-            style: [{ 'line-color': 'green', 'target-arrow-color': 'green' }],
+            style: [Styles.EDGE_TRAVERSE],
             lines: [6],
             duration: 1000,
           }
@@ -75,7 +78,7 @@ const Dijkstra = (param) => {
           commands.push({
             lines: [7],
             eles: [nextId],
-            style: [{'background-color': 'gray'}],
+            style: [Styles.NODE_GRAY],
           });
           pq.push({
             distance: distance + weight,
@@ -124,7 +127,7 @@ const Dijkstra = (param) => {
         commands.push(
           {
             eles: [edge.id()],
-            style: [{ 'line-color': '#ccc', 'target-arrow-color': '#ccc' }],
+            style: [Styles.EDGE_VISITED],
             duration: 10,
           }
         )
@@ -134,7 +137,7 @@ const Dijkstra = (param) => {
       {
         eles: [id],
         distance: [distance.toString()],
-        style: [{ "background-color": 'black', 'color': 'white' }],
+        style: [Styles.NODE_BLACK],
         duration: 1000,
         inst: [{
           name: 'change_element',

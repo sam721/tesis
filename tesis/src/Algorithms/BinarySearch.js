@@ -3,7 +3,7 @@ const BinarySearch = (param, value) => {
   const values = Sort(param);
   const n = values.length;
   const positions = Array(n).fill().map((value, index) => index.toString());
-  const defaultStyle = Array(n).fill({'border-width': 1});
+  const defaultStyle = Array(n).fill({'border-width': 1, 'z-index': 0});
   const commands = [];
 
   let lo = 0, hi = n - 1;
@@ -14,18 +14,20 @@ const BinarySearch = (param, value) => {
       style: defaultStyle,
       duration: 0,
     });
-    const cmd = {eles: [], style: [], lines: [3]};
+    const cmd = {eles: [], style: []};
     for(let i = lo; i <= hi; i++){
       cmd.eles.push(i.toString());
-      cmd.style.push({'border-width': 3});
+      cmd.style.push({'border-width': 3, 'z-index': 1});
     }
     commands.push(cmd);
-    console.log(cmd);
     const mid = Math.floor((lo + hi)/2);
     commands.push({
       eles: [mid.toString()],
-      style: [{'background-color': 'gray'}],
-      lines: (values[mid] < value ? [7, 8] : (values[mid] > value ? [8, 9] : [4, 5])),
+      style: [{'background-color': 'gray', 'z-index': 2}],
+      lines: [3],
+    });
+    commands.push({
+      lines: (value < values[mid] ? [6, 7] : (values[mid] < value ? [8, 9] : [4, 5])),
     });
     if(values[mid] === value){
       commands.push({
@@ -36,10 +38,11 @@ const BinarySearch = (param, value) => {
       found = true;
       break;
     }
+
     commands.push({
       eles: [mid.toString()],
-      style: [{'background-color': 'white'}],
-      lines: [],
+      style: [{'background-color': 'white', 'z-index': 1}],
+      duration: 10,
     });
     if(values[mid] < value) lo = mid + 1;
     else hi = mid - 1;

@@ -29,10 +29,10 @@ const SpeedBar = (props: Props) => {
         <input
           type="range"
           min="0.25"
-          max="2"
+          max="5"
           value={props.speed}
           id="myRange"
-          step="0.25"
+          step="0.05"
           onChange={handleChange}>
         </input>
       </Col>

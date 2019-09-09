@@ -57,6 +57,12 @@ const animationReducer = (state = {}, action) => {
         ...state,
         lines: action.payload.lines,
       }
+
+    case actions.CHANGE_OPTIONS:
+      return {
+        ...state,
+        options: action.payload.options,
+      }
     default:
       return state;
   }
