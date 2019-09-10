@@ -21,7 +21,6 @@ class Editor extends React.Component {
 			<HashRouter>
 				<Row>
 					<Col>
-						<Switch>
 							<Route path={routes.BFS} render={() => <Graph {...properties.BFS} />} />
 							<Route path={routes.DFS} render={() => <Graph {...properties.DFS} />} />
 							<Route path={routes.Dijkstra} render={() => <Graph {...properties.Dijkstra} />} />
@@ -36,7 +35,6 @@ class Editor extends React.Component {
 							<Route path={routes.DoubleLinkedList} render={() => <LinkedList {...properties.DoubleLinkedList}/>}/>
 							<Route path={routes.Queue} render={() => <LinkedList {...properties.Queue}/>}/>
 							<Route path={routes.Stack} render={() => <LinkedList {...properties.Stack}/>}/>
-						</Switch>
 					</Col>
 				</Row>
 			</HashRouter>
