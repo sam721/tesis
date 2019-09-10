@@ -2,6 +2,8 @@ import {Row, Col} from 'react-bootstrap';
 import React from 'react';
 import PhotoControl from './PhotoControl';
 import GIFControl from './GIFControl';
+
+import routes from '../resources/names_and_routes/algorithm_routes';
 const {connect} = require('react-redux');
 const {
 	NavLink,
@@ -20,26 +22,26 @@ const mapStateToProps = (state:Props) => {
 class MenuBar extends React.Component<Props>{
   render(){
     const searchAlgorithms = [
-      <NavLink to={"/BFS"}><button className='dropdown-button'>BFS</button></NavLink>,
-      <NavLink to={"/DFS"}><button className='dropdown-button'>DFS</button></NavLink>,
-      <NavLink to={"/Dijkstra"}><button className='dropdown-button'>Dijkstra</button></NavLink>,
+      <NavLink to={routes.BFS}><button className='dropdown-button'>BFS</button></NavLink>,
+      <NavLink to={routes.DFS}><button className='dropdown-button'>DFS</button></NavLink>,
+      <NavLink to={routes.Dijkstra}><button className='dropdown-button'>Dijkstra</button></NavLink>,
     ];
     const mstAlgorithms = [
-      <NavLink to={"/Kruskal"}><button className='dropdown-button'>Kruskal</button></NavLink>,
-      <NavLink to={"/Prim"}><button className='dropdown-button'>Prim</button></NavLink>,
+      <NavLink to={routes.Kruskal}><button className='dropdown-button'>Kruskal</button></NavLink>,
+      <NavLink to={routes.Prim}><button className='dropdown-button'>Prim</button></NavLink>,
     ];
     const arrays = [
-      <NavLink to={"/bubblesort"}><button className='dropdown-button'>Bubble Sort</button></NavLink>,
-      <NavLink to={"/mergesort"}><button className='dropdown-button'>Merge Sort</button></NavLink>,
-      <NavLink to={"/binarysearch"}><button className='dropdown-button'>Busqueda Binaria</button></NavLink>
+      <NavLink to={routes.BubbleSort}><button className='dropdown-button'>Bubble Sort</button></NavLink>,
+      <NavLink to={routes.MergeSort}><button className='dropdown-button'>Merge Sort</button></NavLink>,
+      <NavLink to={routes.BinarySearch}><button className='dropdown-button'>Busqueda Binaria</button></NavLink>
     ];
     const dataStructures = [
-      <NavLink to={"/SingleLinkedList"}><button className='dropdown-button'>Lista enlazada</button></NavLink>,
-      <NavLink to={"/Queue"}><button className='dropdown-button'>Cola</button></NavLink>,
-      <NavLink to={"/Stack"}><button className='dropdown-button'>Pila</button></NavLink>,
-      <NavLink to={"/DoublelinkedList"}><button className='dropdown-button'>Lista doble</button></NavLink>,
-      <NavLink to={"/heap"}><button className='dropdown-button'>Min Heap</button></NavLink>,
-      <NavLink to={"/AVL"}><button className='dropdown-button'>Arbol AVL</button></NavLink>,
+      <NavLink to={routes.SingleLinkedList}><button className='dropdown-button'>Lista enlazada</button></NavLink>,
+      <NavLink to={routes.Queue}><button className='dropdown-button'>Cola</button></NavLink>,
+      <NavLink to={routes.Stack}><button className='dropdown-button'>Pila</button></NavLink>,
+      <NavLink to={routes.DoubleLinkedList}><button className='dropdown-button'>Lista doble</button></NavLink>,
+      <NavLink to={routes.MinHeap}><button className='dropdown-button'>Min Heap</button></NavLink>,
+      <NavLink to={routes.AVL}><button className='dropdown-button'>Arbol AVL</button></NavLink>,
     ];
     return (
       <div className='top-bar'>

@@ -30,7 +30,7 @@ const Kruskal = param => {
     const x = edge.source().id(), y = edge.target().id();
     commands.push({
       eles: [edge.id()],
-      style: [Styles.NODE_TRAVERSE],
+      style: [Styles.EDGE_TRAVERSE],
       duration: 1000,
       lines: [3],
     })

@@ -27,6 +27,8 @@ type State = {
 	values: Array<number>,
 }
 
+type stackState = Array<number>;
+
 const mapStateToProps = (state: storeState) => {
   return {
     animation: state.animation,
@@ -34,12 +36,16 @@ const mapStateToProps = (state: storeState) => {
   }
 }
 
+
 class BubbleSort extends React.Component<Props, State> {
 	_isMounted = false;
 	
 	_mediaRecorder = new MediaRecorder();
 
   cy = cytoscape();
+
+	undo:Array<stackState> =[];
+	redo:Array<stackState> =[];
 
 	state = {
 		show: false,
@@ -118,6 +124,8 @@ class BubbleSort extends React.Component<Props, State> {
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
 				options: this.options,
+				undo: this.handleUndo,
+				redo: this.handleRedo,
 			}
     })
 		
@@ -155,6 +163,40 @@ class BubbleSort extends React.Component<Props, State> {
 				document.body.removeChild(popper);
 			}
 		});
+	}
+	
+	handleUndo = () => {
+		console.log('UNDO');
+		if(this.undo.length === 0) return;
+
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			})
+			return;
+		}
+		const prevValues = this.undo.pop();
+		this.redo.push([...this.state.values]);
+		if(prevValues) this.changeArray(prevValues);
+	}
+
+	handleRedo = () => {
+		if(this.redo.length === 0) return;
+
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			})
+			return;
+		}
+		const prevValues = this.redo.pop();
+		this.undo.push([...this.state.values]);
+		if(prevValues) this.changeArray(prevValues);
+	}
+
+	pushState(){
+		this.redo = [];
+		this.undo.push([...this.state.values]);
 	}
 	
   refreshLayout() {
@@ -273,7 +315,7 @@ class BubbleSort extends React.Component<Props, State> {
 				<InputArrayModal 
 					show={this.state.show} 
 					handleClose={this.handleClose} 
-					changeArray={this.changeArray}
+					changeArray={(v:Array<number>) => {this.pushState(); this.changeArray(v)}}
 					currentValues={this.state.values}
 				/>
 				<div id="canvas" className='standard-struct'/>

@@ -1,5 +1,5 @@
 const mergesort = [
-  {text: 'mergeSort(Arrego A[n]):', ind: 0},
+  {text: 'mergeSort(Arreglo A[n]):', ind: 0},
   {text: 'Si n==1:', ind: 1},
   {text: 'Retornar A', ind: 2},
   {text: 'Arreglo L=mergeSort(A[0..n/2))', ind:1},

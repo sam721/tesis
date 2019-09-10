@@ -26,6 +26,7 @@ export const NODE_RED = {
 export const NODE_BLACK = {
 	'background-color': 'black',
 	'color': 'white',
+	'font-weight': 'bold',
 }
 
 export const NODE_CORRECT = {

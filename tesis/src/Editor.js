@@ -9,7 +9,8 @@ import MergeSort from './Components/MergeSort';
 import BinarySearch from './Components/BinarySearch';
 import LinkedList from './Components/LinkedList';
 
-const { HashRouter, Route } = require('react-router-dom');
+import routes from './resources/names_and_routes/algorithm_routes';
+const { HashRouter, Route, Switch} = require('react-router-dom');
 class Editor extends React.Component {
 	constructor(props) {
 		super(props);
@@ -17,26 +18,28 @@ class Editor extends React.Component {
 
 	render() {
 		return (
-			<Row>
-				<Col>
-					<HashRouter>
-						<Route path="/BFS" render={() => <Graph {...properties.BFS} />} />
-						<Route path="/DFS" render={() => <Graph {...properties.DFS} />} />
-						<Route path="/Dijkstra" render={() => <Graph {...properties.Dijkstra} />} />
-						<Route path="/Prim" render={() => <Graph {...properties.Prim} />} />
-						<Route path="/Kruskal" render={() => <Graph {...properties.Kruskal} />} />
-						<Route path="/Heap" render={() => <Heap {...properties.Heap} />} />
-						<Route path="/AVL" render={() => <AVL {...properties.AVL} />} />
-						<Route path="/BubbleSort" render={() => <BubbleSort {...properties.BubbleSort} />} />
-						<Route path="/MergeSort" render={() => <MergeSort {...properties.MergeSort} />} />
-						<Route path="/binarysearch" render={() => <BinarySearch {...properties.BinarySearch}/>}/>
-						<Route path="/SingleLinkedList" render={() => <LinkedList {...properties.SingleLinkedList}/>}/>
-						<Route path="/DoubleLinkedList" render={() => <LinkedList {...properties.DoubleLinkedList}/>}/>
-						<Route path="/Queue" render={() => <LinkedList {...properties.Queue}/>}/>
-						<Route path="/Stack" render={() => <LinkedList {...properties.Stack}/>}/>
-					</HashRouter>
-				</Col>
-			</Row>
+			<HashRouter>
+				<Row>
+					<Col>
+						<Switch>
+							<Route path={routes.BFS} render={() => <Graph {...properties.BFS} />} />
+							<Route path={routes.DFS} render={() => <Graph {...properties.DFS} />} />
+							<Route path={routes.Dijkstra} render={() => <Graph {...properties.Dijkstra} />} />
+							<Route path={routes.Prim} render={() => <Graph {...properties.Prim} />} />
+							<Route path={routes.Kruskal} render={() => <Graph {...properties.Kruskal} />} />
+							<Route path={routes.MinHeap} render={() => <Heap {...properties.Heap} />} />
+							<Route path={routes.AVL} render={() => <AVL {...properties.AVL} />} />
+							<Route path={routes.BubbleSort} render={() => <BubbleSort {...properties.BubbleSort} />} />
+							<Route path={routes.MergeSort} render={() => <MergeSort {...properties.MergeSort} />} />
+							<Route path={routes.BinarySearch} render={() => <BinarySearch {...properties.BinarySearch}/>}/>
+							<Route path={routes.SingleLinkedList} render={() => <LinkedList {...properties.SingleLinkedList}/>}/>
+							<Route path={routes.DoubleLinkedList} render={() => <LinkedList {...properties.DoubleLinkedList}/>}/>
+							<Route path={routes.Queue} render={() => <LinkedList {...properties.Queue}/>}/>
+							<Route path={routes.Stack} render={() => <LinkedList {...properties.Stack}/>}/>
+						</Switch>
+					</Col>
+				</Row>
+			</HashRouter>
 		)
 	}
 }

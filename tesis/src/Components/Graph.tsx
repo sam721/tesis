@@ -8,6 +8,7 @@ import GraphArray from './GraphArray';
 import MediaRecorder from '../utils/MediaRecorder';
 import MyModal from './UploadGraphModal';
 import InputModal from './InputModal';
+import algoNames from '../resources/names_and_routes/algorithm_names';
 
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
@@ -310,7 +311,7 @@ class Graph extends React.Component<Props, State>{
 				type: actions.CHANGE_OPTIONS,
 				payload: {
 					options: [
-						{ name: 'Regresar a edicion', run: this.runButton}
+						{ name: 'Volver a edicion', run: this.runButton}
 					]
 				}
 			})
@@ -377,11 +378,11 @@ class Graph extends React.Component<Props, State>{
 			'color': 'black',
 		});
 		let notification;
-		if(this.props.algorithm === 'BFS') notification = actions.STARTING_BFS_INFO;
-		else if(this.props.algorithm === 'DFS') notification = actions.STARTING_DFS_INFO;
-		else if(this.props.algorithm === 'Dijkstra') notification = actions.STARTING_DIJKSTRA_INFO;
-		else if(this.props.algorithm === 'Kruskal') notification = actions.STARTING_KRUSKAL_INFO;
-		else if(this.props.algorithm === 'Prim') notification = actions.STARTING_PRIM_INFO;
+		if(this.props.algorithm === algoNames.BFS) notification = actions.STARTING_BFS_INFO;
+		else if(this.props.algorithm === algoNames.DFS) notification = actions.STARTING_DFS_INFO;
+		else if(this.props.algorithm === algoNames.Dijkstra) notification = actions.STARTING_DIJKSTRA_INFO;
+		else if(this.props.algorithm === algoNames.Kruskal) notification = actions.STARTING_KRUSKAL_INFO;
+		else if(this.props.algorithm === algoNames.Prim) notification = actions.STARTING_PRIM_INFO;
 		this.props.dispatch({
 			type: notification,
 		});
@@ -481,7 +482,7 @@ class Graph extends React.Component<Props, State>{
 			return;
 		}
 		let { selection } = this.props;
-		if (this.props.algorithm !== 'Kruskal' && this.props.algorithm !== 'Prim') {
+		if (this.props.algorithm !== algoNames.Kruskal && this.props.algorithm !== algoNames.Prim) {
 			console.log(this.props.algorithm);
 			if (!selection || selection.type !== 'node') {
 				this.props.dispatch({

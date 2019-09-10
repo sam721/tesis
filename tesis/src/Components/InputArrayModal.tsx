@@ -72,6 +72,7 @@ class InputArrayModal extends React.Component<Props, State>{
             type="text" 
             ref={this.setStepInputRef} 
             value={this.state.text}
+            size={60}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.handleChange(e)}
           />
         </Modal.Body>
