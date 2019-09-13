@@ -6,6 +6,8 @@ import InputArrayModal from './InputArrayModal';
 import Mergesort from '../Algorithms/MergeSort';
 import actions from '../Actions/actions';
 import MediaRecorder from '../utils/MediaRecorder';
+import processCommands from '../Processing/mergesort-processing';
+import { node } from 'prop-types';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -58,7 +60,7 @@ class MergeSort extends React.Component<Props, State> {
 
   state = {
 		show: false,
-		values: [1,4,8,1,4,3,6,9,10,-10],
+		values: [4, 8, 12, 16, 10, 4, 45, 17],
 	}
 
 	layout = {
@@ -69,6 +71,8 @@ class MergeSort extends React.Component<Props, State> {
 	nodeStyle = {...Styles.NODE, shape: 'square', zIndex: 2};
 
 	options:Array<{name: string, run: () => void}>;
+
+	buffer:Array<{elements:Array<Object>, lines: Array<number>, duration: number}> = [];
 
 	undo:Array<stackState> = [];
 	redo:Array<stackState> = [];
@@ -91,41 +95,10 @@ class MergeSort extends React.Component<Props, State> {
   componentDidMount() {
 
 		this._isMounted = true;
-		this.cy = cytoscape({
+				
+		this.initialize([]);
+		this.valuesToGraph();
 
-			container: document.getElementById('canvas'), // container to render in
-
-			elements: [
-			],
-
-			style: [ // the stylesheet for the graph
-				{
-					selector: 'node',
-					style: this.nodeStyle,
-				},
-			],
-
-			layout: {
-				name: 'preset',
-			},
-			headless: false,
-			styleEnabled: true,
-			hideEdgesOnViewport: false,
-			hideLabelsOnViewport: false,
-			userPanningEnabled: false,
-			zoomingEnabled: false,
-			textureOnViewport: false,
-			motionBlur: false,
-			motionBlurOpacity: 0.2,
-			wheelSensitivity: 1,
-			pixelRatio: '1.0',
-			autoungrabify: true,
-		});
-
-		this.cy.autopanOnDrag({ enabled: true, speed: 0.01 });
-		this.layout = this.cy.elements().makeLayout(layoutOptions);
-    this.layout.run();
-    
 		this.props.dispatch({
 			type: this.props.action,
 			payload: {
@@ -136,14 +109,13 @@ class MergeSort extends React.Component<Props, State> {
 				redo: this.handleRedo,
 			}
     })
-		
-		this.initialize();
 	}
 	
 	componentDidUpdate(prevProps:Props, prevState:State){
 		layoutOptions.animationDuration = 500/this.props.speed;
 		if(prevState.values !== this.state.values){
-			this.initialize();
+			this.clearGraph();
+			this.valuesToGraph();
 		}
 		if(prevProps.animation && !this.props.animation){
 			this.props.dispatch({
@@ -174,6 +146,42 @@ class MergeSort extends React.Component<Props, State> {
 		});
 	}
 	
+	initialize(elements: Array<Object>){
+		this.cy = cytoscape({
+
+			container: document.getElementById('canvas'), // container to render in
+
+			elements: JSON.parse(JSON.stringify(elements)),
+
+			style: [ // the stylesheet for the graph
+				{
+					selector: 'node',
+					style: this.nodeStyle,
+				},
+			],
+
+			layout: {
+				name: 'preset',
+			},
+			headless: false,
+			styleEnabled: true,
+			hideEdgesOnViewport: false,
+			hideLabelsOnViewport: false,
+			userPanningEnabled: false,
+			zoomingEnabled: false,
+			textureOnViewport: false,
+			motionBlur: false,
+			motionBlurOpacity: 0.2,
+			pixelRatio: '1.0',
+			autoungrabify: true,
+		});
+		layoutOptions.positions = {};
+		this.cy.autopanOnDrag({ enabled: true, speed: 0.01 });
+		this.layout = this.cy.elements().makeLayout(layoutOptions);
+    this.layout.run();
+		//this.refreshLayout();
+	}
+
 	handleUndo = () => {
 		if(this.undo.length === 0) return;
 
@@ -207,9 +215,66 @@ class MergeSort extends React.Component<Props, State> {
 		this.undo.push([...this.state.values]);
 	}
 
+	loadGraph(elements:Array<Object>){
+		const nodes = this.cy.nodes();
+		nodes.forEach((node:CytoscapeElement) => {
+			this.cy.remove(node);
+		})
+
+		for(let i = 0; i < elements.length; i++){
+			this.cy.add(elements[i]);
+		}
+		
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			const style = node.data('style');
+			if(style != null) node.style(style);
+			const position = node.data('position');
+			//console.log("PREV", node.position());
+			//console.log("NEXT", position);
+			if(position != null){
+				layoutOptions.positions[node.id()] = JSON.parse(JSON.stringify(position));
+			}
+		})
+		
+		this.cy.edges().forEach((edge:CytoscapeElement) => {
+			const style = edge.data('style');
+			if(style != null) edge.style(style);
+		})
+		
+		this.refreshLayout();
+	}
+	
+	exportGraph(withStyle:boolean=false){
+		const elements:Array<Object> = [];
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			elements.push({
+				group: 'nodes',
+				data: {
+					id: node.id(),
+					value: node.data('value'),
+					position: node.position(),
+					style: (withStyle? {
+						color: node.style('color'),
+						zIndex: node.style('z-index'),
+						backgroundColor: node.style('background-color'),
+						borderWidth: node.style('border-width'),
+						width: node.style('width'),
+						height: node.style('height'),
+						visibility: node.style('visibility'),
+					} : {}),
+				},
+				position: {
+					x: node.position().x,
+					y: node.position().y,
+				}
+			})
+		});
+		return elements;
+	}
+
   refreshLayout() {
 		this.layout.stop();
-    this.layout = this.cy.elements().makeLayout(layoutOptions);
+    this.layout = this.cy.elements().makeLayout({...layoutOptions, animate: true});
     this.layout.run();
 	}
   
@@ -240,87 +305,77 @@ class MergeSort extends React.Component<Props, State> {
 		});
 		layoutOptions.positions[id] = position;
 	}
-  executeAnimation = (commands: Array<AnimationStep>) => {
+  animation(start=0){
+		let pos = start;
+		let step = () => {
+			if (pos === this.buffer.length) {
+				
+				this.props.dispatch({
+					type: actions.ARRAY_SORTED_SUCCESS,
+				});
+				return;
+			}
+			if(!this.props.animation){
+				this.cy.nodes().style(this.nodeStyle);
+				return;
+			}
+			const {elements, lines, duration} = this.buffer[pos++];
+			this.loadGraph(elements);
+			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+			console.log(duration);
+			setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+		}
+		step();
+	}
+
+  executeAnimation = (commands: Array<AnimationStep>, found?:boolean) => {
 		this.cy.nodes().style({
 			'background-color': 'white',
 			'color': 'black',
 		});
 		
 		this.props.dispatch({
-			type: actions.STARTING_MERGESORT_INFO,
+			type: actions.STARTING_BUBBLESORT_INFO,
 		});
 
-		let animation = () => {
-			let pos = 0;
-			let step = () => {
-				if(!this.props.animation){
-					this.cy.nodes().style(this.nodeStyle);
-					return;
-				}
-				if(pos === commands.length){
-					this.props.dispatch({
-						type: actions.ARRAY_SORTED_SUCCESS,
-					});
-					this.refreshLayout();
-					return;
-				}
-        let {nodes, duration, lines, style, positions, shadows} = commands[pos++];
-        if(nodes){
-          nodes.forEach((node, index) => {
-						let ele = this.cy.getElementById(node.id);
-						ele.style({visibility: 'visible'})
-						if(style) ele.style(style[index]);
-						if(positions) layoutOptions.positions[node.id] = positions[index];
-          })
-				}
-				if(shadows){
-					shadows.forEach(shadow => {
-						if(shadow.value === '+') this.addShadow(shadow.id, shadow.position);
-						else this.cy.remove('node[id="'+shadow.id+'"]');
-					});
-				}
-				if(this._isMounted && lines != null){
-					this.props.dispatch({
-						type: actions.CHANGE_LINE,
-						payload: {lines},
-					});
-				}
-				this.refreshLayout();
-				console.log(this.cy.nodes());
-				setTimeout(step, ((duration === undefined) ? 1000/this.props.speed : duration)/this.props.speed);
-			}
-			step();
+		this.animation(0);
+  }
+
+	valuesToGraph(){
+		const {values} = this.state;
+    for(let i = 0; i < values.length; i++){
+      this.addNode(i.toString(), values[i]);
 		}
-		animation();
-	}
-	
-	initialize(){
-		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
-    for(let i = 0; i < this.state.values.length; i++){
-      this.addNode(i.toString(), this.state.values[i]);
-		}
+		this.refreshLayout();
+
 	}
 
-  runButton = () => {
+	clearGraph(){
+		const nodes = this.cy.nodes();
+		for(let i = 0; i < nodes.length; i++){
+			this.cy.remove('node[id="'+nodes[i].id()+'"]');
+		}
+	}
+	runButton = () => {
     if(this.props.animation){
 			this.props.dispatch({
 				type: actions.ANIMATION_END,
 			});
-			this.initialize();
+			this.clearGraph();
+			this.valuesToGraph();
 			return;
 		}
-
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => { 
+    new Promise((resolve: () => void, reject) => { 
       this.props.dispatch({
         type: actions.ANIMATION_START,
-			})
-      const commands = Mergesort(this.state.values, this.cy.width(), this.cy.height());
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      setTimeout(this.executeAnimation, 1000/this.props.speed, commands);
+      })
+			const commands = Mergesort(this.state.values, this.cy.width(), this.cy.height());
+			this.buffer = processCommands(this.exportGraph(), commands);     
+			resolve();
+    }).then(()=> {
+      setTimeout(this.executeAnimation, 1000/this.props.speed);
     })
 	}
-	
 	handleClose = () => {
 		this.setState({show: false});
 	}

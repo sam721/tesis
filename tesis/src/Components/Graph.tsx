@@ -2,14 +2,11 @@ import React from 'react';
 import actions from '../Actions/actions';
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import {defaultGraphs} from '../resources/default_examples/defaultGraphs';
-import ControlBar from './ControlBar';
-import { Row, Col, Container } from 'react-bootstrap';
-import GraphArray from './GraphArray';
 import MediaRecorder from '../utils/MediaRecorder';
 import MyModal from './UploadGraphModal';
 import InputModal from './InputModal';
-import algoNames from '../resources/names_and_routes/algorithm_names';
-
+import graphProcessing from '../Processing/graph-processing';
+import algoNames from '../resources/names_and_routes/algorithm_names'
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -102,7 +99,7 @@ class Graph extends React.Component<Props, State>{
 	options: Array<{name: string, run: () => void}>;
 	cy = cytoscape();
 
-
+	buffer: Array<{elements: Array<Object>, lines: Array<number>, duration: number}> = [];
 	constructor(props: Props) {
 		super(props);
 		if (this.props.weighted) {
@@ -141,8 +138,9 @@ class Graph extends React.Component<Props, State>{
 		];
 	}
 
-	initialize(elements: Array<Object>){
+	initialize(elements: Array<Object>, withPoppers:boolean=false){
 		console.log(elements);
+		
 		let edgeStyle = Styles.EDGE;
 		if (this.props.weighted) {
 			edgeStyle = { ...edgeStyle, ...Styles.EDGE_WEIGHTED };
@@ -150,11 +148,12 @@ class Graph extends React.Component<Props, State>{
 		if (this.props.directed) {
 			edgeStyle = { ...edgeStyle, ...Styles.EDGE_DIRECTED };
 		}
+
 		this.cy = cytoscape({
 
 			container: document.getElementById('canvas'), // container to render in
 
-			elements,
+			elements: JSON.parse(JSON.stringify(elements)),
 
 			style: [ // the stylesheet for the graph
 				{
@@ -180,10 +179,14 @@ class Graph extends React.Component<Props, State>{
 			textureOnViewport: false,
 			motionBlur: false,
 			motionBlurOpacity: 0.2,
-			wheelSensitivity: 1,
 			pixelRatio: '1.0'
 		});
-		this.removePoppers();
+		if(!withPoppers) this.removePoppers();
+		else{
+			this.cy.nodes().forEach((node:CytoscapeElement) => {
+				if(node.id().match('popper')) node.style({'visibility': 'hidden'});
+			});
+		}
 		this.cy.on('click', (event: CytoEvent) => this.handleClickViewport(event));
 		this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
 		this.cy.on('click', 'edge', (event: CytoEvent) => this.handleClickOnEdge(event.target));
@@ -215,7 +218,7 @@ class Graph extends React.Component<Props, State>{
 		console.log(elements);
 		this.redo.push(currentElements);
 		
-		if(elements !== undefined) this.initialize(elements);
+		if(elements !== undefined) this.loadGraph(elements);
 		
 	}
 
@@ -238,10 +241,27 @@ class Graph extends React.Component<Props, State>{
 		const currentElements = this.exportGraph();
 		const elements = this.redo.pop();
 		this.undo.push(currentElements);
-		if(elements !== undefined) this.initialize(elements);
+		if(elements !== undefined) this.loadGraph(elements);
 	}
 
-	exportGraph(){
+	loadGraph(elements:Array<Object>, withPoppers:boolean = false){
+		const nodes = this.cy.nodes();
+		for(let i = 0; i < nodes.length; i++){
+			this.removeNode(nodes[i].id());
+		}
+		console.log(elements);
+		for(let i = 0; i < elements.length; i++) this.cy.add(elements[i]);
+		this.cy.nodes().forEach((node:CytoscapeElement) => {
+			const style = node.data('style');
+			if(style != null) node.style(style);
+		})
+		this.cy.edges().forEach((edge:CytoscapeElement) => {
+			const style = edge.data('style');
+			if(style != null) edge.style(style);
+		})
+	}
+
+	exportGraph(withStyle:boolean=false){
 		const elements:Array<Object> = [];
 		this.cy.nodes().forEach((node:CytoscapeElement) => {
 			elements.push({
@@ -249,6 +269,16 @@ class Graph extends React.Component<Props, State>{
 				data: {
 					id: node.id(),
 					value: node.data('value'),
+					position: node.position(),
+					style: (withStyle? {
+						color: node.style('color'),
+						backgroundColor: node.style('background-color'),
+						borderWidth: node.style('border-width'),
+						width: node.style('width'),
+						height: node.style('height'),
+						visibility: node.style('visibility'),
+						zIndex: node.style('z-index'),
+					} : {}),
 				},
 				position: {
 					x: node.position().x,
@@ -263,6 +293,12 @@ class Graph extends React.Component<Props, State>{
 					id: edge.id(),
 					source: edge.source().id(), target: edge.target().id(),
 					weight: edge.data('weight'),
+					style: (withStyle? {
+						lineColor: edge.style('line-color'),
+						targetArrowShape: edge.style('target-arrow-shape'),
+						targetArrowColor: edge.style('target-arrow-color'),
+						lineStyle: edge.style('line-style'),	
+					} : {}),
 				}
 			})
 		});
@@ -300,7 +336,7 @@ class Graph extends React.Component<Props, State>{
 			const elements = JSON.parse(this.props.data);
 			if(elements){
 				this.pushState();
-				this.initialize(elements);
+				this.loadGraph(elements);
 			}
 			this.props.dispatch({
 				type: actions.FINISHED_LOAD,
@@ -372,11 +408,39 @@ class Graph extends React.Component<Props, State>{
 		this.cy.remove('edge[id="' + edge + '"]');
 	}
 
-	executeAnimation = (commands: Array<AnimationStep>) => {
+	animation(start:number=0){
+		let pos = 0;
+		let step = () => {
+			if(!this._isMounted) return;
+			if(pos === this.buffer.length){
+				this.props.dispatch({
+					type: actions.FINISHED_ALGORITHM_SUCCESS,
+				});
+				return;
+			}
+			if (!this.props.animation) {
+				this.cy.nodes().style(this.nodeStyle);
+				this.cy.edges().style(this.edgeStyle);
+				this.props.dispatch({
+					type: actions.ANIMATION_END,
+				});
+				this.cy.autolock(false);
+				return;
+			}
+			const {elements, lines, duration} = this.buffer[pos++];
+			this.loadGraph(elements, true);
+			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+			this.refreshLayout();
+			setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+		}
+		step();
+	}
+	executeAnimation = (commands:Array<AnimationStep>) => {
 		this.cy.nodes().style({
 			'background-color': 'white',
 			'color': 'black',
 		});
+		this.buffer = graphProcessing(this.exportGraph(true), commands);
 		let notification;
 		if(this.props.algorithm === algoNames.BFS) notification = actions.STARTING_BFS_INFO;
 		else if(this.props.algorithm === algoNames.DFS) notification = actions.STARTING_DFS_INFO;
@@ -386,87 +450,7 @@ class Graph extends React.Component<Props, State>{
 		this.props.dispatch({
 			type: notification,
 		});
-		let animation = () => {
-			let pos = 0;
-			let step = () => {
-				if(!this._isMounted) return;
-				if(pos === commands.length){
-					this.props.dispatch({
-						type: actions.FINISHED_ALGORITHM_SUCCESS,
-					});
-					return;
-				}
-				if (!this.props.animation) {
-					this.cy.nodes().style(this.nodeStyle);
-					this.cy.edges().style(this.edgeStyle);
-					this.props.dispatch({
-						type: actions.ANIMATION_END,
-					});
-					if(this._isMounted){
-						this.setState({values: Array()});
-					}
-					this.cy.autolock(false);
-					return;
-				}
-				let { eles, distance, style, duration, inst, lines} = commands[pos++];
-				if (eles) {
-					eles.forEach((ele, index) => {
-						if(style) this.cy.getElementById(ele).style(style[index]);
-					});
-				}
-				if(eles){
-					eles.forEach((node, index) => {
-						
-						if (distance !== undefined){
-							this.cy.getElementById(node+'-popper').style({visibility: 'visible'});
-							this.cy.getElementById(node+'-popper').data('value', distance[index]);
-						}
-						
-					});
-				}
-				if(inst){
-					let {values} = this.state;
-					inst.forEach(ele => {
-						if(ele.name === 'push'){
-							const {data} = ele;
-							console.log(data);
-							values.push(data);
-						}else if(ele.name === 'shift'){
-							values.shift();
-						}else if(ele.name === 'pop'){
-							values.pop();
-						}else if(ele.name === 'change_element'){
-							let {position} = ele;
-							if(position != null) values[position] = ele.data;
-						}else if(ele.name === 'fill'){
-							values.fill(ele.data);
-						}else if(ele.name === 'update_level'){
-							const {data} = ele;
-							if(data){
-								const id = data.id, value = data.value;
-								if(id != null && value != null){
-									this.cy.getElementById(id+'-popper').style({visibility: 'visible'});
-									this.cy.getElementById(id+'-popper').data('value', value);
-								}
-							}
-						}
-					});
-					if(this._isMounted){
-						this.setState({values});
-					}
-				}
-				if(lines != null && this._isMounted){
-					this.props.dispatch({
-						type: actions.CHANGE_LINE,
-						payload: {lines}
-					})
-				}
-				this.refreshLayout();
-				setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
-			}
-			step();
-		}
-		animation();
+		this.animation(0);
 	}
 
 	runButton = () => {
@@ -496,7 +480,7 @@ class Graph extends React.Component<Props, State>{
 			this.createPopper(node.id());
 		});
 		this.refreshLayout();
-		let animationPromise = new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
+		let animationPromise = new Promise((resolve: (commands:Array<AnimationStep>) => void, reject) => {
 			this.props.dispatch({
 				type: actions.ANIMATION_START,
 			});
@@ -504,7 +488,7 @@ class Graph extends React.Component<Props, State>{
 			resolve(commands);
 		});
 
-		animationPromise.then((commands: Array<AnimationStep>) => {
+		animationPromise.then((commands:Array<AnimationStep>) => {
 			this.cy.autolock(true);
 
 			this.executeAnimation(commands);

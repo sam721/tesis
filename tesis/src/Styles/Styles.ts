@@ -10,7 +10,7 @@ export const NODE = {
 	'label': 'data(value)',
 	'text-valign': 'center',
 	'text-halign': 'center',
-	'z-index': 1,
+	'z-index': 3,
 };
 
 export const NODE_GRAY = {
@@ -26,7 +26,6 @@ export const NODE_RED = {
 export const NODE_BLACK = {
 	'background-color': 'black',
 	'color': 'white',
-	'font-weight': 'bold',
 }
 
 export const NODE_CORRECT = {
@@ -100,4 +99,13 @@ export const LINE_STD = {
 export const LINE_FOCUS = {
 	'background-color': '#4C5090',
 	'color': '#CECFE6',
+}
+
+export const NODE_POPPER = {
+	'z-index': 0,
+	'border-width': 0,
+	'font-size': 15,
+	'width': 10,
+	'height': 10,
+	'visibility': 'visible',
 }
