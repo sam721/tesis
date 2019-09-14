@@ -387,6 +387,7 @@ class BubbleSort extends React.Component<Props, State> {
 			});
 			this.clearGraph();
 			this.valuesToGraph();
+			clearTimeout(this.animationTimeout);
 			return;
 		}
     new Promise((resolve: () => void, reject) => { 

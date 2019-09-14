@@ -217,6 +217,7 @@ class Heap extends React.Component<Props, State>{
 							run: () => {
 								this.loadGraph(this.buffer[this.buffer.length-1].elements);
 								this.props.dispatch({ type: actions.ANIMATION_END })
+								clearTimeout(this.animationTimeout);
 							}
 						}]
 				}

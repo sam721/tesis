@@ -524,6 +524,7 @@ class Graph extends React.Component<Props, State>{
 			this.cy.edges().style(this.edgeStyle);
 			this.removePoppers();
 			this.cy.autolock(false);
+			clearTimeout(this.animationTimeout);
 			return;
 		}
 		let { selection } = this.props;

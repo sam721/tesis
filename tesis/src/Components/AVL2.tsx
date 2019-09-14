@@ -427,6 +427,7 @@ class AVL extends React.Component<Props, State>{
 						{
 							name: 'Volver a edicion',
 							run: () => {
+                clearTimeout(this.animationTimeout);
                 this.loadGraph(this.buffer[this.buffer.length-1].elements);
                 this.treeRoot = this.buffer[this.buffer.length-1].treeRoot;
                 this.props.dispatch({ type: actions.ANIMATION_END });
@@ -597,6 +598,7 @@ class AVL extends React.Component<Props, State>{
 
   animation(){
 		let step = () => {
+      if (!this.props.animation) return;
 			if (this.step === this.buffer.length) {
 				this.props.dispatch({
 					type: actions.FINISHED_ALGORITHM_SUCCESS,
@@ -604,9 +606,6 @@ class AVL extends React.Component<Props, State>{
         this.props.dispatch({
           type: actions.ANIMATION_PAUSE,
         })
-				return;
-			}
-			if (!this.props.animation) {
 				return;
 			}
       const { elements, lines, duration, pseudo, treeRoot, refresh} = this.buffer[this.step++];

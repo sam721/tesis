@@ -290,6 +290,11 @@ class BinarySearch extends React.Component<Props, State> {
 	
 	animation(found=false){
 		let step = () => {
+			if(!this.props.animation){
+				this.cy.nodes().style(this.nodeStyle);
+				return;
+			}
+
 			if (this.step === this.buffer.length) {
 				
 				this.props.dispatch({
@@ -301,10 +306,7 @@ class BinarySearch extends React.Component<Props, State> {
 				});
 				return;
 			}
-			if(!this.props.animation){
-				this.cy.nodes().style(this.nodeStyle);
-				return;
-			}
+
 			if(this.props.paused) return;
 			const {elements, lines, duration} = this.buffer[this.step++];
 			this.loadGraph(elements);
@@ -387,6 +389,7 @@ class BinarySearch extends React.Component<Props, State> {
 			});
 			this.clearGraph();
 			this.valuesToGraph();
+			clearTimeout(this.animationTimeout);
 			return;
 		}
     new Promise((resolve: (found:boolean) => void, reject) => { 

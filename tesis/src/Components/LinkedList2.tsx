@@ -269,6 +269,7 @@ class LinkedList extends React.Component<Props, State>{
 						{
 							name: 'Volver a edicion',
 							run: () => {
+                clearTimeout(this.animationTimeout);
 								this.loadGraph(this.buffer[this.buffer.length-1].elements);
 								this.props.dispatch({ type: actions.ANIMATION_END })
 							}
