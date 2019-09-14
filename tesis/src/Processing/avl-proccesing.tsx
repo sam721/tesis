@@ -22,6 +22,8 @@ class AVLProcessor {
   treeRoot:string="";
 
   buffer:Array<exportStep> = [];
+
+  pseudo:Array<Object> = [];
   constructor(vw: number, vh: number){
     this.vh = vh; this.vw = vw; 
   }
@@ -73,6 +75,15 @@ class AVLProcessor {
 		return elements;
   }
 
+  pushStep(lines:Array<number> = [], duration:number = 1000, refresh=true){
+    this.buffer.push({
+      elements: this.exportGraph(refresh),
+      lines,
+      duration,
+      treeRoot: this.treeRoot,
+      pseudo: this.pseudo,
+    })
+  }
   createPopper(nodeId: string){
 		const ele = this.cy.getElementById(nodeId);
 		const position = ele.data('position');
@@ -228,7 +239,7 @@ class AVLProcessor {
     y.data('height', Math.max(getHeight(A), getHeight(x))+1);
     x.data('balance', getHeight(C)-getHeight(B));
     y.data('balance', getHeight(x) - getHeight(A));
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+    this.pushStep([], 1000);
   }
 
  rotateRight(y: CytoscapeElement){
@@ -258,7 +269,7 @@ class AVLProcessor {
     x.data('height', Math.max(getHeight(y), getHeight(C))+1);
     y.data('balance', getHeight(B) - getHeight(A));
     x.data('balance', getHeight(C) - getHeight(y));
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+    this.pushStep();
   }
   balance(start: CytoscapeElement){
     let node = start;
@@ -271,13 +282,9 @@ class AVLProcessor {
     });
     */
     //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: []}});
-    this.buffer.push({
-      elements: this.exportGraph(), 
-      lines: [], 
-      duration: 1000, 
-      treeRoot: this.treeRoot,
-      pseudo: balance,
-    });
+    this.pseudo = balance;
+    this.pushStep();
+
     const recursion = () => {
       const [left, right] = getChildren(node);
       const lh = getHeight(left), rh = getHeight(right);
@@ -286,30 +293,26 @@ class AVLProcessor {
       node.data('balance', bal);
       if(bal === 2){
         if(right.data('balance') >= 0){
-          this.buffer.push({elements: this.exportGraph(), lines: [2,3], duration: 1000, treeRoot: this.treeRoot});
+          this.pushStep([2,3]);
           //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [2, 3]}});
           this.rotateRight(node);
         }else{
-          this.buffer.push({elements: this.exportGraph(), lines: [6,7], duration: 1000, treeRoot: this.treeRoot});
+          this.pushStep([6,7]);
           //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [6, 7]}});
           this.rotateLeft(right);
           this.rotateRight(node);
         }
       }else if(bal === -2){
         if(left.data('balance') <= 0){
-          this.buffer.push({elements: this.exportGraph(), lines: [4,5], duration: 1000, treeRoot: this.treeRoot});
-
-          //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [4, 5]}});
+          this.pushStep([4,5]);
           this.rotateLeft(node);
         }else{
-          this.buffer.push({elements: this.exportGraph(), lines: [8,9], duration: 1000, treeRoot: this.treeRoot});
-          //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [8, 9]}});
+          this.pushStep([8,9]);
           this.rotateRight(left);
           this.rotateLeft(node);
         }
       }else{
-        this.buffer.push({elements: this.exportGraph(), lines: [1], duration: 1000, treeRoot: this.treeRoot});
-        //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [1]}});
+        this.pushStep([1]);
       }
       if(node.id() !== this.treeRoot){
         node.data('style', Styles.NODE);
@@ -321,7 +324,7 @@ class AVLProcessor {
         recursion();
       }
     }  
-    this.buffer.push({elements: this.exportGraph(), lines: [1], duration: 1000, treeRoot: this.treeRoot});
+    this.pushStep([1]);
     //this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [1]}});
     
     node.data('style', {
@@ -339,13 +342,9 @@ class AVLProcessor {
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     let n = this.cy.nodes().length/2 + 1;
     let newNode:(CytoscapeElement | null) = null;
-    this.buffer.push({
-      elements: this.exportGraph(),
-      duration: 1000, 
-      pseudo: insert,
-      lines: [],
-      treeRoot: this.treeRoot,
-    });
+    this.pseudo = insert;
+    this.pushStep();
+
     if(n > 1){
       let insertion = (current: CytoscapeElement, prev: CytoscapeElement | null) => {
         console.log(current);
@@ -364,12 +363,12 @@ class AVLProcessor {
           
           let [left, right] = getChildren(current);
           if (value < current.data('value')) {
-            this.buffer.push({elements: this.exportGraph(), lines: [3,4], duration: 1000, treeRoot: this.treeRoot});
+            this.pushStep([3, 4]);
             //this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [3, 4]}});
             //setTimeout(insertion, 1000/this.props.speed, left, current);  
             insertion(left, current);
           } else {
-            this.buffer.push({elements: this.exportGraph(), lines: [5,6], duration: 1000, treeRoot: this.treeRoot});
+            this.pushStep([5, 6]);
             //this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [5, 6]}});
             //setTimeout(insertion, 1000/this.props.speed, right, current);
             insertion(right, current);
@@ -386,7 +385,7 @@ class AVLProcessor {
               );
             }
           }
-          this.buffer.push({elements: this.exportGraph(), lines: [1,2], duration: 1000, treeRoot: this.treeRoot});
+          this.pushStep([1,2]);
           //this.refreshLayout();
           //setTimeout(resolve, 1000/this.props.speed, null);
         } 
@@ -396,19 +395,20 @@ class AVLProcessor {
       this.addNode(id.toString(), value);
       newNode = this.cy.getElementById(id.toString());
       this.treeRoot = id.toString();
-      this.buffer.push({elements: this.exportGraph(), lines: [1,2], duration: 1000, treeRoot: this.treeRoot});
+      this.pushStep([1,2]);
     }
     if(newNode) this.balance(newNode);
     this.cy.nodes().forEach((node:CytoscapeElement) => {
       if(!node.id().match('popper')) node.data('style', Styles.NODE);
     })
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+    this.pushStep();
     return this.buffer;
   }
 
   search(value: number){
     this.buffer = [];
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, pseudo: search, treeRoot: this.treeRoot});
+    this.pseudo = search;
+    this.pushStep();
 
     let found = false;
     const bsearch = (node: CytoscapeElement | null, prev: CytoscapeElement | null) => {
@@ -430,15 +430,15 @@ class AVLProcessor {
             'color': 'black',
           });
           found = true;
-          this.buffer.push({elements: this.exportGraph(), lines: [2], duration: 1000, treeRoot: this.treeRoot});
+          this.pushStep([2]);
 
           //setTimeout(bsearch, 1000/this.props.speed, null, node);
           bsearch(null, node);
         }else if(node.data('value') < value){
-          this.buffer.push({elements: this.exportGraph(), lines: [5,6], duration: 1000, treeRoot: this.treeRoot});
+          this.pushStep([5,6]);
           bsearch(right, node);
         }else{
-          this.buffer.push({elements: this.exportGraph(), lines: [3,4], duration: 1000, treeRoot: this.treeRoot});
+          this.pushStep([3,4]);
           bsearch(left, node);
         }
       }
@@ -449,12 +449,12 @@ class AVLProcessor {
       if(!node.id().match('popper')) node.data('style', Styles.NODE);
     });
 
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+    this.pushStep();
     return {found, buffer: this.buffer}
   }
 
   inorderSuccessor(node: CytoscapeElement){
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+    this.pushStep();
     let suc = node;
     const getNext = (node: CytoscapeElement, prev: CytoscapeElement | null) => {
       if(prev){
@@ -470,7 +470,7 @@ class AVLProcessor {
           'color' : 'black',
         });
         const left = getChildren(node)[0];
-        this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+        this.pushStep();
         getNext(left, node);
       }
     }
@@ -493,7 +493,7 @@ class AVLProcessor {
   remove = (value: number) => {
     this.buffer = [];
     this.search(value);
-
+    this.pseudo = remove;
     let node = this.cy.getElementById(this.treeRoot);
     let found = false;
     this.cy.nodes().forEach((ele:CytoscapeElement) => {
@@ -505,12 +505,12 @@ class AVLProcessor {
     if(!found) return this.buffer;
     let anc = '';
 
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot, pseudo: remove});
+    this.pushStep();
 
     if(isLeaf(node)){
       if(node.id() !== this.treeRoot) anc = node.data('prev');
       this.removeNode(node);
-      this.buffer.push({elements: this.exportGraph(), lines: [1], duration: 1000, treeRoot: this.treeRoot});
+      this.pushStep([1]);
       if(anc !== '') this.balance(this.cy.getElementById(anc));
     }else if(node.outgoers('node').length === 1){
       //this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [3, 4]}});
@@ -518,7 +518,7 @@ class AVLProcessor {
         this.treeRoot = node.outgoers('node')[0].id();
         anc = this.treeRoot;
         this.removeNode(node);
-        this.buffer.push({elements: this.exportGraph(), lines: [3,4], duration: 1000, treeRoot: this.treeRoot});
+        this.pushStep([3,4]);
       }else{
         let prev = '';
         prev = node.data('prev');
@@ -527,18 +527,18 @@ class AVLProcessor {
         this.removeNode(node);
         this.addEdge(prev, newChild.id());
         anc = newChild.id();
-        this.buffer.push({elements: this.exportGraph(), lines: [3,4], duration: 1000, treeRoot: this.treeRoot});
+        this.pushStep([3,4]);
       }
       this.balance(this.cy.getElementById(anc));
     }else{
-      this.buffer.push({elements: this.exportGraph(), lines: [6], duration: 1000, treeRoot: this.treeRoot});
+      this.pushStep([6]);
       const suc = this.inorderSuccessor(node);
       console.log('NODE', node);
       console.log('SUC', suc);
-      this.buffer.push({elements: this.exportGraph(), lines: [7,8], duration: 1000, treeRoot: this.treeRoot});
+      this.pushStep([7,8]);
       node.data('value', suc.data('value'));
       suc.data('value', value);
-      this.buffer.push({elements: this.exportGraph(false), lines: [7,8], duration: 1000, treeRoot: this.treeRoot});
+      this.pushStep([7,8], 1000, false);
 
       if(!isLeaf(suc)){
         console.log("ERROR");
@@ -549,14 +549,14 @@ class AVLProcessor {
       }
       anc = suc.data('prev');
       this.removeNode(suc);
-      this.buffer.push({refresh: false, elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+      this.pushStep();
       this.balance(this.cy.getElementById(anc))
     }
     this.cy.nodes().forEach((node:CytoscapeElement) => {
       if(!node.id().match('popper')) node.data('style', Styles.NODE);
     });
 
-    this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+    this.pushStep();
     return this.buffer;
   }
 }

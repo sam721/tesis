@@ -297,21 +297,27 @@ class Heap extends React.Component<Props, State>{
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.max(this.step-1, 0);
-		this.loadGraph(this.buffer[this.step].elements);
+		const {elements, lines} = this.buffer[this.step];
+		this.loadGraph(elements);
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
 	handleForward = () => { 
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.min(this.step+1, this.buffer.length-1);
-		this.loadGraph(this.buffer[this.step].elements);
+		const {elements, lines} = this.buffer[this.step];
+		this.loadGraph(elements);
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
 	handleRepeat = () => {
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = 0;
-		this.loadGraph(this.buffer[0].elements);
+		const {elements, lines} = this.buffer[this.step];
+		this.loadGraph(elements);
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
 	handlePauseContinue = () => {

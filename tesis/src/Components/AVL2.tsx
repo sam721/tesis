@@ -358,26 +358,33 @@ class AVL extends React.Component<Props, State>{
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
     this.step = Math.max(this.step-1, 0);
-    this.treeRoot = this.buffer[this.step].treeRoot;
-    console.log(this.buffer[this.step].elements);
-    this.loadGraph(this.buffer[this.step].elements, true);
+    const {treeRoot, elements, pseudo, lines} = this.buffer[this.step];
+    this.treeRoot = treeRoot;
+    this.loadGraph(elements, true);
+    if(pseudo) this.props.dispatch({type: actions.CHANGE_PSEUDO, payload: { pseudo }});
+    if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
 	handleForward = () => { 
 		clearTimeout(this.animationTimeout);
-		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+    this.props.dispatch({type: actions.ANIMATION_PAUSE});
     this.step = Math.min(this.step+1, this.buffer.length-1);
-    this.treeRoot = this.buffer[this.step].treeRoot;
-    this.loadGraph(this.buffer[this.step].elements, true);
-
+    const {treeRoot, elements, pseudo, lines} = this.buffer[this.step];
+    this.treeRoot = treeRoot;
+    this.loadGraph(elements, true);
+    if(pseudo) this.props.dispatch({type: actions.CHANGE_PSEUDO, payload: { pseudo }});
+    if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
 	handleRepeat = () => {
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
     this.step = 0;
-    this.treeRoot = this.buffer[0].treeRoot;
-    this.loadGraph(this.buffer[0].elements);
+    const {treeRoot, elements, pseudo, lines} = this.buffer[this.step];
+    this.treeRoot = treeRoot;
+    this.loadGraph(elements, true);
+    if(pseudo) this.props.dispatch({type: actions.CHANGE_PSEUDO, payload: { pseudo }});
+    if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
 	handlePauseContinue = () => {
