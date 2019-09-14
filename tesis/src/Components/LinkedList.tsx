@@ -299,6 +299,8 @@ class LinkedList extends React.Component<Props, State>{
         forward: this.handleForward,
         repeat: this.handleRepeat,
         pause: this.handlePauseContinue,
+        remove: () => this.remove(!this.doublyLinked),
+        clear: this.clearGraph,
         options: this.options,
         type: this.props.type,
 			}
@@ -336,6 +338,25 @@ class LinkedList extends React.Component<Props, State>{
 		this.layout.run();
   }
   
+  clearGraph = () => {
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+		this.props.dispatch({
+			type: actions.CLEAR_GRAPH,
+		});
+		let nodes = this.cy.nodes();
+    if(nodes.length === 0) return;
+    this.pushState();
+    this.ListProcessor.loadGraph();
+		for (let i = 0; i < nodes.length; i++) {
+			this.removeNode(nodes[i].id());
+		}
+	}
+
   handleClickOnNode = (node: CytoscapeElement) => {
 		if (this.props.animation === true) return;
     let nodeId = node.id();

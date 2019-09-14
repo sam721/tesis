@@ -6,7 +6,7 @@ import GIFControl from './GIFControl';
 import PhotoControl from './PhotoControl';
 import actions from '../Actions/actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause, faUndo, faRedo, faBackward, faForward} from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faPause, faUndo, faRedo, faBackward, faForward, faTimes, faTrash} from '@fortawesome/free-solid-svg-icons'
 const { connect } = require('react-redux');
 
 
@@ -39,6 +39,8 @@ type Props = {
   forward: () => void,
   pause: () => void,
   repeat: () => void,
+  remove: () => void,
+  clear: () => void,
   paused: boolean,
 }
 
@@ -59,48 +61,61 @@ class Footer extends React.Component<Props, State>{
     let control;
     if(!animation){ 
       control = 
-        <>
+        [
           <Col md={1}>
             <button title="Deshacer" className='dropdown-button' onClick={this.props.undo}>
               <FontAwesomeIcon icon={faUndo} size = "lg"/>
             </button>
-          </Col>
+          </Col>,
           <Col md={1}>
             <button title="Rehacer" className='dropdown-button' onClick={this.props.redo}>
               <FontAwesomeIcon icon={faRedo} size = "lg"/>
             </button>
-          </Col>
-          <Col md={{span: 2, offset:4}}>
-            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
-          </Col>
-        </>
+          </Col>,
+        ];
+        if(this.props.remove){
+          control.push(
+            <Col md={1}>
+            <button title="Eliminar elemento" className='dropdown-button' onClick={this.props.remove}>
+              <FontAwesomeIcon icon={faTimes} size = "lg"/>
+            </button>
+          </Col>,
+          );
+        }
+        if(this.props.clear){
+          control.push(
+            <Col md={1}>
+            <button title="Limpiar canvas" className='dropdown-button' onClick={this.props.clear}>
+              <FontAwesomeIcon icon={faTrash} size = "lg"/>
+            </button>
+          </Col>,
+          );
+        }
+        
     }else{
       control = 
-        <>
+        [
           <Col md={1}>
             <button title={paused ? 'Continuar' : 'Pausa'} className='dropdown-button' onClick={this.props.pause}>
               <FontAwesomeIcon icon={paused ? faPlay : faPause} size = "lg"/>
             </button>
-          </Col>
+          </Col>,
           <Col md={1} >
             <button title='Repetir' className='dropdown-button'  onClick={this.props.repeat}>
               <FontAwesomeIcon icon={faRedo} size = "lg"/>
             </button>
-          </Col>
+          </Col>,
           <Col md={1}>
             <button title="Retroceder" className='dropdown-button'  onClick={this.props.rewind}>
               <FontAwesomeIcon icon={faBackward} size = "lg"/>
             </button>
-          </Col>
+          </Col>,
           <Col md={1}>
             <button title="Avanzar" className='dropdown-button'  onClick={this.props.forward}>
               <FontAwesomeIcon icon={faForward} size = "lg"/>
             </button>
-          </Col>
-          <Col md={{span: 2, offset:2}}>
-            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
-          </Col>
-        </>
+          </Col>,
+        ]
     }
     
     return(
@@ -118,11 +133,14 @@ class Footer extends React.Component<Props, State>{
                 }
               </div>
             </Col>
-            <Col md={2}>
+            <Col md={1}>
               <span>Velocidad</span>
               <SpeedBar/>
             </Col>
-           {control}
+            <>{control}</>
+            <Col md={{span: 2, offset:7-control.length}}>
+            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
+          </Col>
           </Row>
         }
       </div>

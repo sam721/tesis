@@ -142,10 +142,6 @@ class AVL extends React.Component<Props, State>{
         run: () => this.setState({showSearchModal: true}),
       },
       {
-        name: 'Limpiar canvas',
-        run: this.clearGraph,
-      },
-      {
         name: 'Subir AVL',
         run: () => this.setState({show: true}),
       },
@@ -172,6 +168,8 @@ class AVL extends React.Component<Props, State>{
         forward: this.handleForward,
         pause: this.handlePauseContinue,
         repeat: this.handleRepeat,
+        remove: () => this.setState({showRemoveModal: true}),
+        clear: this.clearGraph,
       }
     })
   }
@@ -679,8 +677,11 @@ class AVL extends React.Component<Props, State>{
       });
       return;
     }
+    const nodes = this.cy.nodes();
+    if(nodes.length === 0) return;
     this.pushState();
-		this.cy.nodes().forEach((node:CytoscapeElement) => this.cy.remove(node));
+    nodes.forEach((node:CytoscapeElement) => this.cy.remove(node));
+    this.AVLProcessor.loadGraph([], '');
   }
 
   render() {

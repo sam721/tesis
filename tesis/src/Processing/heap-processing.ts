@@ -13,7 +13,7 @@ class HeapProcessor{
     this.vh = vh; this.vw = vw; 
   }
 
-  loadGraph(elements:Array<Object>){
+  loadGraph(elements:Array<Object>=[]){
     this.cy = cytoscape({
       elements: JSON.parse(JSON.stringify(elements)),
     });

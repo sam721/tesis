@@ -23,6 +23,8 @@ const algorithmReducer = (state = {}, action) => {
       forward: action.payload.forward,
       pause: action.payload.pause,
       repeat: action.payload.repeat,
+      remove: action.payload.remove || null,
+      clear: action.payload.clear || null,
       selection: null,
     } : {});
 

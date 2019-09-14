@@ -20,6 +20,8 @@ const initialState = {
   showPseudo: true,
   paused: false,
 
+  remove: null,
+  clear: null,
   undo: () => {},
   redo: () => {},
   rewind: () => {},

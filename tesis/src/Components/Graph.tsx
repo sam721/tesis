@@ -122,16 +122,8 @@ class Graph extends React.Component<Props, State>{
 				run: this.runButton,
 			},
 			{
-				name: 'Eliminar',
-				run: this.removeButton,
-			},
-			{
 				name: 'Cambiar peso',
 				run: this.weightButton,
-			},
-			{
-				name: 'Limpiar canvas',
-				run: this.clearGraph,
 			},
 			{
 				name: 'Descargar grafo',
@@ -160,6 +152,8 @@ class Graph extends React.Component<Props, State>{
 				forward: this.handleForward,
 				pause: this.handlePauseContinue,
 				repeat: this.handleRepeat,
+				remove: this.removeButton,
+				clear: this.clearGraph,
 			}
 		});
 		if(this.props.action === actions.SELECT_DIJKSTRA){
@@ -444,8 +438,9 @@ class Graph extends React.Component<Props, State>{
 		this.props.dispatch({
 			type: actions.CLEAR_GRAPH,
 		});
-		this.pushState();
 		let nodes = this.cy.nodes();
+		if(nodes.length === 0) return;
+		this.pushState();
 		for (let i = 0; i < nodes.length; i++) {
 			this.removeNode(nodes[i].id());
 		}

@@ -3,8 +3,6 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Graph from './Components/Graph';
 import Heap from './Components/Heap';
 import AVL from './Components/AVL'
-import AVL from './Components/AVL'
-import LinkedList from './Components/LinkedList'
 import properties from './algorithm-properties';
 import BubbleSort from './Components/BubbleSort';
 import MergeSort from './Components/MergeSort';

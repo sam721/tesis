@@ -37,7 +37,7 @@ class ListProcessor{
     this.list = new LinkedListSimulator([], type);
   }
 
-  loadGraph(elements:Array<Object>, list:Array<Object>){
+  loadGraph(elements:Array<Object>=[], list:Array<Object>=[]){
     this.cy = cytoscape({
       elements: JSON.parse(JSON.stringify(elements)),
     });

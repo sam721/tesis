@@ -111,10 +111,6 @@ class Heap extends React.Component<Props, State>{
 				run: this.remove,
 			},
 			{
-				name: 'Limpiar canvas',
-				run: () => { },
-			},
-			{
 				name: 'Subir Heap',
 				run: () => this.setState({ show: true }),
 			},
@@ -195,6 +191,8 @@ class Heap extends React.Component<Props, State>{
 				forward: this.handleForward,
 				repeat: this.handleRepeat,
 				pause: this.handlePauseContinue,
+				clear: this.clearGraph,
+				remove: null,
 			}
 		})
 	}
@@ -487,6 +485,25 @@ class Heap extends React.Component<Props, State>{
 		this.layout.run();
 	}
 	
+	clearGraph = () => {
+		if(this.props.animation){
+			this.props.dispatch({
+				type: actions.ANIMATION_RUNNING_ERROR,
+			});
+			return;
+		}
+		this.props.dispatch({
+			type: actions.CLEAR_GRAPH,
+		});
+		let nodes = this.cy.nodes();
+		if(nodes.length === 0) return;
+		this.pushState();
+		this.heapProcessor.loadGraph();
+		for (let i = 0; i < nodes.length; i++) {
+			this.removeNode(nodes[i].id());
+		}
+	}
+
 	layoutProcessing() {
 		const getHeight = (node: CytoscapeElement) => {
 			let outgoers = node.outgoers('node');

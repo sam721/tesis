@@ -443,12 +443,14 @@ class AVLProcessor {
         }
       }
     }
-    bsearch(this.cy.getElementById(this.treeRoot), null);
-
-    this.cy.nodes().forEach((node:CytoscapeElement) => {
-      if(!node.id().match('popper')) node.data('style', Styles.NODE);
-    });
-
+    if(this.treeRoot === ''){
+      this.pushStep([1]);
+    }else{
+      bsearch(this.cy.getElementById(this.treeRoot), null);
+      this.cy.nodes().forEach((node:CytoscapeElement) => {
+        if(!node.id().match('popper')) node.data('style', Styles.NODE);
+      });
+    }
     this.pushStep();
     return {found, buffer: this.buffer}
   }
