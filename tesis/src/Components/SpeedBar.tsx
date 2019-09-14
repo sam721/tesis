@@ -26,15 +26,19 @@ const SpeedBar = (props: Props) => {
   return (
     <Row>
       <Col xs={12}>
-        <input
-          type="range"
-          min="0.25"
-          max="5"
-          value={props.speed}
-          id="myRange"
-          step="0.05"
-          onChange={handleChange}>
-        </input>
+        <div className="slidecontainer">
+          <input
+            type="range"
+            min="0.25"
+            max="5"
+            value={props.speed}
+            id="myRange"
+            step="0.05"
+            onChange={handleChange}
+            className="slider"
+          >
+          </input>
+        </div>
       </Col>
     </Row>
   )

@@ -5,6 +5,8 @@ import SpeedBar from './SpeedBar';
 import GIFControl from './GIFControl';
 import PhotoControl from './PhotoControl';
 import actions from '../Actions/actions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlay, faPause, faUndo, faRedo, faBackward, faForward} from '@fortawesome/free-solid-svg-icons'
 const { connect } = require('react-redux');
 
 
@@ -55,16 +57,20 @@ class Footer extends React.Component<Props, State>{
     console.log(this.props.algorithm);
     const {animation, paused} = this.props;
     let control;
-    if(!this.props.animation){ 
+    if(!animation){ 
       control = 
         <>
           <Col md={1}>
-            <button className='dropdown-button' onClick={this.props.undo}>Deshacer</button>
+            <button title="Deshacer" className='dropdown-button' onClick={this.props.undo}>
+              <FontAwesomeIcon icon={faUndo} size = "lg"/>
+            </button>
           </Col>
           <Col md={1}>
-            <button className='dropdown-button' onClick={this.props.redo}>Rehacer</button>
+            <button title="Rehacer" className='dropdown-button' onClick={this.props.redo}>
+              <FontAwesomeIcon icon={faRedo} size = "lg"/>
+            </button>
           </Col>
-          <Col md={{span: 2, offset:1}}>
+          <Col md={{span: 2, offset:4}}>
             <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
           </Col>
         </>
@@ -72,18 +78,26 @@ class Footer extends React.Component<Props, State>{
       control = 
         <>
           <Col md={1}>
-            <button className='dropdown-button' onClick={this.props.pause}>Pausa/Continuar</button>
+            <button title={paused ? 'Continuar' : 'Pausa'} className='dropdown-button' onClick={this.props.pause}>
+              <FontAwesomeIcon icon={paused ? faPlay : faPause} size = "lg"/>
+            </button>
+          </Col>
+          <Col md={1} >
+            <button title='Repetir' className='dropdown-button'  onClick={this.props.repeat}>
+              <FontAwesomeIcon icon={faRedo} size = "lg"/>
+            </button>
           </Col>
           <Col md={1}>
-            <button className='dropdown-button'  onClick={this.props.repeat}>Repetir</button>
+            <button title="Retroceder" className='dropdown-button'  onClick={this.props.rewind}>
+              <FontAwesomeIcon icon={faBackward} size = "lg"/>
+            </button>
           </Col>
           <Col md={1}>
-            <button className='dropdown-button'  onClick={this.props.rewind}>Retroceder</button>
+            <button title="Avanzar" className='dropdown-button'  onClick={this.props.forward}>
+              <FontAwesomeIcon icon={faForward} size = "lg"/>
+            </button>
           </Col>
-          <Col md={1}>
-            <button className='dropdown-button'  onClick={this.props.forward}>Avanzar</button>
-          </Col>
-          <Col md={{span: 2, offset:1}}>
+          <Col md={{span: 2, offset:2}}>
             <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
           </Col>
         </>

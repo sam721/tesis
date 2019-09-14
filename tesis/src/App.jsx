@@ -5,6 +5,7 @@ import 'react-notifications-component/dist/theme.css'
 
 import './views/css/App.css';
 import './views/css/codeblock.css';
+import './views/css/slider.css';
 import { Container, Row, Col } from 'react-bootstrap';
 import AlgorithmInfo from './Components/AlgorithmInfo'
 import Editor from './Editor';

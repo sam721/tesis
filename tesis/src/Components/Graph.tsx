@@ -330,6 +330,7 @@ class Graph extends React.Component<Props, State>{
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.min(this.step+1, this.buffer.length-1);
+		console.log(this.step);
 		const {elements, lines} = this.buffer[this.step];
 		this.loadGraph(elements);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
