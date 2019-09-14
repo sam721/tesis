@@ -16,11 +16,13 @@ import {isLeaf, getChildren, getHeight, lca, parseAVL} from '../utils/avl-utils'
 import {edgeId} from '../utils/cy-utils';
 import MediaRecorder from '../utils/MediaRecorder';
 import {remove, insert, balance, search} from '../resources/pseudocodes/avl';
+import AVLProcessor from '../Processing/avl-proccesing';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
 const popper = require('cytoscape-popper');
 
+cytoscape.warnings(false);
 type options = {
   name: string,
   positions: { [id: string]: { x: number, y: number } },
@@ -37,10 +39,20 @@ let layoutOptions: options = {
   animationDuration: 500, // duration of animation in ms if enabled
 };
 
+type exportStep = {
+  elements: Array<Object>
+  lines: Array<number>,
+  duration: number,
+  pseudo?: Array<Object>,
+  treeRoot: string,
+  refresh?: boolean,
+}
+
 type storeState = {
   animation: string,
   selection: Object,
   speed: number,
+  paused: boolean,
 }
 
 type Element = {
@@ -68,7 +80,8 @@ type Props = {
 		type: string,
 		id: string,
 		weight: string,
-	}
+  }
+  paused: boolean,
   dispatch: (action: Object) => Object,
 }
 
@@ -77,6 +90,7 @@ const mapStateToProps = (state: storeState) => {
     animation: state.animation,
     speed: state.speed,
     selection: state.selection,
+    paused: state.paused,
   }
 }
 
@@ -103,16 +117,49 @@ class AVL extends React.Component<Props, State>{
 
   nodeStyle = Styles.NODE;
   edgeStyle = Styles.EDGE;
+  AVLProcessor:any;
   cy = cytoscape();
 
+  buffer:Array<exportStep> = [];
+  options: Array<{ name: string, run: () => void }>;
+
+  step = 0;
+  animationTimeout = 0;
   constructor(props:Props){
     super(props);
     this._mediaRecorder = new MediaRecorder(props.dispatch);
+    this.options = [
+      {
+        name: 'Insertar',
+        run: () => this.setState({showInsertModal: true}),
+      },
+      {
+        name: 'Eliminar',
+        run: () => this.setState({showRemoveModal: true}),
+      },
+      {
+        name: 'Buscar',
+        run: () => this.setState({showSearchModal: true}),
+      },
+      {
+        name: 'Limpiar canvas',
+        run: this.clearGraph,
+      },
+      {
+        name: 'Subir AVL',
+        run: () => this.setState({show: true}),
+      },
+      {
+        name: 'Descargar AVL',
+        run:  () => parseAVL(this.cy.getElementById(this.treeRoot)),
+      }
+    ];
   }
   
   componentDidMount() {
     this._isMounted = true;
     this.initialize({ root: '', elements: []});
+    this.AVLProcessor = new AVLProcessor(this.cy.width(), this.cy.height());
     this.props.dispatch({
       type: this.props.action,
       payload:{
@@ -120,32 +167,11 @@ class AVL extends React.Component<Props, State>{
         gif: () => this._mediaRecorder.takeGif(this.cy),
         undo: this.handleUndo,
         redo: this.handleRedo,
-        options: [
-          {
-            name: 'Insertar',
-            run: () => this.setState({showInsertModal: true}),
-          },
-          {
-            name: 'Eliminar',
-            run: () => this.setState({showRemoveModal: true}),
-          },
-          {
-            name: 'Buscar',
-            run: () => this.setState({showSearchModal: true}),
-          },
-          {
-            name: 'Limpiar canvas',
-            run: this.clearGraph,
-          },
-          {
-            name: 'Subir AVL',
-            run: () => this.setState({show: true}),
-          },
-          {
-            name: 'Descargar AVL',
-            run:  () => parseAVL(this.cy.getElementById(this.treeRoot)),
-          }
-        ]
+        options: this.options,
+        rewind: this.handleRewind,
+        forward: this.handleForward,
+        pause: this.handlePauseContinue,
+        repeat: this.handleRepeat,
       }
     })
   }
@@ -180,7 +206,6 @@ class AVL extends React.Component<Props, State>{
       textureOnViewport: false,
       motionBlur: false,
       motionBlurOpacity: 0.2,
-      wheelSensitivity: 1,
       pixelRatio: '1.0',
       autoungrabify: true,
 
@@ -199,11 +224,11 @@ class AVL extends React.Component<Props, State>{
 			}
     });
     this.treeRoot = root;
-		this.cy.on('resize', () => this.refreshLayout(false));
+		//this.cy.on('resize', () => { this.layoutProcessing(); this.refreshLayout(false)});
 		this.layout = this.cy.elements().makeLayout({...layoutOptions, animate: false});
 		this.layout.run();
 
-		this.refreshLayout();
+    this.refreshLayout();
   }
   
   handleUndo = () => {
@@ -225,8 +250,10 @@ class AVL extends React.Component<Props, State>{
 		const currentElements = this.exportGraph();
 		let state = this.undo.pop();
 		if(state !== undefined){
-		  this.redo.push({ root: this.treeRoot, elements: currentElements});
-		  this.initialize(state);
+      this.redo.push({ root: this.treeRoot, elements: currentElements});
+      this.treeRoot = state.root;
+      this.loadGraph(state.elements);
+      this.AVLProcessor.loadGraph(state.elements, state.root);
     }
 	}
 
@@ -250,8 +277,42 @@ class AVL extends React.Component<Props, State>{
 		let state = this.redo.pop();
 		if(state !== undefined){
 		  this.undo.push({ root: this.treeRoot, elements: currentElements});
-		  this.initialize(state);
+      this.treeRoot = state.root;
+      this.loadGraph(state.elements);
+      this.AVLProcessor.loadGraph(state.elements, state.root);
     }
+	}
+
+  loadGraph(elements: Array<Object>, keep=false) {
+    const nodes = this.cy.nodes();
+    const positions:{[id:string]:{x:number,y:number}} = {};
+		nodes.forEach((node: CytoscapeElement) => {
+      if(keep) positions[node.id()] = JSON.parse(JSON.stringify(node.data('position')));
+			this.cy.remove(node);
+		})
+
+		for (let i = 0; i < elements.length; i++) {
+			this.cy.add(JSON.parse(JSON.stringify(elements[i])));
+		}
+
+		this.cy.nodes().forEach((node: CytoscapeElement) => {
+			const style = node.data('style');
+			if (style != null) node.style(style);
+      const position = node.data('position');
+      if(keep && positions[node.id()]) node.position({x:positions[node.id()].x, y:positions[node.id()].y});
+			//console.log("PREV", node.position());
+			//console.log("NEXT", position);
+			if (position != null) {
+				layoutOptions.positions[node.id()] = JSON.parse(JSON.stringify(position));
+			}
+		})
+
+		this.cy.edges().forEach((edge: CytoscapeElement) => {
+			const style = edge.data('style');
+			if (style != null) edge.style(style);
+		})
+
+    this.refreshLayout();
 	}
 
 	exportGraph(){
@@ -265,6 +326,8 @@ class AVL extends React.Component<Props, State>{
           prev: node.data('prev'),
           height: node.data('height'),
           balance: node.data('balance'),
+          style: node.style(),
+          position: { x: node.position().x, y: node.position().y }
 				},
 				position: {
 					x: node.position().x,
@@ -291,16 +354,89 @@ class AVL extends React.Component<Props, State>{
 		this.undo.push({root: this.treeRoot, elements: this.exportGraph()});
   }
   
+  handleRewind = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+    this.step = Math.max(this.step-1, 0);
+    const {treeRoot, elements, pseudo, lines} = this.buffer[this.step];
+    this.treeRoot = treeRoot;
+    this.loadGraph(elements, true);
+    if(pseudo) this.props.dispatch({type: actions.CHANGE_PSEUDO, payload: { pseudo }});
+    if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+	}
+
+	handleForward = () => { 
+		clearTimeout(this.animationTimeout);
+    this.props.dispatch({type: actions.ANIMATION_PAUSE});
+    this.step = Math.min(this.step+1, this.buffer.length-1);
+    const {treeRoot, elements, pseudo, lines} = this.buffer[this.step];
+    this.treeRoot = treeRoot;
+    this.loadGraph(elements, true);
+    if(pseudo) this.props.dispatch({type: actions.CHANGE_PSEUDO, payload: { pseudo }});
+    if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+	}
+
+	handleRepeat = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+    this.step = 0;
+    const {treeRoot, elements, pseudo, lines} = this.buffer[this.step];
+    this.treeRoot = treeRoot;
+    this.loadGraph(elements, true);
+    if(pseudo) this.props.dispatch({type: actions.CHANGE_PSEUDO, payload: { pseudo }});
+    if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+	}
+
+	handlePauseContinue = () => {
+		if(!this.props.paused){
+			clearTimeout(this.animationTimeout);
+			this.props.dispatch({
+				type: actions.ANIMATION_PAUSE,
+			})
+		}else{
+			new Promise(resolve => {
+				this.props.dispatch({
+					type: actions.ANIMATION_CONTINUE
+				})
+				resolve();
+			}).then(() => this.animation());
+		}
+  }
+  
   componentWillUnmount(){
     this.props.dispatch({
       type: actions.ANIMATION_END,
     });
-    
+    clearTimeout(this.animationTimeout);
     this._isMounted = false;
 
   }
-  componentDidUpdate(){
+  componentDidUpdate(prevProps:Props){
     layoutOptions.animationDuration = 500/this.props.speed;
+
+    if (prevProps.animation && !this.props.animation) {
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: { options: this.options }
+			});
+		} else if (!prevProps.animation && this.props.animation) {
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: {
+					options: [
+						{
+							name: 'Volver a edicion',
+							run: () => {
+                clearTimeout(this.animationTimeout);
+                this.loadGraph(this.buffer[this.buffer.length-1].elements);
+                this.treeRoot = this.buffer[this.buffer.length-1].treeRoot;
+                this.props.dispatch({ type: actions.ANIMATION_END });
+                console.log(getChildren(this.cy.getElementById(this.treeRoot)));
+							}
+						}]
+				}
+			});
+		}
   }
 
   removeNodePopper(node: string) {
@@ -352,29 +488,9 @@ class AVL extends React.Component<Props, State>{
       }
     });
     this.createPopper(id);
-    /*
-    let node = this.cy.getElementById(id);
-
-    let popper = node.popper({
-			content: () => {
-				let div = document.createElement('div');
-				div.setAttribute('id', id + 'popper');
-				document.body.appendChild(div);
-
-				return div;
-			}
-    });
-    
-    let update = () => {
-			popper.scheduleUpdate();
-		};
-
-    node.on('position', update);
-    */
   }
   
   addEdge = (source: string, target: string) => {
-    console.log(source, target);
     this.cy.add({
       group: 'edges',
       data: {
@@ -382,7 +498,6 @@ class AVL extends React.Component<Props, State>{
       }
     });
     this.cy.getElementById(target).data('prev', source);
-    //this.refreshLayout();
   }
 
   isLeaf(node: CytoscapeElement){
@@ -406,7 +521,6 @@ class AVL extends React.Component<Props, State>{
     return [left, right];
   }
   refreshLayout(animate:boolean = true) {
-    this.layoutProcessing();
     this.layout.stop();
     this.layout = this.cy.elements().makeLayout({...layoutOptions, animate});
     this.layout.run();
@@ -482,448 +596,79 @@ class AVL extends React.Component<Props, State>{
     return true;
   }
 
-  async rotateLeft(x: CytoscapeElement){
-    let promise = new Promise((resolve: () => void, reject) => {
-        const [y, C] = getChildren(x);
-        if(y == null) return;
-        const [A, B] = getChildren(y);
-        this.removeEdge(x.id(), y.id());
-        if(B){
-          this.removeEdge(y.id(), B.id());
-          this.addEdge(x.id(), B.id());
-          //B.data('prev', x.id());
-        }
-        const prev = x.data('prev');
-        this.addEdge(y.id(), x.id());
-
-        if(this.treeRoot !== x.id()){
-          this.removeEdge(prev, x.id());
-          this.addEdge(prev, y.id());
-          //y.data('prev', prev);
-        }else{
-          this.treeRoot = y.id();
-          console.log(this.treeRoot);
-        }
-        //x.data('prev', y.id());
-
-        x.data('height', Math.max(getHeight(B), getHeight(C))+1);
-        y.data('height', Math.max(getHeight(A), getHeight(x))+1);
-        x.data('balance', getHeight(C)-getHeight(B));
-        y.data('balance', getHeight(x) - getHeight(A));
-        this.refreshLayout();
-        setTimeout(resolve, 1000/this.props.speed);
-      }
-    );
-
-    let result = await promise;
-    return result;
-  }
-  
-
-  async rotateRight(y: CytoscapeElement){
-    let promise = new Promise((resolve: () => void, reject) => {
-        const [A, x] = getChildren(y);
-        if(x == null) return;
-        const [B, C] = getChildren(x);
-        this.removeEdge(y.id(), x.id());
-        if(B){
-          this.removeEdge(x.id(), B.id());
-          this.addEdge(y.id(), B.id());
-          //B.data('prev', y.id());
-        }
-        const prev = y.data('prev');
-        this.addEdge(x.id(), y.id());
-        
-        if(this.treeRoot !== y.id()){
-          this.removeEdge(prev, y.id());
-          this.addEdge(prev, x.id());
-          //x.data('prev', prev);
-        }else{
-          this.treeRoot = x.id();
-          console.log(this.treeRoot);
-        }
-        //y.data('prev', x.id());
-
-        y.data('height', Math.max(getHeight(A), getHeight(B))+1);
-        x.data('height', Math.max(getHeight(y), getHeight(C))+1);
-        y.data('balance', getHeight(B) - getHeight(A));
-        x.data('balance', getHeight(C) - getHeight(y));
-        this.refreshLayout();
-        setTimeout(resolve, 1000/this.props.speed);
-      }
-    );
-    let result = await promise;
-    return result;
-  }
-
-  balance(start: CytoscapeElement){
-    let node = start;
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: balance,
-      }
-    });
-    this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: []}});
-    let promise = new Promise((resolve, reject) => {
-      const recursion = () => {
-        const [left, right] = getChildren(node);
-        const lh = getHeight(left), rh = getHeight(right);
-        node.data('height', Math.max(lh, rh)+1);
-        const bal = rh - lh;
-        node.data('balance', bal);
-        console.log('NODO ' + node.id() + ' BAL ' + bal);
-        let first = () => new Promise((resolve)=>{resolve()}), second = () => new Promise((resolve) => {resolve()});
-        if(bal === 2){
-          if(right.data('balance') >= 0){
-            this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [2, 3]}});
-            first = () => this.rotateRight(node);
-          }else{
-            this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [6, 7]}});
-            first = () => this.rotateLeft(right);
-            second = () => this.rotateRight(node);
-          }
-        }else if(bal === -2){
-          if(left.data('balance') <= 0){
-            this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [4, 5]}});
-            first = () => this.rotateLeft(node);
-          }else{
-            this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [8, 9]}});
-            first = () => this.rotateRight(left);
-            second = () => this.rotateLeft(node);
-          }
-        }else this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [1]}});
-        
-        first().then(() => {
-          second().then(() => {
-            console.log('hello');
-            node.style({
-              'background-color': 'white',
-              'color': 'black',
-            })
-            if(node.id() === this.treeRoot){
-              resolve();
-              return;
-            }   
-            node = this.cy.getElementById(node.data('prev'));
-            node.style({
-              'background-color': 'red',
-              'color': 'black',
-            })
-            //console.log(node.id());
-            setTimeout(recursion, 1000/this.props.speed);
-          })
-        });
-      }  
-      this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [1]}});
-      node.style({
-        'background-color': 'red',
-        'color': 'black',
-      })
-      setTimeout(recursion, 1000/this.props.speed);
-    });
-    return promise;
-  }
-
-  insert(value: number) {
-    if(this.props.animation){
-      this.props.dispatch({
-        type: actions.ANIMATION_RUNNING_ERROR,
-      });
-      return;
-    }
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: insert,
-      }
-    });
-
-    let id = 0;
-    while(this.cy.getElementById(id.toString()).length > 0) id++;
-    let n = this.cy.nodes().length/2 + 1;
-    let newNode:CytoscapeElement;
-    new Promise((resolve : (found: String | null) => void, reject) => {
-      this.props.dispatch({
-        type: actions.ANIMATION_START,
-      });
-      if(n > 1){
-        let insertion = (current: CytoscapeElement, prev: CytoscapeElement | null) => {
-          console.log(current);
-          if(prev) prev.style({
-            'color': 'black',
-            'background-color': 'white',
-          });
-          if(current){
-            current.style({
-              'color': 'white',
-              'background-color': 'black',
-            });
-            let [left, right] = getChildren(current);
-            if(value === current.data('value')){
-              this.props.dispatch({
-                type: actions.AVL_ELEMENT_ALREADY_INFO,
-              })
-              setTimeout(resolve, 1000/this.props.speed, current.id());
-              return;
-            }
-            if (value < current.data('value')) {
-              this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [3, 4]}});
-              setTimeout(insertion, 1000/this.props.speed, left, current);  
-            } else {
-              this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [5, 6]}});
-              setTimeout(insertion, 1000/this.props.speed, right, current);
-            }
-          }else{
-            this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [1, 2]}});
-            if(prev){
-              this.pushState();
-              this.addNode(id.toString(), value, 0, 0, prev.position());
-              newNode = this.cy.getElementById(id.toString());
-              this.addEdge(prev.id(), newNode.id());
-              /*newNode.data(
-                'prev', prev.id(),
-              );*/
-            }
-            this.refreshLayout();
-            setTimeout(resolve, 1000/this.props.speed, null);
-          } 
-        }
-        insertion(this.cy.getElementById(this.treeRoot), null);
-      }else{
-        this.pushState();
-        this.addNode(id.toString(), value);
-        newNode = this.cy.getElementById(id.toString());
-        this.treeRoot = id.toString();
-        this.refreshLayout();
-        resolve(null);
-      }
-    }).then( (found: String | null) => {
-      if(!found){
-        this.balance(newNode).then(() => {
-          this.props.dispatch({
-            type: actions.ANIMATION_END,
-          });
-        });
-      }else{
-        this.cy.getElementById(found).style({
-          'background-color': 'white',
-          'color': 'black',
+  animation(){
+		let step = () => {
+      if (!this.props.animation) return;
+			if (this.step === this.buffer.length) {
+				this.props.dispatch({
+					type: actions.FINISHED_ALGORITHM_SUCCESS,
         });
         this.props.dispatch({
-          type: actions.ANIMATION_END,
-        });
-      }
-    })
+          type: actions.ANIMATION_PAUSE,
+        })
+				return;
+			}
+      const { elements, lines, duration, pseudo, treeRoot, refresh} = this.buffer[this.step++];
+      if(this.props.paused) return;
+      this.loadGraph(elements, refresh);
+      if(pseudo) this.props.dispatch({ type: actions.CHANGE_PSEUDO, payload: { pseudo}});
+      if (lines) this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
+      if(treeRoot != null) this.treeRoot = treeRoot;
+			console.log(duration);
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration) / (this.props.speed));
+		}
+		step();
   }
 
-  async inorderSuccessor(node: CytoscapeElement){
-    let promise = new Promise((resolve: (node:CytoscapeElement) => void, reject) => {
-      const getNext = (node: CytoscapeElement, prev: CytoscapeElement | null) => {
-        if(prev){
-          prev.style({
-            'background-color': 'white',
-            'color': 'black',
-          });
-        }
-        if(node){
-          node.style({
-            'background-color': 'red',
-            'color' : 'black',
-          });
-          const left = getChildren(node)[0];
-          setTimeout(getNext, 1000/this.props.speed, left, node);
-        }else prev && resolve(prev);
+  insert(value=0){
+    const nodes = this.cy.nodes();
+    for(let i = 0; i < nodes.length; i++){
+      if(nodes[i].id().match('popper')) continue;
+      if(nodes[i].data('value') === value){
+        this.props.dispatch({
+          type: actions.AVL_ELEMENT_ALREADY_INFO,
+        })
+        return;
       }
-      let right = getChildren(node)[1];
-      node = right;
-      getNext(node, null);
-    });
-    let result = await promise;
-    return result;
-  }
-  
-  async search(value: number, stopAnimation: boolean = true){
-    if(this.props.animation){
-      this.props.dispatch({
-        type: actions.ANIMATION_RUNNING_ERROR,
-      });
-      return;
     }
-    this.props.dispatch({
-      type: actions.ANIMATION_START,
-    });
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload:{
-        pseudo: search,
-      }
-    })
-    let promise = new Promise((resolve: (node: CytoscapeElement) => void, reject) => {
-      let found = false;
-      const bsearch = (node: CytoscapeElement, prev: CytoscapeElement | null) => {
-        if(prev){
-          prev.style({
-            'background-color': 'white',
-            'color': 'black',
-          });
-        }
-        if(node){
-          node.style({
-            'background-color': 'red',
-            'color': 'black',
-          });
-          const [left, right] = getChildren(node);
-          if(node.data('value') === value){
-            node.style({
-              'background-color': 'lightgreen',
-              'color': 'black',
-            });
-            found = true;
-            this.props.dispatch({
-              type: actions.CHANGE_LINE,
-              payload: {lines: [2]}
-            });
-            setTimeout(bsearch, 1000/this.props.speed, null, node);
-          }else if(node.data('value') < value){
-            this.props.dispatch({
-              type: actions.CHANGE_LINE,
-              payload: {lines: [5,6]}
-            });
-            setTimeout(bsearch, 1000/this.props.speed, right, node);
-          }else{
-            this.props.dispatch({
-              type: actions.CHANGE_LINE,
-              payload: {lines: [3,4]}
-            });
-            setTimeout(bsearch, 1000/this.props.speed, left, node);
-          }
-        }else{
-          this.props.dispatch({
-            type: (found ? actions.AVL_FOUND_SUCCESS : actions.AVL_NOT_FOUND_INFO),
-          });
-
-          if(stopAnimation){
-            this.props.dispatch({
-              type: actions.ANIMATION_END,
-            });
-          }
-
-          if(!found){
-            this.props.dispatch({
-              type: actions.CHANGE_LINE,
-              payload: {lines: [1]},
-            });
-
-            setTimeout(reject, 1000/ this.props.speed);
-          }
-          setTimeout(resolve, 1000/this.props.speed, prev);
-        }
-      }
-      bsearch(this.cy.getElementById(this.treeRoot), null);
-    });
-    let result = await promise;
-    return result;
+    this.pushState();
+    this.buffer = this.AVLProcessor.insert(value);
+    this.step = 0;
+    new Promise((resolve, reject) => {
+      this.props.dispatch({type: actions.ANIMATION_START});
+      resolve();
+    }).then(() => this.animation());
   }
-  remove = (value: number) => {
-    if(this.props.animation){
-      this.props.dispatch({
-        type: actions.ANIMATION_RUNNING_ERROR,
-      });
-      return;
-    }
 
-    const searchPromise = this.search(value, false);
-    searchPromise.then((node?: CytoscapeElement) => {
-      if(node === undefined) return;
-      let anc = '';
-      this.props.dispatch({
-        type: actions.ANIMATION_START,
-      });
-      this.props.dispatch({
-        type: actions.CHANGE_PSEUDO,
-        payload: { pseudo: remove}
-      });
-
-      this.pushState();
-      if(isLeaf(node)){
-        this.props.dispatch({ type: actions.CHANGE_LINE, payload: {lines: [1]}});
-        if(node.id() !== this.treeRoot) anc = node.data('prev');
-        this.removeNode(node);
-        this.refreshLayout();
-        if(anc !== '') this.balance(this.cy.getElementById(anc)).then(() => {
-          this.props.dispatch({type: actions.ANIMATION_END});
-        });
-        else this.props.dispatch({type: actions.ANIMATION_END});
-      }else if(node.outgoers('node').length === 1){
-        this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [3, 4]}});
-        if(node.id() === this.treeRoot){
-          this.treeRoot = node.outgoers('node')[0].id();
-          anc = this.treeRoot;
-          this.removeNode(node);
-          this.refreshLayout();
-        }else{
-          let prev = '';
-          prev = node.data('prev');
-          const newChild = node.outgoers('node')[0];
-          newChild.data(prev);
-          this.removeNode(node);
-          this.addEdge(prev, newChild.id());
-          anc = newChild.id();
-          this.refreshLayout();
-        }
-        setTimeout(() => 
-          this.balance(this.cy.getElementById(anc)).then(() => {
-            this.props.dispatch({type: actions.ANIMATION_END});
-          }),
-          1000/this.props.speed
-        );
-      }else{
-        this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [6]}});
-        let promise = this.inorderSuccessor(node);
-        promise.then((suc: CytoscapeElement) => {
-          this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [7, 8]}});
-          node.data('value', suc.data('value'));
-          suc.data('value', value);
-          setTimeout(
-            () => {
-                if(!isLeaf(suc)){
-                  const right = getChildren(suc)[1];
-                  right.data('prev', suc.data('prev'));
-                  this.addEdge(suc.data('prev'), right.id());
-                }
-                anc = suc.data('prev');
-                this.removeNode(suc);
-                this.refreshLayout();
-                setTimeout(() => 
-                  this.balance(this.cy.getElementById(anc)).then(() => {
-                    this.props.dispatch({type: actions.ANIMATION_END});
-                  }),
-                  1000/this.props.speed
-                );
-                node.style(Styles.NODE);
-              },
-              1000/this.props.speed);
-        });
-      }
-    }).catch(() => {
-      this.props.dispatch({
-        type: actions.ANIMATION_END,
-      });
-    });
+  search(value=0){
+    let {found, buffer} = this.AVLProcessor.search(value);
+    this.buffer = buffer;
+    console.log(buffer);
+    this.step = 0;
+    new Promise((resolve, reject) => {
+      this.props.dispatch({type: actions.ANIMATION_START});
+      resolve();
+    }).then(() => this.animation());
   }
-  testRotation(mode: number){
-    let {selection} = this.props;
-    if(!selection) return;
-    if(mode === 0) this.rotateLeft(this.cy.getElementById(selection.id));
-    else this.rotateRight(this.cy.getElementById(selection.id));
+
+  remove(value=0){ 
+    this.pushState();
+    this.buffer = this.AVLProcessor.remove(value);
+    console.log(this.buffer);
+    this.step = 0;
+    new Promise((resolve, reject) => {
+      this.props.dispatch({type: actions.ANIMATION_START});
+      resolve();
+    }).then(() => this.animation());
   }
 
   handleClose = (update: boolean = false) => {
     this.setState({show: false});
     if(update){
       this.treeRoot = "0";
+      this.layoutProcessing();
       this.refreshLayout();
+      this.AVLProcessor.loadGraph(this.exportGraph(), "0");
     }
   }
 
@@ -949,7 +694,7 @@ class AVL extends React.Component<Props, State>{
         <InputModal 
           show={this.state.showSearchModal} 
           handleClose={() => this.setState({showSearchModal: false})}
-          callback={(v:number) => this.search(v).catch(() => {})}
+          callback={(v:number) => this.search(v)}
         />
         <InputModal
           show={this.state.showRemoveModal}

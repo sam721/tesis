@@ -3,8 +3,8 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Graph from './Components/Graph';
 import Heap from './Components/Heap';
 import AVL from './Components/AVL'
-import AVL2 from './Components/AVL2'
-import LinkedList2 from './Components/LinkedList2'
+import AVL from './Components/AVL'
+import LinkedList from './Components/LinkedList'
 import properties from './algorithm-properties';
 import BubbleSort from './Components/BubbleSort';
 import MergeSort from './Components/MergeSort';
@@ -29,14 +29,14 @@ class Editor extends React.Component {
 							<Route path={routes.Prim} render={() => <Graph {...properties.Prim} />} />
 							<Route path={routes.Kruskal} render={() => <Graph {...properties.Kruskal} />} />
 							<Route path={routes.MinHeap} render={() => <Heap {...properties.Heap} />} />
-							<Route path={routes.AVL} render={() => <AVL2 {...properties.AVL} />} />
+							<Route path={routes.AVL} render={() => <AVL {...properties.AVL} />} />
 							<Route path={routes.BubbleSort} render={() => <BubbleSort {...properties.BubbleSort} />} />
 							<Route path={routes.MergeSort} render={() => <MergeSort {...properties.MergeSort} />} />
 							<Route path={routes.BinarySearch} render={() => <BinarySearch {...properties.BinarySearch}/>}/>
-							<Route path={routes.SingleLinkedList} render={() => <LinkedList2 {...properties.SingleLinkedList}/>}/>
-							<Route path={routes.DoubleLinkedList} render={() => <LinkedList2 {...properties.DoubleLinkedList}/>}/>
-							<Route path={routes.Queue} render={() => <LinkedList2 {...properties.Queue}/>}/>
-							<Route path={routes.Stack} render={() => <LinkedList2 {...properties.Stack}/>}/>
+							<Route path={routes.SingleLinkedList} render={() => <LinkedList {...properties.SingleLinkedList}/>}/>
+							<Route path={routes.DoubleLinkedList} render={() => <LinkedList {...properties.DoubleLinkedList}/>}/>
+							<Route path={routes.Queue} render={() => <LinkedList {...properties.Queue}/>}/>
+							<Route path={routes.Stack} render={() => <LinkedList {...properties.Stack}/>}/>
 					</Col>
 				</Row>
 			</HashRouter>
