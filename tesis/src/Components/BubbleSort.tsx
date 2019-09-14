@@ -14,13 +14,15 @@ const { connect } = require('react-redux');
 type storeState = {
 	animation: string,
 	speed: number,
+	paused: boolean,
 }
 
 type Props = {
 	action: string,
   animation: boolean,
   speed: number,
-  dispatch: (action: Object) => Object,
+	dispatch: (action: Object) => Object,
+	paused: boolean,
 }
 
 type State = {
@@ -33,7 +35,8 @@ type stackState = Array<number>;
 const mapStateToProps = (state: storeState) => {
   return {
     animation: state.animation,
-    speed: state.speed,
+		speed: state.speed,
+		paused: state.paused,
   }
 }
 
@@ -76,6 +79,8 @@ class BubbleSort extends React.Component<Props, State> {
 		]
 	}
 	
+	animationTimeout = 0;
+	step = 0;
   componentDidMount() {
 
 		this._isMounted = true;
@@ -91,6 +96,10 @@ class BubbleSort extends React.Component<Props, State> {
 				options: this.options,
 				undo: this.handleUndo,
 				redo: this.handleRedo,
+				rewind: this.handleRewind,
+				forward: this.handleForward,
+				repeat: this.handleRepeat,
+				pause: this.handlePauseContinue,
 			}
     })
 		
@@ -120,7 +129,7 @@ class BubbleSort extends React.Component<Props, State> {
     this.props.dispatch({
       type: actions.ANIMATION_END,
     });
-    
+		clearTimeout(this.animationTimeout);
     this._isMounted = false;
 		let nodes = this.cy.nodes();
 		nodes.forEach((node: CytoscapeElement) => {
@@ -200,7 +209,44 @@ class BubbleSort extends React.Component<Props, State> {
 		this.undo.push([...this.state.values]);
 		if(prevValues) this.changeArray(prevValues);
 	}
+	
+	handleRewind = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.max(this.step-1, 0);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
 
+	handleForward = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.min(this.step+1, this.buffer.length-1);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
+
+	handleRepeat = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = 0;
+		this.loadGraph(this.buffer[0].elements);
+	}
+
+	handlePauseContinue = () => {
+		if(!this.props.paused){
+			clearTimeout(this.animationTimeout);
+			this.props.dispatch({
+				type: actions.ANIMATION_PAUSE,
+			})
+		}else{
+			new Promise(resolve => {
+				this.props.dispatch({
+					type: actions.ANIMATION_CONTINUE
+				})
+				resolve();
+			}).then(() => this.animation());
+		}
+	}
+	
 	pushState(){
 		this.redo = [];
 		this.undo.push([...this.state.values]);
@@ -273,25 +319,30 @@ class BubbleSort extends React.Component<Props, State> {
 		});
   }
   
-  animation(start=0){
-		let pos = start;
+  animation(){
 		let step = () => {
-			if (pos === this.buffer.length) {
+			if (this.step === this.buffer.length) {
 				
 				this.props.dispatch({
 					type: actions.ARRAY_SORTED_SUCCESS,
 				});
+
+				this.props.dispatch({
+					type: actions.ANIMATION_PAUSE,
+				});
+
 				return;
 			}
 			if(!this.props.animation){
 				this.cy.nodes().style(this.nodeStyle);
 				return;
 			}
-			const {elements, lines, duration} = this.buffer[pos++];
-			this.loadGraph(elements);
+			const {elements, lines, duration} = this.buffer[this.step++];
 			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+			if(this.props.paused) return;
+			this.loadGraph(elements);
 			this.refreshLayout();
-			setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 		}
 		step();
 	}
@@ -305,8 +356,8 @@ class BubbleSort extends React.Component<Props, State> {
 		this.props.dispatch({
 			type: actions.STARTING_BUBBLESORT_INFO,
 		});
-
-		this.animation(0);
+		this.step = 0;
+		this.animation();
   }
 
 	valuesToGraph(){

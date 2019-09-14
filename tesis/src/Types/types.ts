@@ -7,7 +7,7 @@ export interface CytoscapeElement {
 	style: ((styleSheet?: Object) => void | Object)
 	outgoers: (selector?: string) => Array<CytoscapeElement>,
 	data: ((selector: string, value?: any) => any)
-	position: () => {x:number, y:number},
+	position: (pos?:{x:number, y:number}) => {x:number, y:number},
 	source: () => CytoscapeElement,
 	target: () => CytoscapeElement,
 }

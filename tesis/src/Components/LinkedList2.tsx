@@ -63,6 +63,7 @@ type Props = {
   data: string,
   
   pseudoset: pseudoSet,
+  paused: boolean,
 }
 
 type State = {
@@ -76,6 +77,7 @@ type storeState = {
   animation: boolean,
   speed: number,
   selection: Object,
+  paused: boolean,
 }
 
 type stackState = {
@@ -83,12 +85,12 @@ type stackState = {
   elements: Array<Object>,
 }
 
-
 const mapStateToProps = (state: storeState) => {
   return {
     animation: state.animation,
     speed: state.speed,
     selection: state.selection,
+    paused: state.paused,
   }
 }
 class LinkedList extends React.Component<Props, State>{
@@ -122,6 +124,8 @@ class LinkedList extends React.Component<Props, State>{
   buffer:Array<exportStep> =[];
   options:Array<{name: string, run: () => void}> = [];
 
+  step = 0;
+  animationTimeout = 0;
   constructor(props:Props){
     super(props);
     if(this.props.type === actions.SELECT_SINGLE_LINKED_LIST || this.props.type === actions.SELECT_DOUBLE_LINKED_LIST){
@@ -289,13 +293,29 @@ class LinkedList extends React.Component<Props, State>{
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
 				undo: this.handleUndo,
-				redo: this.handleRedo,
+        redo: this.handleRedo,
+        rewind: this.handleRewind,
+        forward: this.handleForward,
+        repeat: this.handleRepeat,
+        pause: this.handlePauseContinue,
         options: this.options,
         type: this.props.type,
 			}
 		});
   }
 
+  componentWillUnmount() {
+		this.props.dispatch({
+			type: actions.ANIMATION_END,
+		});
+		clearTimeout(this.animationTimeout);
+		this._isMounted = false;
+		let nodes = this.cy.nodes();
+		nodes.forEach((node: CytoscapeElement) => {
+			this.removeNode(node.id());
+		});
+  }
+  
   layoutProcessing(){
     const n = this.list.length();
     if(n === 0) return;
@@ -402,20 +422,60 @@ class LinkedList extends React.Component<Props, State>{
     });
   }
   
-  loadGraph(elements: Array<Object>) {
-		const nodes = this.cy.nodes();
+  handleRewind = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.max(this.step-1, 0);
+		this.loadGraph(this.buffer[this.step].elements, true);
+	}
+
+	handleForward = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.min(this.step+1, this.buffer.length-1);
+		this.loadGraph(this.buffer[this.step].elements, true);
+	}
+
+	handleRepeat = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = 0;
+		this.loadGraph(this.buffer[0].elements);
+	}
+
+	handlePauseContinue = () => {
+		if(!this.props.paused){
+			clearTimeout(this.animationTimeout);
+			this.props.dispatch({
+				type: actions.ANIMATION_PAUSE,
+			})
+		}else{
+			new Promise(resolve => {
+				this.props.dispatch({
+					type: actions.ANIMATION_CONTINUE
+				})
+				resolve();
+			}).then(() => this.animation());
+		}
+	}
+	
+  loadGraph(elements: Array<Object>, keep=false) {
+    const nodes = this.cy.nodes();
+    const positions:{[id:string]:{x:number,y:number}} = {};
 		nodes.forEach((node: CytoscapeElement) => {
+      if(keep) positions[node.id()] = JSON.parse(JSON.stringify(node.data('position')));
 			this.cy.remove(node);
 		})
 
 		for (let i = 0; i < elements.length; i++) {
-			this.cy.add(elements[i]);
+			this.cy.add(JSON.parse(JSON.stringify(elements[i])));
 		}
 
 		this.cy.nodes().forEach((node: CytoscapeElement) => {
 			const style = node.data('style');
 			if (style != null) node.style(style);
-			const position = node.data('position');
+      const position = node.data('position');
+      if(keep && positions[node.id()]) node.position({x:positions[node.id()].x, y:positions[node.id()].y});
 			//console.log("PREV", node.position());
 			//console.log("NEXT", position);
 			if (position != null) {
@@ -428,9 +488,8 @@ class LinkedList extends React.Component<Props, State>{
 			if (style != null) edge.style(style);
 		})
 
-		this.refreshLayout();
+    this.refreshLayout();
 	}
-
   exportGraph(){
 		const elements:Array<Object> = [];
 		this.cy.nodes().forEach((node:CytoscapeElement) => {
@@ -463,15 +522,16 @@ class LinkedList extends React.Component<Props, State>{
 		return elements;
   }
   
-  animation(start:number=0){
-    let pos = start;
-    console.log(this.props.animation);
+  animation(){
 		let step = () => {
 			if(!this._isMounted) return;
-			if(pos === this.buffer.length){
+			if(this.step === this.buffer.length){
 				this.props.dispatch({
 					type: actions.FINISHED_ALGORITHM_SUCCESS,
-				});
+        });
+        this.props.dispatch({
+          type: actions.ANIMATION_PAUSE,
+        });
 				return;
 			}
 			if (!this.props.animation) {
@@ -483,138 +543,14 @@ class LinkedList extends React.Component<Props, State>{
 				this.cy.autolock(false);
 				return;
 			}
-			const {elements, lines, duration} = this.buffer[pos++];
+      const {elements, lines, duration} = this.buffer[this.step++];
+      if(this.props.paused) return;
 			this.loadGraph(elements);
 			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 			//this.refreshLayout();
-			setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 		}
 		step();
-  }
-  
-  executeAnimation = (commands: Array<AnimationStep>) => {
-		this.cy.nodes().style({
-			'background-color': 'white',
-			'color': 'black',
-		});
-
-		let animation = () => {
-			let pos = 0;
-			let step = () => {
-				if(!this._isMounted) return;
-				if(pos === commands.length){
-          this.props.dispatch({
-						type: actions.ANIMATION_END,
-					});
-					return;
-				}
-				if (!this.props.animation) {
-					this.cy.nodes().style(this.nodeStyle);
-					this.cy.edges().style(this.edgeStyle);
-					this.props.dispatch({
-						type: actions.ANIMATION_END,
-					});
-					return;
-				}
-				let { eles, style, duration, inst, lines} = commands[pos++];
-				if (eles) {
-					eles.forEach((ele, index) => {
-						if(style) this.cy.getElementById(ele).style(style[index]);
-					});
-        }
-        
-				if(inst){
-					inst.forEach(ele => {
-            if(ele.data == null) return;
-            const {id, value, source, target} = ele.data;
-
-						if(ele.name === 'remove'){
-              if(id !== undefined) this.removeNode(id);
-              if(source != null && target != null) this.addEdge(source, target);
-              if(value !== undefined) this.list._data.splice(value, 1);
-						}else if(ele.name === 'add'){
-              if(id !== undefined && value !== undefined){
-                this.addNode(id, value);
-                this.list._data.push({id, value});
-                if(source !== undefined) this.addEdge(source, id);
-                if(target !== undefined) this.addEdge(id, target);
-              }
-            }else if(ele.name === 'push_back'){
-              if(id != null && value != null){
-                const n = this.list.length();
-                this.addNode(id, value, {x: this.cy.width()/2 + n*35, y: this.cy.height()/4 - 70});
-                this.list._data.push({id, value});
-                if(source != null) this.addEdge(source, id);
-              }
-            }else if(ele.name === 'push_front'){
-              if(id != null && value != null){
-                this.addNode(id, value, {x: this.cy.width()/2 - this.list.length()*35, y: this.cy.height()/4 - 70});
-                this.list._data.unshift({id, value});
-                if(target != null) this.addEdge(id, target);
-              }
-            }else if(ele.name === 'pop_front'){
-              if(id != null){
-                this.removeNode(id);
-                this.list._data.shift();
-              }
-            }else if(ele.name === 'pop_back'){
-              if(id != null){
-                this.removeNode(id);
-                this.list._data.pop();
-              }
-            }else if(ele.name === 'add_node_before'){
-              let {id, value, pos} = ele.data;
-              if(id != null && value != null && pos != null){
-                const x = this.cy.width()/2 - (this.list.length()-1)*(35) + 70*pos;
-                this.addNode(id, value, {x, y: this.cy.height()/4 - 70});
-                if(pos === 0) this.list._data.unshift({id, value});
-                else{
-
-                  let rest = this.list._data.splice(pos);
-                  this.list._data.push({id, value});
-                  this.list._data = this.list._data.concat(...rest);
-                }
-              }
-            }else if(ele.name === 'add_node'){
-              let {id, value, pos} = ele.data;
-              if(id != null && value != null && pos != null){
-                const x = this.cy.width()/2 - (this.list.length()-1)*(35) + 70*pos;
-                this.addNode(id, value, {x, y: this.cy.height()/4 - 70});
-                pos++;
-                if(pos === this.list.length()) this.list._data.push({id, value});
-                else{
-                  let rest = this.list._data.splice(pos);
-                  this.list._data.push({id, value});
-                  this.list._data = this.list._data.concat(...rest);
-                }
-              }
-            }else if(ele.name === 'add_edge'){
-              let {source, target} = ele.data;
-              if(source && target){
-                console.log('ADD', source, target);
-                this.addEdge(source, target);
-              }
-            }else if(ele.name === 'remove_edge'){
-              let {source, target} = ele.data;
-              if(source && target){
-                this.removeEdge(source+'-'+target);
-                if(this.doublyLinked) this.removeEdge(target+'-'+source);
-              }
-            }
-					});
-				}
-				if(lines != null && this._isMounted){
-					this.props.dispatch({
-						type: actions.CHANGE_LINE,
-						payload: {lines}
-					})
-				}
-        this.refreshLayout();
-				setTimeout(step, ((duration === undefined) ? 500 : duration)/(this.props.speed));
-			}
-			step();
-    }
-		animation();
   }
   
   removeNode = (node: string) => {
@@ -661,6 +597,7 @@ class LinkedList extends React.Component<Props, State>{
       return;
     }
 
+    this.step = 0;
     this.pushState();
 
     this.props.dispatch({
@@ -669,28 +606,13 @@ class LinkedList extends React.Component<Props, State>{
         pseudo: this.props.pseudoset.pushFront,
       }
     });
-    /*
-    let id = 0;
-    while(this.cy.getElementById(id.toString()).length > 0) id++;
-    
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
-      this.props.dispatch({
-				type: actions.ANIMATION_START,
-      });
-      const commands = this.list.push_front({id: id.toString(), value});
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      this.executeAnimation(commands);
-    })
-    */
     this.buffer = this.ListProcessor.pushFront(value);
     new Promise((resolve, reject) => {
       this.props.dispatch({
         type: actions.ANIMATION_START,
       });
       resolve();
-    }).then(() => this.animation(0));
-    //this.animation(0);
+    }).then(() => this.animation());
   }
 
 
@@ -710,29 +632,15 @@ class LinkedList extends React.Component<Props, State>{
       }
     });
 
+    this.step = 0;
     this.pushState();
-    /*
-    let id = 0;
-    while(this.cy.getElementById(id.toString()).length > 0) id++;
-    
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
-      this.props.dispatch({
-				type: actions.ANIMATION_START,
-      });
-      const commands = this.list.push_back({id: id.toString(), value}, slow);
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      this.executeAnimation(commands);
-    })
-    */
     this.buffer = this.ListProcessor.pushBack(value, slow);
     new Promise((resolve, reject) => {
       this.props.dispatch({
         type: actions.ANIMATION_START,
       });
       resolve();
-    }).then(() => this.animation(0));
-    //this.refreshLayout();
+    }).then(() => this.animation());
   }
 
   
@@ -744,14 +652,6 @@ class LinkedList extends React.Component<Props, State>{
       return;
     }
 
-    /*
-    if(this.list.length() === 0){
-      this.props.dispatch({
-        type: actions.EMPTY_LIST_WARNING,
-      });
-      return;
-    }
-    */
     this.props.dispatch({
       type: actions.CHANGE_PSEUDO,
       payload: {
@@ -759,25 +659,27 @@ class LinkedList extends React.Component<Props, State>{
       }
     });
 
-    this.pushState();
-    /*
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
+    if(this.ListProcessor.list.length() === 0){
       this.props.dispatch({
-				type: actions.ANIMATION_START,
+        type: actions.CHANGE_LINE,
+        payload: { lines: [1] }
       });
-      const commands = this.list.pop_front();
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      this.executeAnimation(commands);
-    })
-    */
+      this.props.dispatch({
+        type: actions.EMPTY_LIST_WARNING,
+      });
+      return;
+    }
+
+    this.step = 0;
+    this.pushState();
+
     this.buffer = this.ListProcessor.popFront();
     new Promise((resolve, reject) => {
       this.props.dispatch({
         type: actions.ANIMATION_START,
       });
       resolve();
-    }).then(() => this.animation(0));
+    }).then(() => this.animation());
   }
 
   popBack(slow:boolean=false){
@@ -788,14 +690,6 @@ class LinkedList extends React.Component<Props, State>{
       return;
     }
 
-    /*
-    if(this.list.length() === 0){
-      this.props.dispatch({
-        type: actions.EMPTY_LIST_WARNING,
-      });
-      return;
-    }
-    */
     this.props.dispatch({
       type: actions.CHANGE_PSEUDO,
       payload: {
@@ -803,26 +697,23 @@ class LinkedList extends React.Component<Props, State>{
       }
     });
 
-    this.pushState();
-    
-    /*
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
+    if(this.ListProcessor.list.length() === 0){
       this.props.dispatch({
-				type: actions.ANIMATION_START,
+        type: actions.EMPTY_LIST_WARNING,
       });
-      const commands = this.list.pop_back(slow);
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      this.executeAnimation(commands);
-    })
-    */
+      return;
+    }
+
+    this.step = 0;
+    this.pushState();
+
     this.buffer = this.ListProcessor.popBack(slow);
     new Promise((resolve, reject) => {
       this.props.dispatch({
         type: actions.ANIMATION_START,
       });
       resolve();
-    }).then(() => this.animation(0));
+    }).then(() => this.animation());
   }
 
   remove(slow = false){
@@ -850,27 +741,18 @@ class LinkedList extends React.Component<Props, State>{
       }
     });
     
+    this.step = 0;
     this.pushState();
 
     const nodeId = selection.id;
-    /*
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
-      this.props.dispatch({
-				type: actions.ANIMATION_START,
-      });
-      const commands = this.list.delete_position(nodeId, slow);
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      this.executeAnimation(commands);
-    })
-    */
-   this.buffer = this.ListProcessor.remove(slow, nodeId);
-   new Promise((resolve, reject) => {
-      this.props.dispatch({
-        type: actions.ANIMATION_START,
-      });
-      resolve();
-    }).then(() => this.animation(0));
+
+    this.buffer = this.ListProcessor.remove(slow, nodeId);
+    new Promise((resolve, reject) => {
+        this.props.dispatch({
+          type: actions.ANIMATION_START,
+        });
+        resolve();
+      }).then(() => this.animation());
   }
 
   insert(value:number = 0, where:string, slow = false){
@@ -896,32 +778,17 @@ class LinkedList extends React.Component<Props, State>{
       }
     });
 
+    this.step = 0;
     this.pushState();
     const nodeId = selection.id;
 
-    /*
-    let id = 0;
-    while(this.cy.getElementById(id.toString()).length > 0) id++;
-
-    new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
-      this.props.dispatch({
-				type: actions.ANIMATION_START,
-      });
-      let commands;
-      if(where === 'before') commands = this.list.insert_before(nodeId, id.toString(), value, slow);
-      else commands = this.list.insert_after(nodeId, id.toString(), value, slow);
-      resolve(commands);
-    }).then((commands: Array<AnimationStep>) => {
-      this.executeAnimation(commands);
-    })
-    */
     this.buffer = this.ListProcessor.insert(value, where, slow, nodeId);
     new Promise((resolve, reject) => {
       this.props.dispatch({
         type: actions.ANIMATION_START,
       });
       resolve();
-    }).then(() => this.animation(0));
+    }).then(() => this.animation());
   }
   render(){
     return(

@@ -38,18 +38,21 @@ let layoutOptions: options = {
 type storeState = {
 	animation: string,
 	speed: number,
+	paused: boolean,
 }
 
 type Props = {
   action: string,
   animation: boolean,
   speed: number,
-  dispatch: (action: Object) => Object,
+	dispatch: (action: Object) => Object,
+	paused: boolean,
 }
 const mapStateToProps = (state: storeState) => {
   return {
     animation: state.animation,
-    speed: state.speed,
+		speed: state.speed,
+		paused: state.paused,
   }
 }
 
@@ -77,6 +80,8 @@ class MergeSort extends React.Component<Props, State> {
 	undo:Array<stackState> = [];
 	redo:Array<stackState> = [];
 
+	step = 0;
+	animationTimeout = 0;
 	constructor(props:Props){
     super(props);
 		this._mediaRecorder = new MediaRecorder(props.dispatch);
@@ -107,6 +112,10 @@ class MergeSort extends React.Component<Props, State> {
 				options: this.options,
 				undo: this.handleUndo,
 				redo: this.handleRedo,
+				rewind: this.handleRewind,
+				forward: this.handleForward,
+				pause: this.handlePauseContinue,
+				repeat: this.handleRepeat,
 			}
     })
 	}
@@ -130,21 +139,13 @@ class MergeSort extends React.Component<Props, State> {
 		}
 	}
 	
-	componentWillUnmount(){
-    this.props.dispatch({
-      type: actions.ANIMATION_END,
-    });
-    
-    this._isMounted = false;
-		let nodes = this.cy.nodes();
-		nodes.forEach((node: CytoscapeElement) => {
-			let id = node.id();
-			let popper = document.getElementById(id + 'popper');
-			if (popper) {
-				document.body.removeChild(popper);
-			}
+	componentWillUnmount() {
+		this.props.dispatch({
+			type: actions.ANIMATION_END,
 		});
-	}
+		clearTimeout(this.animationTimeout);
+		this._isMounted = false;
+  }
 	
 	initialize(elements: Array<Object>){
 		this.cy = cytoscape({
@@ -215,6 +216,43 @@ class MergeSort extends React.Component<Props, State> {
 		this.undo.push([...this.state.values]);
 	}
 
+	handleRewind = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.max(this.step-1, 0);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
+
+	handleForward = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.min(this.step+1, this.buffer.length-1);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
+
+	handleRepeat = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = 0;
+		this.loadGraph(this.buffer[0].elements);
+	}
+
+	handlePauseContinue = () => {
+		if(!this.props.paused){
+			clearTimeout(this.animationTimeout);
+			this.props.dispatch({
+				type: actions.ANIMATION_PAUSE,
+			})
+		}else{
+			new Promise(resolve => {
+				this.props.dispatch({
+					type: actions.ANIMATION_CONTINUE
+				})
+				resolve();
+			}).then(() => this.animation());
+		}
+	}
+	
 	loadGraph(elements:Array<Object>){
 		const nodes = this.cy.nodes();
 		nodes.forEach((node:CytoscapeElement) => {
@@ -305,25 +343,32 @@ class MergeSort extends React.Component<Props, State> {
 		});
 		layoutOptions.positions[id] = position;
 	}
-  animation(start=0){
-		let pos = start;
+
+  animation(){
 		let step = () => {
-			if (pos === this.buffer.length) {
+			console.log(this.props.paused);
+			if (this.step === this.buffer.length) {
 				
 				this.props.dispatch({
 					type: actions.ARRAY_SORTED_SUCCESS,
 				});
+
+				this.props.dispatch({
+					type: actions.ANIMATION_PAUSE,
+				});
+
 				return;
 			}
 			if(!this.props.animation){
 				this.cy.nodes().style(this.nodeStyle);
 				return;
 			}
-			const {elements, lines, duration} = this.buffer[pos++];
+			const {elements, lines, duration} = this.buffer[this.step++];
+			if(this.props.paused) return;
 			this.loadGraph(elements);
 			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 			console.log(duration);
-			setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 		}
 		step();
 	}
@@ -337,8 +382,8 @@ class MergeSort extends React.Component<Props, State> {
 		this.props.dispatch({
 			type: actions.STARTING_BUBBLESORT_INFO,
 		});
-
-		this.animation(0);
+		this.step = 0;
+		this.animation();
   }
 
 	valuesToGraph(){

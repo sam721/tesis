@@ -9,10 +9,23 @@ const animationReducer = (state = {}, action) => {
         animation: true,
       }
 
+    case actions.ANIMATION_PAUSE:
+      return {
+        ...state,
+        paused: true,
+      }
+
+    case actions.ANIMATION_CONTINUE:
+      return {
+        ...state,
+        paused: false,
+      }
+
     case actions.ANIMATION_END:
       return {
         ...state,
         animation: false,
+        paused: false,
         lines: null,
       }
 

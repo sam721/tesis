@@ -82,7 +82,7 @@ class ListProcessor{
       const {id} = this.list._data[i];
       const node = this.cy.getElementById(id);
       const prevPosition = node.data('position');
-      node.data('prevPosition', prevPosition);
+      node.data('prevPosition', {x: prevPosition.x, y: prevPosition.y});
       node.data('position', { x: mid - (n-1)*(35) + 70*i, y: this.vh/4 });
     }
   }
@@ -122,7 +122,7 @@ class ListProcessor{
     });
   }
   
-  pushStep(lines: Array<number>, duration: number){
+  pushStep(lines: Array<number> = [], duration: number = 0){
     this.buffer.push({
       elements: this.exportGraph(),
       lines,
@@ -253,6 +253,8 @@ class ListProcessor{
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     const commands = this.list.push_front({id: id.toString(), value});
     this.processCommands(commands);
+    this.layoutProcessing();
+    this.pushStep();
     //console.log(this.buffer);
     return this.buffer;
   }
@@ -271,6 +273,8 @@ class ListProcessor{
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     const commands = this.list.push_back({id: id.toString(), value}, slow);
     this.processCommands(commands);
+    this.layoutProcessing();
+    this.pushStep();
     return this.buffer;
   }
 
@@ -285,6 +289,8 @@ class ListProcessor{
     */
     const commands = this.list.pop_front();
     this.processCommands(commands);
+    this.layoutProcessing();
+    this.pushStep();
     return this.buffer;
   }
 
@@ -299,6 +305,8 @@ class ListProcessor{
     */
     const commands = this.list.pop_back(slow);
     this.processCommands(commands);
+    this.layoutProcessing();
+    this.pushStep();
     return this.buffer;
   }
 
@@ -319,6 +327,8 @@ class ListProcessor{
     if(where === 'before') commands = this.list.insert_before(nodeId, id.toString(), value, slow);
     else commands = this.list.insert_after(nodeId, id.toString(), value, slow);
     this.processCommands(commands);
+    this.layoutProcessing();
+    this.pushStep();
     return this.buffer;
   }
 
@@ -334,6 +344,8 @@ class ListProcessor{
     */
     const commands = this.list.delete_position(nodeId, slow);  
     this.processCommands(commands);
+    this.layoutProcessing();
+    this.pushStep();
     return this.buffer;
   }
 }

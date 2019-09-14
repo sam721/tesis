@@ -3,8 +3,6 @@ import animationReducer from './animationReducer';
 import canvasReducer from './canvasReducer';
 import selectionReducer from './selectionReducer';
 import notificationsReducer from './notificationsReducer';
-import { number } from 'prop-types';
-
 const initialState = {
   algorithm: 'none',
   selection: null,
@@ -20,18 +18,25 @@ const initialState = {
   gif: () => {},
   gifLength: 0,
   showPseudo: true,
+  paused: false,
 
   undo: () => {},
   redo: () => {},
+  rewind: () => {},
+  forward: () => {},
+  repeat: () => {},
+  pause: () => {},
 };
 
 
 const reducer = (state = initialState, action) => {
   let finalState = state;
+
   finalState = algorithmReducer(finalState, action);
   finalState = animationReducer(finalState, action);
   finalState = canvasReducer(finalState, action);
   finalState = selectionReducer(finalState, action);
+  
   notificationsReducer(action);
   return finalState;
 }

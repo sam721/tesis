@@ -36,6 +36,7 @@ type Props = {
 
 	loadingGraph: Boolean,
 	data: string,
+	paused: boolean,
 }
 
 type Element = {
@@ -50,6 +51,7 @@ type storeState = {
 	speed: number,
 	loadingGraph: Boolean,
 	data: string,
+	paused: boolean,
 }
 
 type State = {
@@ -70,6 +72,7 @@ const mapStateToProps = (state: storeState) => {
 		speed: state.speed,
 		loadingGraph: state.loadingGraph,
 		data: state.data,
+		paused: state.paused,
 	}
 }
 
@@ -100,6 +103,9 @@ class Graph extends React.Component<Props, State>{
 	cy = cytoscape();
 
 	buffer: Array<{elements: Array<Object>, lines: Array<number>, duration: number}> = [];
+
+	step:number=0;
+	animationTimeout = 0;
 	constructor(props: Props) {
 		super(props);
 		if (this.props.weighted) {
@@ -137,6 +143,73 @@ class Graph extends React.Component<Props, State>{
 			}
 		];
 	}
+
+	componentDidMount() {
+		this._isMounted = true;
+		this.initialize([]);
+		this.props.dispatch({
+			type: this.props.action,
+			payload:{
+				run: this.runButton,
+				photo: () => this._mediaRecorder.takePicture(this.cy),
+				gif: () => this._mediaRecorder.takeGif(this.cy),
+				undo: this.handleUndo,
+				redo: this.handleRedo,
+				options: this.options,
+				rewind: this.handleRewind,
+				forward: this.handleForward,
+				pause: this.handlePauseContinue,
+				repeat: this.handleRepeat,
+			}
+		});
+		if(this.props.action === actions.SELECT_DIJKSTRA){
+			this.props.dispatch({
+				type: actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING,
+			});
+		}
+	}
+
+	componentDidUpdate(prevProps:Props){
+		if(!prevProps.loadingGraph && this.props.loadingGraph){
+			const elements = JSON.parse(this.props.data);
+			if(elements){
+				this.pushState();
+				this.loadGraph(elements);
+			}
+			this.props.dispatch({
+				type: actions.FINISHED_LOAD,
+			});
+		}
+		if(!prevProps.animation && this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: {
+					options: [
+						{ name: 'Volver a edicion', run: this.runButton}
+					]
+				}
+			})
+		}else if(prevProps.animation && !this.props.animation){
+			this.props.dispatch({
+				type: actions.CHANGE_OPTIONS,
+				payload: {
+					options: this.options,
+				}
+			});
+		}
+	}
+	
+	componentWillUnmount() {
+		this.props.dispatch({
+			type: actions.ANIMATION_END,
+		});
+		
+		this._isMounted = false;
+		clearTimeout(this.animationTimeout);
+		this._mediaRecorder.cancelGif();
+		this.removePoppers();
+	}
+
 
 	initialize(elements: Array<Object>, withPoppers:boolean=false){
 		console.log(elements);
@@ -244,6 +317,43 @@ class Graph extends React.Component<Props, State>{
 		if(elements !== undefined) this.loadGraph(elements);
 	}
 
+	handleRewind = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.max(this.step-1, 0);
+		this.loadGraph(this.buffer[this.step].elements, true);
+	}
+
+	handleForward = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.min(this.step+1, this.buffer.length-1);
+		this.loadGraph(this.buffer[this.step].elements, true);
+	}
+
+	handleRepeat = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = 0;
+		this.loadGraph(this.buffer[0].elements, true);
+	}
+
+	handlePauseContinue = () => {
+		if(!this.props.paused){
+			clearTimeout(this.animationTimeout);
+			this.props.dispatch({
+				type: actions.ANIMATION_PAUSE,
+			})
+		}else{
+			new Promise(resolve => {
+				this.props.dispatch({
+					type: actions.ANIMATION_CONTINUE
+				})
+				resolve();
+			}).then(() => this.animation());
+		}
+	}
+	
 	loadGraph(elements:Array<Object>, withPoppers:boolean = false){
 		const nodes = this.cy.nodes();
 		for(let i = 0; i < nodes.length; i++){
@@ -310,67 +420,7 @@ class Graph extends React.Component<Props, State>{
 		this.undo.push(this.exportGraph());
 	}
 
-	componentDidMount() {
-		this._isMounted = true;
-		this.initialize([]);
-		this.props.dispatch({
-			type: this.props.action,
-			payload:{
-				run: this.runButton,
-				photo: () => this._mediaRecorder.takePicture(this.cy),
-				gif: () => this._mediaRecorder.takeGif(this.cy),
-				undo: this.handleUndo,
-				redo: this.handleRedo,
-				options: this.options,
-			}
-		});
-		if(this.props.action === actions.SELECT_DIJKSTRA){
-			this.props.dispatch({
-				type: actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING,
-			});
-		}
-	}
-
-	componentDidUpdate(prevProps:Props){
-		if(!prevProps.loadingGraph && this.props.loadingGraph){
-			const elements = JSON.parse(this.props.data);
-			if(elements){
-				this.pushState();
-				this.loadGraph(elements);
-			}
-			this.props.dispatch({
-				type: actions.FINISHED_LOAD,
-			});
-		}
-		if(!prevProps.animation && this.props.animation){
-			this.props.dispatch({
-				type: actions.CHANGE_OPTIONS,
-				payload: {
-					options: [
-						{ name: 'Volver a edicion', run: this.runButton}
-					]
-				}
-			})
-		}else if(prevProps.animation && !this.props.animation){
-			this.props.dispatch({
-				type: actions.CHANGE_OPTIONS,
-				payload: {
-					options: this.options,
-				}
-			});
-		}
-	}
 	
-	componentWillUnmount() {
-		this.props.dispatch({
-			type: actions.ANIMATION_END,
-		});
-		
-		this._isMounted = false;
-		this._mediaRecorder.cancelGif();
-		this.removePoppers();
-	}
-
 	refreshLayout() {
 		this.layout.stop();
 		this.layout = this.cy.elements().makeLayout({ name: 'preset' });
@@ -408,13 +458,15 @@ class Graph extends React.Component<Props, State>{
 		this.cy.remove('edge[id="' + edge + '"]');
 	}
 
-	animation(start:number=0){
-		let pos = 0;
+	animation(){
 		let step = () => {
 			if(!this._isMounted) return;
-			if(pos === this.buffer.length){
+			if(this.step === this.buffer.length){
 				this.props.dispatch({
 					type: actions.FINISHED_ALGORITHM_SUCCESS,
+				});
+				this.props.dispatch({
+					type: actions.ANIMATION_PAUSE,
 				});
 				return;
 			}
@@ -427,11 +479,12 @@ class Graph extends React.Component<Props, State>{
 				this.cy.autolock(false);
 				return;
 			}
-			const {elements, lines, duration} = this.buffer[pos++];
+			if(this.props.paused) return;
+			const {elements, lines, duration} = this.buffer[this.step++];
 			this.loadGraph(elements, true);
 			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 			this.refreshLayout();
-			setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 		}
 		step();
 	}
@@ -450,7 +503,8 @@ class Graph extends React.Component<Props, State>{
 		this.props.dispatch({
 			type: notification,
 		});
-		this.animation(0);
+		this.step = 0;
+		this.animation();
 	}
 
 	runButton = () => {

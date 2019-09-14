@@ -17,13 +17,15 @@ const { connect } = require('react-redux');
 type storeState = {
 	animation: string,
 	speed: number,
+	paused: boolean,
 }
 
 type Props = {
 	action: string,
   animation: boolean,
   speed: number,
-  dispatch: (action: Object) => Object,
+	dispatch: (action: Object) => Object,
+	paused: boolean,
 }
 
 type stackState = Array<number>;
@@ -37,7 +39,8 @@ type State = {
 const mapStateToProps = (state: storeState) => {
   return {
     animation: state.animation,
-    speed: state.speed,
+		speed: state.speed,
+		paused: state.paused,
   }
 }
 
@@ -65,6 +68,8 @@ class BinarySearch extends React.Component<Props, State> {
 	nodeStyle = Styles.NODE;
 	options:Array<{name: string, run: () => void}>;
 	buffer: Array<{elements: Array<Object>, lines: Array<number>, duration: number}> = [];
+	animationTimeout = 0;
+	step = 0;
 	constructor(props:Props){
     super(props);
 		this._mediaRecorder = new MediaRecorder(props.dispatch);
@@ -93,6 +98,10 @@ class BinarySearch extends React.Component<Props, State> {
 				options: this.options,
 				undo: this.handleUndo,
 				redo: this.handleRedo,
+				rewind: this.handleRewind,
+				forward: this.handleForward,
+				pause: this.handlePauseContinue,
+				repeat: this.handleRepeat,
 			}
     })
 		
@@ -124,7 +133,8 @@ class BinarySearch extends React.Component<Props, State> {
       type: actions.ANIMATION_END,
     });
     
-    this._isMounted = false;
+		this._isMounted = false;
+		clearTimeout(this.animationTimeout);
 		let nodes = this.cy.nodes();
 		nodes.forEach((node: CytoscapeElement) => {
 			let id = node.id();
@@ -163,6 +173,43 @@ class BinarySearch extends React.Component<Props, State> {
 		if(prevValues) this.changeArray(prevValues);
 	}
 
+	handleRewind = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.max(this.step-1, 0);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
+
+	handleForward = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.min(this.step+1, this.buffer.length-1);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
+
+	handleRepeat = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = 0;
+		this.loadGraph(this.buffer[0].elements);
+	}
+
+	handlePauseContinue = () => {
+		if(!this.props.paused){
+			clearTimeout(this.animationTimeout);
+			this.props.dispatch({
+				type: actions.ANIMATION_PAUSE,
+			})
+		}else{
+			new Promise(resolve => {
+				this.props.dispatch({
+					type: actions.ANIMATION_CONTINUE
+				})
+				resolve();
+			}).then(() => this.animation());
+		}
+	}
+	
 	pushState(){
 		this.redo = [];
 		this.undo.push([...this.state.values]);
@@ -235,13 +282,16 @@ class BinarySearch extends React.Component<Props, State> {
 		});
   }
 	
-	animation(start=0, found=false){
-		let pos = start;
+	animation(found=false){
 		let step = () => {
-			if (pos === this.buffer.length) {
+			if (this.step === this.buffer.length) {
 				
 				this.props.dispatch({
 					type: found ? actions.BINARY_SEARCH_FOUND_SUCCESS : actions.BINARY_SEARCH_NOT_FOUND_INFO,
+				});
+
+				this.props.dispatch({
+					type: actions.ANIMATION_PAUSE,
 				});
 				return;
 			}
@@ -249,11 +299,12 @@ class BinarySearch extends React.Component<Props, State> {
 				this.cy.nodes().style(this.nodeStyle);
 				return;
 			}
-			const {elements, lines, duration} = this.buffer[pos++];
+			if(this.props.paused) return;
+			const {elements, lines, duration} = this.buffer[this.step++];
 			this.loadGraph(elements);
 			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 			this.refreshLayout();
-			setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 		}
 		step();
 	}
@@ -266,8 +317,8 @@ class BinarySearch extends React.Component<Props, State> {
 		this.props.dispatch({
 			type: actions.STARTING_BINARY_SEARCH_INFO,
 		});
-
-		this.animation(0);
+		this.step = 0;
+		this.animation();
   }
 
 	valuesToGraph(){

@@ -27,24 +27,24 @@ const algoDict:({[name: string]: string})= {
 
 type Props = {
   algorithm: string,
+  animation: boolean,
   run: () => void,
   options: Array<{name: string, run: () => void}>,
   dispatch: (action: Object) => void,
   undo: () => void,
   redo: () => void,
+  rewind: () => void,
+  forward: () => void,
+  pause: () => void,
+  repeat: () => void,
+  paused: boolean,
 }
 
 type State = {
   showActions: boolean,
 }
 const mapStateToProps = (state:Props) => {
-  return {
-    algorithm: state.algorithm,
-    run: state.run,
-    options: state.options,
-    undo: state.undo,
-    redo: state.redo,
-  }
+  return {...state}
 }
 
 class Footer extends React.Component<Props, State>{
@@ -53,6 +53,42 @@ class Footer extends React.Component<Props, State>{
   }
   render(){
     console.log(this.props.algorithm);
+    const {animation, paused} = this.props;
+    let control;
+    if(!this.props.animation){ 
+      control = 
+        <>
+          <Col md={1}>
+            <button className='dropdown-button' onClick={this.props.undo}>Deshacer</button>
+          </Col>
+          <Col md={1}>
+            <button className='dropdown-button' onClick={this.props.redo}>Rehacer</button>
+          </Col>
+          <Col md={{span: 2, offset:1}}>
+            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
+          </Col>
+        </>
+    }else{
+      control = 
+        <>
+          <Col md={1}>
+            <button className='dropdown-button' onClick={this.props.pause}>Pausa/Continuar</button>
+          </Col>
+          <Col md={1}>
+            <button className='dropdown-button'  onClick={this.props.repeat}>Repetir</button>
+          </Col>
+          <Col md={1}>
+            <button className='dropdown-button'  onClick={this.props.rewind}>Retroceder</button>
+          </Col>
+          <Col md={1}>
+            <button className='dropdown-button'  onClick={this.props.forward}>Avanzar</button>
+          </Col>
+          <Col md={{span: 2, offset:1}}>
+            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
+          </Col>
+        </>
+    }
+    
     return(
       <div className='footer'>
         {this.props.algorithm !== 'none' && 
@@ -72,15 +108,7 @@ class Footer extends React.Component<Props, State>{
               <span>Velocidad</span>
               <SpeedBar/>
             </Col>
-            <Col md={1}>
-              <button className='dropdown-button' onClick={this.props.undo}>Deshacer</button>
-            </Col>
-            <Col md={1}>
-              <button className='dropdown-button' onClick={this.props.redo}>Rehacer</button>
-            </Col>
-            <Col md={{span: 2, offset:4}}>
-              <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
-            </Col>
+           {control}
           </Row>
         }
       </div>

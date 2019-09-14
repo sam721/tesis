@@ -37,6 +37,7 @@ let layoutOptions: options = {
 type storeState = {
 	animation: string,
 	speed: number,
+	paused: boolean,
 }
 
 type Element = {
@@ -59,11 +60,13 @@ type Props = {
 	animation: boolean,
 	speed: number,
 	dispatch: (action: Object) => Object,
+	paused: boolean,
 }
 const mapStateToProps = (state: storeState) => {
 	return {
 		animation: state.animation,
 		speed: state.speed,
+		paused: state.paused,
 	}
 }
 class Heap extends React.Component<Props, State>{
@@ -91,6 +94,10 @@ class Heap extends React.Component<Props, State>{
 	heapProcessor:any;
 	buffer: Array<{ elements: Array<Object>, lines: Array<number>, duration: number }> = [];
 	options: Array<{ name: string, run: () => void }>;
+
+	animationTimeout = 0;
+	step = 0;
+
 	constructor(props: Props) {
 		super(props);
 		this._mediaRecorder = new MediaRecorder(props.dispatch);
@@ -184,6 +191,10 @@ class Heap extends React.Component<Props, State>{
 				undo: this.handleUndo,
 				redo: this.handleRedo,
 				options: this.options,
+				rewind: this.handleRewind,
+				forward: this.handleForward,
+				repeat: this.handleRepeat,
+				pause: this.handlePauseContinue,
 			}
 		})
 	}
@@ -217,6 +228,7 @@ class Heap extends React.Component<Props, State>{
 		this.props.dispatch({
 			type: actions.ANIMATION_END,
 		});
+		clearTimeout(this.animationTimeout);
 		this._isMounted = false;
 		let nodes = this.cy.nodes();
 		nodes.forEach((node: CytoscapeElement) => {
@@ -279,6 +291,43 @@ class Heap extends React.Component<Props, State>{
 	pushState() {
 		this.redo = [];
 		this.undo.push(this.exportGraph());
+	}
+
+	handleRewind = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.max(this.step-1, 0);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
+
+	handleForward = () => { 
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = Math.min(this.step+1, this.buffer.length-1);
+		this.loadGraph(this.buffer[this.step].elements);
+	}
+
+	handleRepeat = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = 0;
+		this.loadGraph(this.buffer[0].elements);
+	}
+
+	handlePauseContinue = () => {
+		if(!this.props.paused){
+			clearTimeout(this.animationTimeout);
+			this.props.dispatch({
+				type: actions.ANIMATION_PAUSE,
+			})
+		}else{
+			new Promise(resolve => {
+				this.props.dispatch({
+					type: actions.ANIMATION_CONTINUE
+				})
+				resolve();
+			}).then(() => this.animation());
+		}
 	}
 
 	loadGraph(elements: Array<Object>) {
@@ -380,23 +429,26 @@ class Heap extends React.Component<Props, State>{
 		this.cy.remove('node[id="' + node + '-popper"]');
 	}
 
-	animation(start = 0) {
-		let pos = start;
+	animation() {
 		let step = () => {
-			if (pos === this.buffer.length) {
+			if (this.step === this.buffer.length) {
 				this.props.dispatch({
 					type: actions.FINISHED_ALGORITHM_SUCCESS,
+				});
+				this.props.dispatch({
+					type: actions.ANIMATION_PAUSE,
 				});
 				return;
 			}
 			if (!this.props.animation) {
 				return;
 			}
-			const { elements, lines, duration } = this.buffer[pos++];
+			const { elements, lines, duration } = this.buffer[this.step++];
+			if(this.props.paused) return;
 			this.loadGraph(elements);
 			if (lines) this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
 			console.log(duration);
-			setTimeout(step, ((duration === undefined) ? 1000 : duration) / (this.props.speed));
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration) / (this.props.speed));
 		}
 		step();
 	}
@@ -416,7 +468,8 @@ class Heap extends React.Component<Props, State>{
 			});
 			resolve();
 		}).then(() => {
-			this.animation(0);
+			this.step = 0;
+			this.animation();
 		})
 	}
 

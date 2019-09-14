@@ -323,7 +323,7 @@ class LinkedListSimulator {
           {
             eles: [id],
             style: [{ 'background-color': 'black', 'color': 'white'}],
-            duration: 500,
+            duration: 1000,
             lines,
           },
           {

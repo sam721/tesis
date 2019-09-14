@@ -12,154 +12,112 @@ import binarySearch from '../resources/pseudocodes/binarySearch';
 import listPseudo from '../resources/pseudocodes/list';
 import actions from '../Actions/actions'
 const algorithmReducer = (state = {}, action) => {
+  const control = (action.payload ? 
+    {
+      options: action.payload.options,
+      photo: action.payload.photo,
+      gif: action.payload.gif,
+      undo: action.payload.undo,
+      redo: action.payload.redo,
+      rewind: action.payload.rewind,
+      forward: action.payload.forward,
+      pause: action.payload.pause,
+      repeat: action.payload.repeat,
+      selection: null,
+    } : {});
+
   switch (action.type) {
     case actions.SELECT_BFS:
       return {
         ...state,
+        ...control,
         algorithm: 'BFS',
         selection: null,
         pseudo: BFS,
         run: action.payload.run,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_DFS:
       
       return {
         ...state,
+        ...control,
         algorithm: 'DFS',
-        selection: null,
         pseudo: DFS,
         run: action.payload.run,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_DIJKSTRA:
       return {
         ...state,
+        ...control,
         algorithm: 'Dijkstra',
-        selection: null,
         pseudo: dijkstra,
         run: action.payload.run,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_KRUSKAL:
       return {
         ...state,
+        ...control,
         algorithm: 'Kruskal',
-        selection: null,
         pseudo: kruskal,
         run: action.payload.run,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_PRIM:
       return {
         ...state,
+        ...control,
         algorithm: 'Prim',
-        selection: null,
-
         pseudo: prim,
         run: action.payload.run,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_HEAP:
       return {
         ...state,
+        ...control,
         algorithm: 'Heap',
-        selection: null,
-        options: action.payload.options,
         pseudo: heap,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_AVL:
       return {
         ...state,
+        ...control,
         algorithm: 'AVL',
-        selection: null,
         pseudo: avl,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_BUBBLESORT:
       return {
         ...state,
+        ...control,
         algorithm: 'BubbleSort',
-        selection: null,
-
         pseudo: bubblesort,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_MERGESORT:
       return {
         ...state,
+        ...control,
         algorithm: 'MergeSort',
-        selection: null,
         pseudo: mergesort,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_BINARY_SEARCH:
       return {
         ...state,
+        ...control,
         algorithm: 'BinarySearch',
-        selection: null,
         pseudo: binarySearch,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
       }
 
     case actions.SELECT_LINKED_LIST:
       const nextState = {
         ...state,
-        selection: null,
-        options: action.payload.options,
-        photo: action.payload.photo,
-        gif: action.payload.gif,
-        undo: action.payload.undo,
-        redo: action.payload.redo,
+        ...control,
       }
       switch(action.payload.type){
         case actions.SELECT_SINGLE_LINKED_LIST:

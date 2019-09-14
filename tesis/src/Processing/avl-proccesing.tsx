@@ -12,6 +12,7 @@ type exportStep = {
   duration: number,
   pseudo?: Array<Object>,
   treeRoot: string,
+  refresh?: boolean,
 }
 class AVLProcessor { 
 
@@ -548,7 +549,7 @@ class AVLProcessor {
       }
       anc = suc.data('prev');
       this.removeNode(suc);
-      this.buffer.push({elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
+      this.buffer.push({refresh: false, elements: this.exportGraph(), lines: [], duration: 1000, treeRoot: this.treeRoot});
       this.balance(this.cy.getElementById(anc))
     }
     this.cy.nodes().forEach((node:CytoscapeElement) => {
