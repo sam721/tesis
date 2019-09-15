@@ -37,6 +37,24 @@ const canvasReducer = (state = {}, action) => {
         gifLength: 0,
       }
   
+    case actions.START_GIF_ENCODING:
+      return {
+        ...state,
+        processingGif: true,
+      }
+
+    case actions.FINISHED_GIF_ENCODING:
+      return {
+        ...state,
+        processingGif: false,
+      }
+
+    case actions.TOGGLE_TUTORIAL_MODAL:
+      return {
+        ...state,
+        showTutorialModal: !state.showTutorialModal,
+      }
+      
     default: 
       return state;
   }

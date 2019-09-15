@@ -19,7 +19,8 @@ const initialState = {
   gifLength: 0,
   showPseudo: true,
   paused: false,
-
+  processingGif: false,
+  
   remove: null,
   clear: null,
   undo: () => {},
@@ -28,6 +29,9 @@ const initialState = {
   forward: () => {},
   repeat: () => {},
   pause: () => {},
+  end: () => {},
+
+  showTutorialModal: false,
 };
 
 

@@ -14,36 +14,48 @@ class MediaRecorder{
 
   downloadGif = (buffer, width, height) => {
     const dispatch = this._dispatch;
-    gifshot.createGIF({
-      'images': buffer,
-      'gifWidth': width,
-      'gifHeight': height,
-      'frameDuration': 1,
-      }, function(obj) {
-        if(!obj.error) {
-          const image = dataURItoBlob(obj.image);
-    
-          let link = document.createElement('a');
-          link.setAttribute('href', window.URL.createObjectURL(image));
-          link.setAttribute('download', 'test.gif');
-          link.setAttribute('target', '_blank');
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          dispatch({
-            type: actions.FINISHED_GIF_SUCCESS,
-          });
+    try{
+      gifshot.createGIF({
+        'images': buffer,
+        'gifWidth': width,
+        'gifHeight': height,
+        'frameDuration': 1,
+        }, function(obj) {
+          if(!obj.error) {
+            const image = dataURItoBlob(obj.image);
       
-        }else{
-          dispatch({
-            type: actions.FINISHED_GIF_SUCCESS,
-          });
-          
-          console.log(obj.error);
+            let link = document.createElement('a');
+            link.setAttribute('href', window.URL.createObjectURL(image));
+            link.setAttribute('download', 'test.gif');
+            link.setAttribute('target', '_blank');
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            dispatch({
+              type: actions.FINISHED_GIF_SUCCESS,
+            });
+            dispatch({
+              type: actions.FINISHED_GIF_ENCODING,
+            });
+          }else{
+            dispatch({
+              type: actions.FINISHED_GIF_SUCCESS,
+            });
+            
+            console.log(obj.error);
+          }
         }
-      }
-    );
+      );
+    }catch(error){
+      console.log(error);
+      dispatch({
+        type: actions.FINISHED_GIF_ENCODING,
+      });
+      dispatch({
+        type: actions.GIF_ENCODING_ERROR,
+      });
+    }
   }
   takePicture(cy, _this = null, download = true){
     let image = cy.jpg();
@@ -81,6 +93,7 @@ class MediaRecorder{
       clearInterval(this._interval);
       this._dispatch({type: actions.FINISHED_GIF_RECORDING_INFO});
       this._dispatch({type: actions.RESET_GIF_LENGTH});
+      this._dispatch({type: actions.START_GIF_ENCODING});
       this.downloadGif(this._gifBuffer, cy.width(), cy.height());
       this._takingGif = false;
       this._gifBuffer = [];

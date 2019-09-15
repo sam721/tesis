@@ -190,6 +190,7 @@ class Heap extends React.Component<Props, State>{
 				rewind: this.handleRewind,
 				forward: this.handleForward,
 				repeat: this.handleRepeat,
+				end: this.handleEnd,
 				pause: this.handlePauseContinue,
 				clear: this.clearGraph,
 				remove: null,
@@ -314,6 +315,15 @@ class Heap extends React.Component<Props, State>{
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = 0;
+		const {elements, lines} = this.buffer[this.step];
+		this.loadGraph(elements);
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
+	}
+
+	handleEnd = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = this.buffer.length - 1;
 		const {elements, lines} = this.buffer[this.step];
 		this.loadGraph(elements);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});

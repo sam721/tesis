@@ -1,7 +1,6 @@
 import React from 'react';
 import actions from '../Actions/actions';
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-import {defaultGraphs} from '../resources/default_examples/defaultGraphs';
 import MediaRecorder from '../utils/MediaRecorder';
 import MyModal from './UploadGraphModal';
 import InputModal from './InputModal';
@@ -152,6 +151,7 @@ class Graph extends React.Component<Props, State>{
 				forward: this.handleForward,
 				pause: this.handlePauseContinue,
 				repeat: this.handleRepeat,
+				end: this.handleEnd,
 				remove: this.removeButton,
 				clear: this.clearGraph,
 			}
@@ -341,6 +341,15 @@ class Graph extends React.Component<Props, State>{
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = 0;
+		const {elements, lines} = this.buffer[this.step];
+		this.loadGraph(elements);
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
+	}
+
+	handleEnd = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = this.buffer.length - 1;
 		const {elements, lines} = this.buffer[this.step];
 		this.loadGraph(elements);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});

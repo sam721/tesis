@@ -16,6 +16,7 @@ import BFS_table from './resources/value_tables/BFS_table';
 
 import Footer from './Components/Footer';
 import MenuBar from './Components/MenuBar';
+import FreeGraphModal from './Components/FreeGraphModal';
 
 class App extends React.Component{
   
@@ -25,17 +26,13 @@ class App extends React.Component{
         <div>
           <Container>
             <ReactNotification/>
+            <FreeGraphModal/>
             <CodeBlock/>
             <MenuBar/>
             <Row>
               <Col>
                 <Editor algorithm={this.props.algorithm} />
               </Col>
-              {/*
-                <Col xs={3}>
-                  <AlgorithmInfo algorithm={this.props.algorithm} />
-                </Col>
-              */}
             </Row>
             <Footer/>
           </Container>

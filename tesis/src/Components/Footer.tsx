@@ -6,7 +6,17 @@ import GIFControl from './GIFControl';
 import PhotoControl from './PhotoControl';
 import actions from '../Actions/actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause, faUndo, faRedo, faBackward, faForward, faTimes, faTrash} from '@fortawesome/free-solid-svg-icons'
+import { 
+  faPlay, 
+  faPause, 
+  faUndo, 
+  faRedo, 
+  faBackward, 
+  faForward, 
+  faStepBackward,
+  faStepForward,
+  faTimes, 
+  faTrash} from '@fortawesome/free-solid-svg-icons'
 const { connect } = require('react-redux');
 
 
@@ -42,6 +52,7 @@ type Props = {
   repeat: () => void,
   remove: () => void,
   clear: () => void,
+  end: () => void,
   paused: boolean,
 }
 
@@ -112,14 +123,9 @@ class Footer extends React.Component<Props, State>{
     }else{
       control = 
         [
-          <Col md={1}>
-            <button title={paused ? 'Continuar' : 'Pausa'} className='dropdown-button' onClick={this.props.pause}>
-              <FontAwesomeIcon icon={paused ? faPlay : faPause} size = "lg"/>
-            </button>
-          </Col>,
           <Col md={1} >
-            <button title='Repetir' className='dropdown-button'  onClick={this.props.repeat}>
-              <FontAwesomeIcon icon={faRedo} size = "lg"/>
+            <button title='Principio' className='dropdown-button'  onClick={this.props.repeat}>
+              <FontAwesomeIcon icon={faStepBackward} size = "lg"/>
             </button>
           </Col>,
           <Col md={1}>
@@ -128,10 +134,20 @@ class Footer extends React.Component<Props, State>{
             </ControlButton>
           </Col>,
           <Col md={1}>
+            <button title={paused ? 'Continuar' : 'Pausa'} className='dropdown-button' onClick={this.props.pause}>
+              <FontAwesomeIcon icon={paused ? faPlay : faPause} size = "lg"/>
+            </button>
+          </Col>,
+          <Col md={1}>
             <ControlButton title="Avanzar" callback={this.props.forward} delay={200}>
               <FontAwesomeIcon icon={faForward} size = "lg"/>
             </ControlButton>
           </Col>,
+          <Col md={1} >
+          <button title='Final' className='dropdown-button'  onClick={this.props.end}>
+            <FontAwesomeIcon icon={faStepForward} size = "lg"/>
+          </button>
+        </Col>,
         ]
     }
     

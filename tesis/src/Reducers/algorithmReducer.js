@@ -24,12 +24,21 @@ const algorithmReducer = (state = {}, action) => {
       forward: action.payload.forward,
       pause: action.payload.pause,
       repeat: action.payload.repeat,
+      end: action.payload.end,
       remove: action.payload.remove || null,
       clear: action.payload.clear || null,
       selection: null,
     } : {});
 
   switch (action.type) {
+    case actions.HOME:
+      return {
+        ...state,
+        algorithm: 'none',
+        selection: null,
+        pseudo: null,
+      }
+
     case actions.SELECT_BFS:
       return {
         ...state,

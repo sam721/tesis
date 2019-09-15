@@ -57,7 +57,7 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
     let { eles, distance, style, duration, inst, lines, data } = commands[pos];
 
     if(duration == null) duration = 1000;
-    if(lines == null) lines = [];
+    if(lines == null) lines = lastLines;
 
     steps.push({elements: exportGraph(cy), lines: lastLines, duration});
     lastLines = lines;

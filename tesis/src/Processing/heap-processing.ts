@@ -150,7 +150,7 @@ class HeapProcessor{
     for(let pos = 0; pos < commands.length; pos++){
       let { eles, style, duration, data, classes, lines} = commands[pos];
       if(duration == null) duration = 1000;
-      if(lines == null) lines = [];
+      if(lines == null) lines = lastLines;
 
       steps.push({elements: this.exportGraph(), lines: lastLines, duration: lastDuration});
       lastLines = lines;

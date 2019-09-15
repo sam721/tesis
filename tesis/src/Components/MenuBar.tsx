@@ -4,6 +4,7 @@ import PhotoControl from './PhotoControl';
 import GIFControl from './GIFControl';
 
 import routes from '../resources/names_and_routes/algorithm_routes';
+import actions from '../Actions/actions';
 const {connect} = require('react-redux');
 const {
 	NavLink,
@@ -13,6 +14,8 @@ const {
 type Props = {
   photo: () => void,
   gif: () => void,
+  algorithm: string,
+  dispatch: (action:Object) => void,
 }
 
 const mapStateToProps = (state:Props) => {
@@ -80,11 +83,21 @@ class MenuBar extends React.Component<Props>{
               </HashRouter>
             </div>
           </Col>
+          { 
+            this.props.algorithm !== 'none' && 
+            <>
+              <Col md={1}>
+                <PhotoControl callback={this.props.photo}/>
+              </Col>
+              <Col md={1}>
+                <GIFControl callback={this.props.gif}/>
+              </Col>
+            </>
+          }
           <Col md={1}>
-            <PhotoControl callback={this.props.photo}/>
-          </Col>
-          <Col md={1}>
-            <GIFControl callback={this.props.gif}/>
+            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_TUTORIAL_MODAL})}>
+              Tutorial
+            </button>
           </Col>
         </Row>
       </div>

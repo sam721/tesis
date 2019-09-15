@@ -76,7 +76,7 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
   for(let pos = 0; pos < commands.length; pos++){
     let {nodes, duration, lines, style, positions, shadows} = commands[pos];
     if(duration == null) duration = 1000;
-    if(lines == null) lines = [];
+    if(lines == null) lines = lastLines;
 
     steps.push({elements: exportGraph(cy), lines: lastLines, duration: lastDuration});
     lastLines = lines;

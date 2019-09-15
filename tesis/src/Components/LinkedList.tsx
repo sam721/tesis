@@ -298,6 +298,7 @@ class LinkedList extends React.Component<Props, State>{
         rewind: this.handleRewind,
         forward: this.handleForward,
         repeat: this.handleRepeat,
+        end: this.handleEnd,
         pause: this.handlePauseContinue,
         remove: () => this.remove(!this.doublyLinked),
         clear: this.clearGraph,
@@ -471,6 +472,15 @@ class LinkedList extends React.Component<Props, State>{
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
+  handleEnd = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = this.buffer.length - 1;
+		const {elements, lines} = this.buffer[this.step];
+		this.loadGraph(elements);
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
+  }
+  
 	handlePauseContinue = () => {
 		if(!this.props.paused){
 			clearTimeout(this.animationTimeout);

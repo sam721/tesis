@@ -168,6 +168,7 @@ class AVL extends React.Component<Props, State>{
         forward: this.handleForward,
         pause: this.handlePauseContinue,
         repeat: this.handleRepeat,
+        end: this.handleEnd,
         remove: () => this.setState({showRemoveModal: true}),
         clear: this.clearGraph,
       }
@@ -385,6 +386,17 @@ class AVL extends React.Component<Props, State>{
     if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
+  handleEnd = () => {
+		clearTimeout(this.animationTimeout);
+		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.step = this.buffer.length - 1;
+		const {treeRoot, elements, pseudo, lines} = this.buffer[this.step];
+    this.treeRoot = treeRoot;
+    this.loadGraph(elements, true);
+    if(pseudo) this.props.dispatch({type: actions.CHANGE_PSEUDO, payload: { pseudo }});
+    if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+	}
+	
 	handlePauseContinue = () => {
 		if(!this.props.paused){
 			clearTimeout(this.animationTimeout);

@@ -71,9 +71,15 @@ const notificationsReducer = action => {
     case actions.ANIMATION_RUNNING_ERROR:
       createNotification('Error',
       'No se pueden hacer modificaciones mientras se ejecuta el algoritmo',
-      'warning');
+      'danger');
       break;
     
+    case actions.GIF_ENCODING_ERROR:
+      createNotification('Error procesando GIF',
+      'Ha ocurrido un error y no se pudo descargar el GIF. Intente nuevamente',
+      'danger');
+      break;
+
     case actions.EMPTY_LIST_WARNING:
       createNotification('La lista se encuentra vacia',
       'No se pudo realizar la accion',
