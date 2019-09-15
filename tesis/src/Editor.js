@@ -24,6 +24,7 @@ class Editor extends React.Component {
 							<Route path={routes.BFS} render={() => <Graph {...properties.BFS} />} />
 							<Route path={routes.DFS} render={() => <Graph {...properties.DFS} />} />
 							<Route path={routes.Dijkstra} render={() => <Graph {...properties.Dijkstra} />} />
+							<Route path={routes.BellmanFord} render={() => <Graph {...properties.BellmanFord} />} />
 							<Route path={routes.Prim} render={() => <Graph {...properties.Prim} />} />
 							<Route path={routes.Kruskal} render={() => <Graph {...properties.Kruskal} />} />
 							<Route path={routes.MinHeap} render={() => <Heap {...properties.Heap} />} />

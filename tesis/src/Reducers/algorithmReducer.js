@@ -2,6 +2,7 @@ import BFS from '../resources/pseudocodes/BFS';
 import DFS from '../resources/pseudocodes/DFS';
 import dijkstra from '../resources/pseudocodes/dijkstra';
 import kruskal from '../resources/pseudocodes/kruskal';
+import bellmanFord from '../resources/pseudocodes/bellmanFord';
 import bubblesort from '../resources/pseudocodes/bubblesort';
 import mergesort from '../resources/pseudocodes/mergesort';
 import prim from '../resources/pseudocodes/prim';
@@ -55,6 +56,15 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'Dijkstra',
         pseudo: dijkstra,
+        run: action.payload.run,
+      }
+
+    case actions.SELECT_BELLMAN_FORD:
+      return {
+        ...state,
+        ...control,
+        algorithm: 'BellmanFord',
+        pseudo: bellmanFord,
         run: action.payload.run,
       }
 

@@ -14,20 +14,31 @@ class UploadGraphModal extends React.Component<Props>{
 
   uploadGraph = () => {
     const input = (document.getElementById('graphUploadInput') as HTMLInputElement);
-    if(input.files){
+    if(input.files && input.files.length > 0){
       const file = input.files[0];
       const reader = new FileReader();
       reader.onload = () => {
         const content = reader.result;
-        this.props.dispatch({
-          type: actions.LOAD_GRAPH,
-          payload: {
-            data: content,
+        if(typeof content === 'string'){
+          try{
+            JSON.parse(content);
+            this.props.dispatch({
+              type: actions.LOAD_GRAPH,
+              payload: {
+                data: content,
+              }
+            });
+          }catch(e){
+            this.props.dispatch({type: actions.INVALID_GRAPH_ERROR});
           }
-        });
+        }
       }
       reader.readAsText(file);
       this.props.handleClose();
+    }else{
+      this.props.dispatch({
+        type: actions.NO_FILE_SELECTED_INFO,
+      });
     }
   }
   render(){

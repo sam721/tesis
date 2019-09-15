@@ -25,6 +25,7 @@ class MenuBar extends React.Component<Props>{
       <NavLink to={routes.BFS}><button className='dropdown-button'>BFS</button></NavLink>,
       <NavLink to={routes.DFS}><button className='dropdown-button'>DFS</button></NavLink>,
       <NavLink to={routes.Dijkstra}><button className='dropdown-button'>Dijkstra</button></NavLink>,
+      <NavLink to={routes.BellmanFord}><button className='dropdown-button'>Bellman-Ford</button></NavLink>
     ];
     const mstAlgorithms = [
       <NavLink to={routes.Kruskal}><button className='dropdown-button'>Kruskal</button></NavLink>,

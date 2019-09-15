@@ -51,8 +51,8 @@ const notificationsReducer = action => {
       break;
 
     case actions.INVALID_GRAPH_ERROR:
-      createNotification('Error',
-      'Existe un error con el archivo, intente de nuevo con otro archivo',
+      createNotification('Error en el archivo',
+      'El archivo no representa un grafo valido',
       'danger');
       break;
     
@@ -92,6 +92,12 @@ const notificationsReducer = action => {
       'warning');
       break;
 
+    case actions.NEGATIVE_CYCLE_FOUND:
+      createNotification('El algoritmo ha encontrado un ciclo negativo',
+      'Los nodos pertenecientes al ciclo estan marcados en rojo',
+      'warning');
+      break;
+
     case actions.AVL_NOT_FOUND_INFO:
       createNotification('El elemento no fue encontrado en el arbol AVL',
       'Debe volver a la edicion para modificar el arreglo',
@@ -122,6 +128,12 @@ const notificationsReducer = action => {
       'info');
       break;
     
+    case actions.STARTING_BELLMAN_FORD_INFO:
+      createNotification('',
+      'Calculando caminos de peso minimo desde el nodo seleccionado mediante Bellman-Ford',
+      'info');
+      break;
+
     case actions.STARTING_KRUSKAL_INFO:
       createNotification('',
       'Obteniendo arbol recubridor minimo mediante el algoritmo de Kruskal',
@@ -176,6 +188,12 @@ const notificationsReducer = action => {
       'info');
       break;
     
+    case actions.NO_FILE_SELECTED_INFO:
+      createNotification('Ningun archivo seleccionado',
+      'Debe seleccionar un archivo para subirlo',
+      'info');
+      break;
+
     case actions.FINISHED_GIF_SUCCESS:
       createNotification('Creacion de GIF terminada',
       'El archivo GIF sera descargado a su dispositivo',

@@ -1,6 +1,7 @@
 import BFS from './Algorithms/BFS';
 import DFS from './Algorithms/DFS';
 import Dijkstra from './Algorithms/Dijkstra';
+import BellmanFord from './Algorithms/BellmanFord';
 import Prim from './Algorithms/Prim';
 import Kruskal from './Algorithms/Kruskal';
 
@@ -22,6 +23,12 @@ const properties = {
     directed: true,
     weighted: true,
     action: actions.SELECT_DIJKSTRA,
+  },
+  BellmanFord: {
+    execute: BellmanFord,
+    directed: true,
+    weighted: true,
+    action: actions.SELECT_BELLMAN_FORD,
   },
   Prim: {
     execute: Prim,

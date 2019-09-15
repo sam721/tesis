@@ -15,6 +15,7 @@ const canvasReducer = (state = {}, action) => {
         loadingGraph: true,
         animation: false,
         data: action.payload.data,
+        selection: null,
       }
 
     case actions.FINISHED_LOAD:

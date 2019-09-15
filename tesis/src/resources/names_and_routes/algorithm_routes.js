@@ -2,6 +2,7 @@ const algorithmRoutes = {
   BFS: '/bfs',
   DFS: '/dfs',
   Dijkstra: '/dijkstra',
+  BellmanFord: '/bellman-ford',
   Kruskal: '/kruskal',
   Prim: '/prim',
   BubbleSort: '/bubblesort',

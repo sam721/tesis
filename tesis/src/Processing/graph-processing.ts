@@ -1,6 +1,5 @@
 import actions from '../Actions/actions';
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -50,9 +49,10 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
     headless: true,
   });
 
-  const steps:Array<{elements:Array<Object>, lines: Array<number>, duration: number}>=[];
+  const steps:Array<{elements:Array<Object>, lines: Array<number>, duration: number, action?: string}>=[];
 
   let lastLines:Array<number> = [];
+  let action:string|undefined;
   for(let pos = 0; pos < commands.length; pos++){
     let { eles, distance, style, duration, inst, lines, data } = commands[pos];
 
@@ -74,6 +74,7 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
     }
 
     if(inst){
+      console.log(inst);
       inst.forEach(ele => {
         if(ele.name === 'update_level'){
           const {data} = ele;
@@ -84,11 +85,13 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
               cy.getElementById(id+'-popper').data('value', value);
             }
           }
+        }else if(ele.name === 'negative_cycle'){
+          action = actions.NEGATIVE_CYCLE_FOUND;
         }
       });
     }
   }
-  steps.push({elements: exportGraph(cy), lines: lastLines, duration: 0});
+  steps.push({elements: exportGraph(cy), lines: lastLines, duration: 0, action});
 
   return steps;
 }

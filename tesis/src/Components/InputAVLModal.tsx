@@ -4,12 +4,14 @@ import { Button, FormControl } from 'react-bootstrap';
 import {validateAVL} from '../utils/avl-utils';
 import actions from '../Actions/actions';
 
+const {connect} = require('react-redux');
 type Props = {
   show: boolean,
   handleClose: (update?: boolean) => void,
   addNode: (id: string, value: number) => void,
   addEdge: (source: string, target: string) => void,
   clearGraph: () => void,
+  dispatch: (action:Object) => void,
 }
 type State = {
   text: string,
@@ -26,7 +28,6 @@ class InputAVLModal extends React.Component<Props, State>{
       const file = input.files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        console.log(reader.result);
         if(typeof reader.result === 'string'){
           const text = reader.result;
           this.validateArray(text);
@@ -40,10 +41,13 @@ class InputAVLModal extends React.Component<Props, State>{
     const {addNode, addEdge, clearGraph} = this.props;
     let regex = /^([^0-9().-]|([0-9]{4,})|([.]{2,}))/;
     if (text && regex.test(text)) {
-      console.error('Invalid AVL format');
+      this.props.dispatch({type: actions.INVALID_AVL_ERROR})
       return false;
     } else {
       if(validateAVL(text, addNode, addEdge, clearGraph)) this.props.handleClose(true);
+      else{
+        this.props.dispatch({type: actions.INVALID_AVL_ERROR})
+      }
     }
   }
 
@@ -78,4 +82,4 @@ class InputAVLModal extends React.Component<Props, State>{
   }
 }
 
-export default InputAVLModal;
+export default connect()(InputAVLModal);

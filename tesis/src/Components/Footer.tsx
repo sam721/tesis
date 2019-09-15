@@ -1,5 +1,5 @@
 import {Row, Col} from 'react-bootstrap';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import OptionsMenu from './OptionsMenu';
 import SpeedBar from './SpeedBar';
 import GIFControl from './GIFControl';
@@ -14,6 +14,7 @@ const algoDict:({[name: string]: string})= {
   'BFS': 'BFS',
   'DFS': 'DFS',
   'Dijkstra': 'Dijkstra',
+  'BellmanFord': 'Bellman-Ford',
   'Prim': 'Prim',
   'Kruskal': 'Kruskal',
   'Heap': 'Min Heap',
@@ -44,6 +45,12 @@ type Props = {
   paused: boolean,
 }
 
+type ButtonProps = {
+  title: string,
+  callback: () => void,
+  delay: number,
+}
+
 type State = {
   showActions: boolean,
 }
@@ -51,10 +58,20 @@ const mapStateToProps = (state:Props) => {
   return {...state}
 }
 
+let interval = 0;
+const ControlButton:FunctionComponent<ButtonProps> = ({title, callback, delay, children}) => {
+  return <button title={title} className='dropdown-button'
+          onMouseDown={()=>{callback(); interval=window.setInterval(() => callback(), delay); console.log('STARTED', interval)}}
+          onMouseUp={() => {console.log('STOP', interval); clearInterval(interval)}}>
+            {children}
+          </button>
+}
+
 class Footer extends React.Component<Props, State>{
   state = {
     showActions: true,
   }
+  interval = 0;
   render(){
     console.log(this.props.algorithm);
     const {animation, paused} = this.props;
@@ -63,14 +80,14 @@ class Footer extends React.Component<Props, State>{
       control = 
         [
           <Col md={1}>
-            <button title="Deshacer" className='dropdown-button' onClick={this.props.undo}>
+            <ControlButton title="Deshacer" callback={this.props.undo} delay={500}>
               <FontAwesomeIcon icon={faUndo} size = "lg"/>
-            </button>
+            </ControlButton>
           </Col>,
           <Col md={1}>
-            <button title="Rehacer" className='dropdown-button' onClick={this.props.redo}>
+            <ControlButton title="Rehacer" callback={this.props.redo} delay={500}>
               <FontAwesomeIcon icon={faRedo} size = "lg"/>
-            </button>
+            </ControlButton>
           </Col>,
         ];
         if(this.props.remove){
@@ -106,14 +123,14 @@ class Footer extends React.Component<Props, State>{
             </button>
           </Col>,
           <Col md={1}>
-            <button title="Retroceder" className='dropdown-button'  onClick={this.props.rewind}>
+            <ControlButton title="Retroceder" callback={this.props.rewind} delay={200}>
               <FontAwesomeIcon icon={faBackward} size = "lg"/>
-            </button>
+            </ControlButton>
           </Col>,
           <Col md={1}>
-            <button title="Avanzar" className='dropdown-button'  onClick={this.props.forward}>
+            <ControlButton title="Avanzar" callback={this.props.forward} delay={200}>
               <FontAwesomeIcon icon={faForward} size = "lg"/>
-            </button>
+            </ControlButton>
           </Col>,
         ]
     }

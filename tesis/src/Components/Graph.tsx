@@ -102,7 +102,7 @@ class Graph extends React.Component<Props, State>{
 	options: Array<{name: string, run: () => void}>;
 	cy = cytoscape();
 
-	buffer: Array<{elements: Array<Object>, lines: Array<number>, duration: number}> = [];
+	buffer: Array<{elements: Array<Object>, lines: Array<number>, duration: number, action?:string}> = [];
 
 	step:number=0;
 	animationTimeout = 0;
@@ -265,6 +265,7 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	handleUndo = () => {
+		console.log(this.undo);
 		if(this.undo.length === 0){
 			return;
 		}
@@ -311,7 +312,13 @@ class Graph extends React.Component<Props, State>{
 		if(elements !== undefined) this.loadGraph(elements);
 	}
 
+	pushState(){
+		this.redo = [];
+		this.undo.push(this.exportGraph());
+	}
+
 	handleRewind = () => { 
+		console.log(this.animationTimeout);
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.max(this.step-1, 0);
@@ -356,20 +363,24 @@ class Graph extends React.Component<Props, State>{
 	}
 	
 	loadGraph(elements:Array<Object>, withPoppers:boolean = false){
-		const nodes = this.cy.nodes();
-		for(let i = 0; i < nodes.length; i++){
-			this.removeNode(nodes[i].id());
+		try{
+			const nodes = this.cy.nodes();
+			for(let i = 0; i < nodes.length; i++){
+				this.removeNode(nodes[i].id());
+			}
+			for(let i = 0; i < elements.length; i++) this.cy.add(JSON.parse(JSON.stringify(elements[i])));
+			this.cy.nodes().forEach((node:CytoscapeElement) => {
+				const style = node.data('style');
+				if(style != null) node.style(style);
+			})
+			this.cy.edges().forEach((edge:CytoscapeElement) => {
+				const style = edge.data('style');
+				edge.style(this.edgeStyle);
+				if(style != null) edge.style(style);
+			})
+		}catch(error){
+			this.props.dispatch({ type: actions.INVALID_GRAPH_ERROR});
 		}
-		console.log(elements);
-		for(let i = 0; i < elements.length; i++) this.cy.add(elements[i]);
-		this.cy.nodes().forEach((node:CytoscapeElement) => {
-			const style = node.data('style');
-			if(style != null) node.style(style);
-		})
-		this.cy.edges().forEach((edge:CytoscapeElement) => {
-			const style = edge.data('style');
-			if(style != null) edge.style(style);
-		})
 	}
 
 	exportGraph(withStyle:boolean=false){
@@ -389,6 +400,7 @@ class Graph extends React.Component<Props, State>{
 						height: node.style('height'),
 						visibility: node.style('visibility'),
 						zIndex: node.style('z-index'),
+
 					} : {}),
 				},
 				position: {
@@ -408,17 +420,15 @@ class Graph extends React.Component<Props, State>{
 						lineColor: edge.style('line-color'),
 						targetArrowShape: edge.style('target-arrow-shape'),
 						targetArrowColor: edge.style('target-arrow-color'),
-						lineStyle: edge.style('line-style'),	
+						lineStyle: edge.style('line-style'),
+						label: edge.style('label'),
+						textRotation: edge.style('text-rotation'),
+						textMarginY: edge.style('text-margin-y'),	
 					} : {}),
 				}
 			})
 		});
 		return elements;
-	}
-
-	pushState(){
-		this.redo = [];
-		this.undo.push(this.exportGraph());
 	}
 
 	
@@ -482,7 +492,10 @@ class Graph extends React.Component<Props, State>{
 				return;
 			}
 			if(this.props.paused) return;
-			const {elements, lines, duration} = this.buffer[this.step++];
+			const {elements, lines, duration, action} = this.buffer[this.step++];
+			if(action){
+				this.props.dispatch({ type: action });
+			}
 			this.loadGraph(elements, true);
 			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
 			this.refreshLayout();
@@ -500,6 +513,7 @@ class Graph extends React.Component<Props, State>{
 		if(this.props.algorithm === algoNames.BFS) notification = actions.STARTING_BFS_INFO;
 		else if(this.props.algorithm === algoNames.DFS) notification = actions.STARTING_DFS_INFO;
 		else if(this.props.algorithm === algoNames.Dijkstra) notification = actions.STARTING_DIJKSTRA_INFO;
+		else if(this.props.algorithm === algoNames.BellmanFord) notification = actions.STARTING_BELLMAN_FORD_INFO;
 		else if(this.props.algorithm === algoNames.Kruskal) notification = actions.STARTING_KRUSKAL_INFO;
 		else if(this.props.algorithm === algoNames.Prim) notification = actions.STARTING_PRIM_INFO;
 		this.props.dispatch({
@@ -511,17 +525,20 @@ class Graph extends React.Component<Props, State>{
 
 	runButton = () => {
 		if (this.props.animation === true) {
-			this.setState({values: Array()});
-			this.props.dispatch({
-				type: actions.ANIMATION_END,
-			});
-			this.cy.nodes().style(this.nodeStyle);
-			this.cy.edges().style(this.edgeStyle);
-			this.removePoppers();
-			this.cy.autolock(false);
-			clearTimeout(this.animationTimeout);
+			//this.setState({values: Array()});
+			new Promise((resolve) => {
+				this.props.dispatch({
+					type: actions.ANIMATION_END,
+				});
+				this.cy.autolock(false);
+				clearTimeout(this.animationTimeout);
+				resolve();
+			}).then(() => {this.handleUndo(); this.redo.pop()});
+
 			return;
 		}
+
+		this.pushState();
 		let { selection } = this.props;
 		if (this.props.algorithm !== algoNames.Kruskal && this.props.algorithm !== algoNames.Prim) {
 			console.log(this.props.algorithm);

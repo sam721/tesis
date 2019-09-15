@@ -2,6 +2,7 @@ const algorithmNames = {
   BFS: 'BFS',
   DFS: 'DFS',
   Dijkstra: 'Dijkstra',
+  BellmanFord: 'BellmanFord',
   Kruskal: 'Kruskal',
   Prim: 'Prim',
   MinHeap: 'MinHeap',
