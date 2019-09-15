@@ -449,7 +449,7 @@ class LinkedList extends React.Component<Props, State>{
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.max(this.step-1, 0);
 		const {elements, lines} = this.buffer[this.step];
-		this.loadGraph(elements);
+		this.loadGraph(elements, true);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
@@ -458,7 +458,7 @@ class LinkedList extends React.Component<Props, State>{
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.min(this.step+1, this.buffer.length-1);
 		const {elements, lines} = this.buffer[this.step];
-		this.loadGraph(elements);
+		this.loadGraph(elements, true);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 

@@ -221,7 +221,7 @@ class MergeSort extends React.Component<Props, State> {
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.max(this.step-1, 0);
 		const {elements, lines} = this.buffer[this.step];
-		this.loadGraph(elements);
+		this.loadGraph(elements, true);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
@@ -230,7 +230,7 @@ class MergeSort extends React.Component<Props, State> {
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.min(this.step+1, this.buffer.length-1);
 		const {elements, lines} = this.buffer[this.step];
-		this.loadGraph(elements);
+		this.loadGraph(elements, true);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
 	}
 
@@ -259,33 +259,36 @@ class MergeSort extends React.Component<Props, State> {
 		}
 	}
 	
-	loadGraph(elements:Array<Object>){
-		const nodes = this.cy.nodes();
-		nodes.forEach((node:CytoscapeElement) => {
+	loadGraph(elements: Array<Object>, keep=false) {
+    const nodes = this.cy.nodes();
+    const positions:{[id:string]:{x:number,y:number}} = {};
+		nodes.forEach((node: CytoscapeElement) => {
+      if(keep) positions[node.id()] = JSON.parse(JSON.stringify(node.data('position')));
 			this.cy.remove(node);
 		})
 
-		for(let i = 0; i < elements.length; i++){
-			this.cy.add(elements[i]);
+		for (let i = 0; i < elements.length; i++) {
+			this.cy.add(JSON.parse(JSON.stringify(elements[i])));
 		}
-		
-		this.cy.nodes().forEach((node:CytoscapeElement) => {
+
+		this.cy.nodes().forEach((node: CytoscapeElement) => {
 			const style = node.data('style');
-			if(style != null) node.style(style);
-			const position = node.data('position');
+			if (style != null) node.style(style);
+      const position = node.data('position');
+      if(keep && positions[node.id()]) node.position({x:positions[node.id()].x, y:positions[node.id()].y});
 			//console.log("PREV", node.position());
 			//console.log("NEXT", position);
-			if(position != null){
+			if (position != null) {
 				layoutOptions.positions[node.id()] = JSON.parse(JSON.stringify(position));
 			}
 		})
-		
-		this.cy.edges().forEach((edge:CytoscapeElement) => {
+
+		this.cy.edges().forEach((edge: CytoscapeElement) => {
 			const style = edge.data('style');
-			if(style != null) edge.style(style);
+			if (style != null) edge.style(style);
 		})
-		
-		this.refreshLayout();
+
+    this.refreshLayout();
 	}
 	
 	exportGraph(withStyle:boolean=false){
