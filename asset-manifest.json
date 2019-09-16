@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/tesis/static/css/main.5257925c.chunk.css",
-    "main.js": "/tesis/static/js/main.0947032b.chunk.js",
-    "main.js.map": "/tesis/static/js/main.0947032b.chunk.js.map",
+    "main.css": "/tesis/static/css/main.9a0d7075.chunk.css",
+    "main.js": "/tesis/static/js/main.4b377cbe.chunk.js",
+    "main.js.map": "/tesis/static/js/main.4b377cbe.chunk.js.map",
     "runtime~main.js": "/tesis/static/js/runtime~main.ca416940.js",
     "runtime~main.js.map": "/tesis/static/js/runtime~main.ca416940.js.map",
     "static/css/2.3bf07905.chunk.css": "/tesis/static/css/2.3bf07905.chunk.css",
-    "static/js/2.f4f54a8b.chunk.js": "/tesis/static/js/2.f4f54a8b.chunk.js",
-    "static/js/2.f4f54a8b.chunk.js.map": "/tesis/static/js/2.f4f54a8b.chunk.js.map",
+    "static/js/2.c0b8c9a0.chunk.js": "/tesis/static/js/2.c0b8c9a0.chunk.js",
+    "static/js/2.c0b8c9a0.chunk.js.map": "/tesis/static/js/2.c0b8c9a0.chunk.js.map",
     "index.html": "/tesis/index.html",
-    "precache-manifest.00d44a9f3ae7f30e6a5038ba3aa1e61d.js": "/tesis/precache-manifest.00d44a9f3ae7f30e6a5038ba3aa1e61d.js",
+    "precache-manifest.04c97c9ee6aac4df3ab5d91d8e0d872c.js": "/tesis/precache-manifest.04c97c9ee6aac4df3ab5d91d8e0d872c.js",
     "service-worker.js": "/tesis/service-worker.js",
     "static/css/2.3bf07905.chunk.css.map": "/tesis/static/css/2.3bf07905.chunk.css.map",
-    "static/css/main.5257925c.chunk.css.map": "/tesis/static/css/main.5257925c.chunk.css.map",
+    "static/css/main.9a0d7075.chunk.css.map": "/tesis/static/css/main.9a0d7075.chunk.css.map",
     "static/media/AVL.png": "/tesis/static/media/AVL.79af0dfa.png",
     "static/media/graph3.png": "/tesis/static/media/graph3.674484b1.png"
   }
