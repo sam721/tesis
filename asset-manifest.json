@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/tesis/static/css/main.9a0d7075.chunk.css",
+    "main.css": "/tesis/static/css/main.e7fade7e.chunk.css",
     "main.js": "/tesis/static/js/main.4e3d33a2.chunk.js",
     "main.js.map": "/tesis/static/js/main.4e3d33a2.chunk.js.map",
     "runtime~main.js": "/tesis/static/js/runtime~main.ca416940.js",
@@ -9,10 +9,10 @@
     "static/js/2.c0b8c9a0.chunk.js": "/tesis/static/js/2.c0b8c9a0.chunk.js",
     "static/js/2.c0b8c9a0.chunk.js.map": "/tesis/static/js/2.c0b8c9a0.chunk.js.map",
     "index.html": "/tesis/index.html",
-    "precache-manifest.ee0116fd2f5d04364ba9efca6a990bd6.js": "/tesis/precache-manifest.ee0116fd2f5d04364ba9efca6a990bd6.js",
+    "precache-manifest.91462486196d701e295ee94a862ca772.js": "/tesis/precache-manifest.91462486196d701e295ee94a862ca772.js",
     "service-worker.js": "/tesis/service-worker.js",
     "static/css/2.3bf07905.chunk.css.map": "/tesis/static/css/2.3bf07905.chunk.css.map",
-    "static/css/main.9a0d7075.chunk.css.map": "/tesis/static/css/main.9a0d7075.chunk.css.map",
+    "static/css/main.e7fade7e.chunk.css.map": "/tesis/static/css/main.e7fade7e.chunk.css.map",
     "static/media/AVL.png": "/tesis/static/media/AVL.79af0dfa.png",
     "static/media/graph3.png": "/tesis/static/media/graph3.674484b1.png"
   }
