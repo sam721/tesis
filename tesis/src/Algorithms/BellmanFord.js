@@ -84,12 +84,12 @@ const BellmanFord = (param) => {
           const eles = [], style = [];
           const visited = {};
           while(true){
-            visited[v] = true;
-            const prev = pre[v];
-            eles.push(prev.id, prev.u, prev.v);
-            style.push(Styles.EDGE_SELECTED, Styles.NODE_RED, Styles.NODE_RED);
-            v = prev.u;
-            if(visited[v]) break;
+            visited[u] = true;
+            const prev = pre[u];
+            eles.push(prev.id, prev.u);
+            style.push(Styles.EDGE_SELECTED, Styles.NODE_RED);
+            u = prev.u;
+            if(visited[u]) break;
           }
           commands.push(
             {
