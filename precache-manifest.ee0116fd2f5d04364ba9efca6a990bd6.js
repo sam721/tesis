@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "32db1ba530e2b987aa9409f547788572",
+    "revision": "4b21c4e4eec235f28698f5aa074a92dc",
     "url": "/tesis/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/tesis/static/css/2.3bf07905.chunk.css"
   },
   {
-    "revision": "7021ea8cd1ca2c4f078d",
+    "revision": "8013eebe83d9d7039ec7",
     "url": "/tesis/static/css/main.9a0d7075.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/tesis/static/js/2.c0b8c9a0.chunk.js"
   },
   {
-    "revision": "7021ea8cd1ca2c4f078d",
-    "url": "/tesis/static/js/main.4b377cbe.chunk.js"
+    "revision": "8013eebe83d9d7039ec7",
+    "url": "/tesis/static/js/main.4e3d33a2.chunk.js"
   },
   {
     "revision": "600eb75214f0225fc6d8",
