@@ -6,6 +6,9 @@ import MyModal from './UploadGraphModal';
 import InputModal from './InputModal';
 import graphProcessing from '../Processing/graph-processing';
 import algoNames from '../resources/names_and_routes/algorithm_names'
+import { instanceOf } from 'prop-types';
+import { withCookies, Cookies } from 'react-cookie';
+
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -36,6 +39,8 @@ type Props = {
 	loadingGraph: Boolean,
 	data: string,
 	paused: boolean,
+
+	cookies: any,
 }
 
 type Element = {
@@ -156,9 +161,21 @@ class Graph extends React.Component<Props, State>{
 				clear: this.clearGraph,
 			}
 		});
+		const {cookies} = this.props;
+		console.log(cookies.getAll());
 		if(this.props.action === actions.SELECT_DIJKSTRA){
+			if(!cookies.get('dijkstra_warning')){
+				cookies.set('dijkstra_warning', 'true', {path: '/'});		
+				this.props.dispatch({
+					type: actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING,
+				});
+			}
+		}
+
+		if(!cookies.get('visited')){
+			cookies.set('visited', 'true', {path: '/' });
 			this.props.dispatch({
-				type: actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING,
+				type: actions.TOGGLE_TUTORIAL_MODAL,
 			});
 		}
 	}
@@ -747,7 +764,7 @@ class Graph extends React.Component<Props, State>{
 			group: 'edges',
 			data: {
 				id: x + '-' + y,
-				weight: Math.floor(Math.random() * 15),
+				weight: Math.floor(Math.random() * 15) - (this.props.algorithm === 'BellmanFord' ? 7 : 0),
 				source: x,
 				target: y,
 			}
@@ -849,4 +866,4 @@ class Graph extends React.Component<Props, State>{
 	}
 };
 
-export default connect(mapStateToProps)(Graph);
+export default withCookies(connect(mapStateToProps)(Graph));

@@ -21,6 +21,7 @@
     "gifshot": "^0.4.5",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.9",
+    "react-cookie": "^4.0.1",
     "react-dom": "^16.8.6",
     "react-notifications-component": "^2.0.7",
     "react-redux": "^7.0.3",
