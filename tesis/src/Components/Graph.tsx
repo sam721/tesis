@@ -736,7 +736,7 @@ class Graph extends React.Component<Props, State>{
 			data: {id : nodeId+'-popper'},
 			position: {
 				x: position.x,
-				y: position.y+30,
+				y: position.y+32,
 			},
 			style: {
 				'z-index': 0,

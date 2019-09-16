@@ -17,7 +17,7 @@ const mergeSortAnimation = (input, width, height) => {
         id: (start + index).toString(),
       });
       positions.push({
-        x: p - (n-1)*(35/2) + 35*(index),
+        x: p - (n-1)*(40/2) + 40*(index),
         y: h,
       });
       focus.push({
@@ -29,7 +29,7 @@ const mergeSortAnimation = (input, width, height) => {
       shadows.push({
         id: (start+index).toString() + '-' + h.toString(),
         value: '+',
-        position: {x: p - (n-1)*(35/2) + 35*(index), y: h }
+        position: {x: p - (n-1)*(40/2) + 40*(index), y: h }
       });
       rshadows.push({
         id: (start+index).toString() + '-' + h.toString(),
@@ -54,7 +54,7 @@ const mergeSortAnimation = (input, width, height) => {
     let li = 0, ri = 0;
     commands.push({nodes: [], lines: [5]}, {nodes: [], lines: [8,9]});
     for(let i = 0; i < n; i++){  
-      const pos = p - (n-1)*(35/2) + 35*i;
+      const pos = p - (n-1)*(40/2) + 40*i;
       cmd = {
         nodes: [],
         duration: 1000,
@@ -84,7 +84,7 @@ const mergeSortAnimation = (input, width, height) => {
     }
   });
   const mid = width/2;
-  mergeSort(input, 0, mid - 35*input.length, mid + 35*input.length, height/4);
+  mergeSort(input, 0, mid - 40*input.length, mid + 40*input.length, height/4);
   return commands;
 }
 

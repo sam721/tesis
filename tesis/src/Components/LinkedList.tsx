@@ -327,7 +327,7 @@ class LinkedList extends React.Component<Props, State>{
     for(let i = 0; i < n; i++){
       const {id} = this.list._data[i];
       layoutOptions.positions[id] = {
-        x: mid - (n-1)*(35) + 70*i,
+        x: mid - (n-1)*(40) + 70*i,
         y: this.cy.height()/4,
       }
     }

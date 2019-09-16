@@ -183,11 +183,11 @@ class AVLProcessor {
     const setSep = (node: CytoscapeElement, nx: number, ny: number) => {
       const prevPosition = node.data('position');
       node.data('prevPosition', prevPosition);
-      node.data('position', { x: node.data('X')*24 + nx, y: ny });
+      node.data('position', { x: node.data('X')*30 + nx, y: ny });
       const popper = this.cy.getElementById(node.id() + '-popper');
       const prevPopPosition = popper.data('position');
       popper.data('prevPosition', prevPopPosition);
-			popper.data('position', {x: node.data('X')*24 + nx, y: ny + 30});
+			popper.data('position', {x: node.data('X')*30 + nx, y: ny + 32});
       let [left, right] = getChildren(node);
       if (left) setSep(left, nx, ny + 50);
       if (right) setSep(right, nx, ny + 50);

@@ -415,7 +415,7 @@ class Heap extends React.Component<Props, State>{
 			data: { id: nodeId + '-popper', value },
 			position: {
 				x: position.x,
-				y: position.y + 30,
+				y: position.y + 32,
 			},
 			style: {
 				'z-index': 0,
@@ -531,8 +531,8 @@ class Heap extends React.Component<Props, State>{
 			layoutOptions.positions[node.id()] = { x: nx, y: ny }
 			node.data('position', {x: nx, y: ny});
 			const popper = this.cy.getElementById(node.id() + '-popper');
-			layoutOptions.positions[popper.id()] = { x: nx, y: ny + 30 }
-			popper.data('position', {x: nx, y: ny+30});
+			layoutOptions.positions[popper.id()] = { x: nx, y: ny + 32 }
+			popper.data('position', {x: nx, y: ny+32});
 			if (node.outgoers('node').length) setSep(node.outgoers('node')[0], nx - sep, ny + 50, sep / 2);
 			if (node.outgoers('node').length === 2) setSep(node.outgoers('node')[1], nx + sep, ny + 50, sep / 2);
 		}

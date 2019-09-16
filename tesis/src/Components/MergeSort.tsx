@@ -63,7 +63,7 @@ class MergeSort extends React.Component<Props, State> {
 
   state = {
 		show: false,
-		values: [4, 8, 12, 16, 10, 4, 45, 17],
+		values: [4, 8, 12, 16, 10, 4, 40, 17],
 	}
 
 	layout = {
@@ -343,12 +343,12 @@ class MergeSort extends React.Component<Props, State> {
         value,
 			},
 			position: {
-				x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
+				x: this.cy.width()/2 - (this.state.values.length-1)*(40/2) + 40*(parseInt(id)),
 				y: this.cy.height()/4,
 			},
 		});
 		layoutOptions.positions[id] = {
-			x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
+			x: this.cy.width()/2 - (this.state.values.length-1)*(40/2) + 40*(parseInt(id)),
 			y: this.cy.height()/4,
 		}
   }

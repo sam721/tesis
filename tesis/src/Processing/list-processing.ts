@@ -83,7 +83,7 @@ class ListProcessor{
       const node = this.cy.getElementById(id);
       const prevPosition = node.data('position');
       node.data('prevPosition', {x: prevPosition.x, y: prevPosition.y});
-      node.data('position', { x: mid - (n-1)*(35) + 70*i, y: this.vh/4 });
+      node.data('position', { x: mid - (n-1)*(40) + 70*i, y: this.vh/4 });
     }
   }
 
@@ -174,13 +174,13 @@ class ListProcessor{
           }else if(ele.name === 'push_back'){
             if(id != null && value != null){
               const n = this.list.length();
-              this.addNode(id, value, {x: this.vw/2 + n*35, y: this.vh/4 - 70});
+              this.addNode(id, value, {x: this.vw/2 + n*40, y: this.vh/4 - 70});
               this.list._data.push({id, value});
               if(source != null) this.addEdge(source, id);
             }
           }else if(ele.name === 'push_front'){
             if(id != null && value != null){
-              this.addNode(id, value, {x: this.vw/2 - this.list.length()*35, y: this.vh/4 - 70});
+              this.addNode(id, value, {x: this.vw/2 - this.list.length()*40, y: this.vh/4 - 70});
               this.list._data.unshift({id, value});
               if(target != null) this.addEdge(id, target);
             }
@@ -197,7 +197,7 @@ class ListProcessor{
           }else if(ele.name === 'add_node_before'){
             let {id, value, pos} = ele.data;
             if(id != null && value != null && pos != null){
-              const x = this.vw/2 - (this.list.length()-1)*(35) + 70*pos;
+              const x = this.vw/2 - (this.list.length()-1)*(40) + 70*pos;
               this.addNode(id, value, {x, y: this.vh/4 - 70});
               if(pos === 0) this.list._data.unshift({id, value});
               else{
@@ -210,7 +210,7 @@ class ListProcessor{
           }else if(ele.name === 'add_node'){
             let {id, value, pos} = ele.data;
             if(id != null && value != null && pos != null){
-              const x = this.vw/2 - (this.list.length()-1)*(35) + 70*pos;
+              const x = this.vw/2 - (this.list.length()-1)*(40) + 70*pos;
               this.addNode(id, value, {x, y: this.vh/4 - 70});
               pos++;
               if(pos === this.list.length()) this.list._data.push({id, value});

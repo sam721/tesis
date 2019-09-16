@@ -2,8 +2,6 @@ import {Row, Col} from 'react-bootstrap';
 import React, { FunctionComponent } from 'react';
 import OptionsMenu from './OptionsMenu';
 import SpeedBar from './SpeedBar';
-import GIFControl from './GIFControl';
-import PhotoControl from './PhotoControl';
 import actions from '../Actions/actions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
@@ -16,7 +14,8 @@ import {
   faStepBackward,
   faStepForward,
   faTimes, 
-  faTrash} from '@fortawesome/free-solid-svg-icons'
+  faTrash,
+  faInfo,} from '@fortawesome/free-solid-svg-icons'
 const { connect } = require('react-redux');
 
 
@@ -171,7 +170,12 @@ class Footer extends React.Component<Props, State>{
               <SpeedBar/>
             </Col>
             <>{control}</>
-            <Col md={{span: 2, offset:7-control.length}}>
+            <Col md={{span: 1, offset: 6-control.length}}>
+              <button className='dropdown-button' title="Información">
+                <FontAwesomeIcon icon={faInfo} size="lg"/>
+              </button>
+            </Col>
+            <Col md={2}>
             <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
           </Col>
           </Row>

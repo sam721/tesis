@@ -67,13 +67,20 @@
 }
 
 .standard-struct {
-  width: 100%;
-  top: 30px;
-  height: 95vh;
+  width: 90%;
+  top: 40px;
+  height: 90vh;
   margin: auto;
   display: block;
   left: 0;
   z-index: 0;
+}
+
+#home{
+  width: 100%;
+  height: 100%;
+  margin-top: 40px;
+  background-color: white;
 }
 
 .modal-struct {
@@ -289,4 +296,76 @@
 .modal-header{
   background-color: #121558;
   color: white;
+}
+
+.algoThumbnail{
+  position: relative;
+  margin-top: 20px;
+  height: 300px;
+  
+  width: 100%;
+  border-width: 10px;
+  border-style: solid;
+  border-color: #121558;
+  background-color: #121558;
+  color: white;
+}
+
+.thumb-menu{
+  position: absolute;
+  z-index: 1;
+  visibility: hidden;
+  color: black;
+  margin-right: 10px;
+  opacity: 1.0;
+  width: 100%;
+}
+
+.thumb-menu button{
+  width: 100%;
+  outline: none;
+  border-style: none;
+  height: 40px;
+  background-color: #121558;
+  color:white;
+}
+
+.thumb-menu button:hover{
+  background-color: #4C5090;
+}
+.algoThumbnail:hover{
+  background-color: #2B3B6B;
+  border-color: #2B3B6B;
+}
+.algoThumbnail:hover .algoPicture{
+  opacity: 0.2;
+}
+
+.algoThumbnail:hover .algoName{
+  opacity: 0.2;
+}
+.algoThumbnail:hover .thumb-menu{
+  visibility: visible;
+}
+.home-title{
+  background-color: #121558;
+  color: white;
+  padding: 30px;
+  border-top-style: solid;
+  border-top-color: white;
+}
+
+.home-title h1, .home-title h2{
+  text-align: center;
+}
+
+.home-content{
+  padding: 10px;
+}
+
+.algoName{
+  text-align: center;
+  font-size: 20px;
+  padding-top: 30px;
+  font-weight: bold;
 }

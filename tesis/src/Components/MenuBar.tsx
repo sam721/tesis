@@ -2,7 +2,6 @@ import {Row, Col} from 'react-bootstrap';
 import React from 'react';
 import PhotoControl from './PhotoControl';
 import GIFControl from './GIFControl';
-
 import routes from '../resources/names_and_routes/algorithm_routes';
 import actions from '../Actions/actions';
 const {connect} = require('react-redux');
@@ -83,21 +82,24 @@ class MenuBar extends React.Component<Props>{
               </HashRouter>
             </div>
           </Col>
-          { 
-            this.props.algorithm !== 'none' && 
-            <>
-              <Col md={1}>
-                <PhotoControl callback={this.props.photo}/>
-              </Col>
-              <Col md={1}>
-                <GIFControl callback={this.props.gif}/>
-              </Col>
-            </>
-          }
-          <Col md={1}>
-            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_TUTORIAL_MODAL})}>
-              Tutorial
-            </button>
+          <Col md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
+            <PhotoControl callback={this.props.photo}/>
+          </Col>
+          <Col md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
+            <GIFControl callback={this.props.gif}/>
+          </Col>
+          <Col md={{span: 2, offset: 6}}>
+            <div className='dropdown'>
+              <button className='dropdown-button'>Ayuda</button>
+              <div className='dropdown-menu'>
+                <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_TUTORIAL_MODAL})}>
+                  Dibujo de grafos
+                </button>
+                <button className='dropdown-button'>
+                  Acerca de
+                </button>
+              </div>
+            </div>
           </Col>
         </Row>
       </div>

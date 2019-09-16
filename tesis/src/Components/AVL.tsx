@@ -471,7 +471,7 @@ class AVL extends React.Component<Props, State>{
 			data: {id : nodeId+'-popper', value: 0},
 			position: {
 				x: position.x,
-				y: position.y+30,
+				y: position.y+32,
 			},
 			style: {
 				'z-index': 0,
@@ -594,8 +594,8 @@ class AVL extends React.Component<Props, State>{
     }
 
     const setSep = (node: CytoscapeElement, nx: number, ny: number) => {
-      layoutOptions.positions[node.id()] = { x: node.data('X')*24 + nx, y: ny }
-      layoutOptions.positions[node.id()+'-popper'] =  { x: node.data('X')*24 + nx, y: ny + 30};
+      layoutOptions.positions[node.id()] = { x: node.data('X')*30 + nx, y: ny }
+      layoutOptions.positions[node.id()+'-popper'] =  { x: node.data('X')*30 + nx, y: ny + 32};
       let [left, right] = getChildren(node);
       if (left) setSep(left, nx, ny + 50);
       if (right) setSep(right, nx, ny + 50);

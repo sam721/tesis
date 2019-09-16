@@ -292,7 +292,7 @@ class BinarySearch extends React.Component<Props, State> {
         value,
 			},
 			position: {
-				x: this.cy.width()/2 - (this.state.values.length-1)*(35/2) + 35*(parseInt(id)),
+				x: this.cy.width()/2 - (this.state.values.length-1)*(40/2) + 40*(parseInt(id)),
 				y: this.cy.height()/4,
 			},
 		});
