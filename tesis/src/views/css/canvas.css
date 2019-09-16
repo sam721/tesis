@@ -1,0 +1,35 @@
+#canvas{
+  background-color: white;
+}
+
+.standard-struct {
+  width: 90%;
+  top: 40px;
+  height: 90vh;
+  margin: auto;
+  display: block;
+  left: 0;
+  z-index: 0;
+}
+.modal-struct {
+  width: 100%;
+  top: 30px;
+  height: 50vh;
+  margin: auto;
+  display: block;
+  left: 0;
+  z-index: 0;
+  border-top-style: dotted;
+  border-top-color: gray;
+  border-top-width: 1px;
+}
+.fixed-struct {
+  width: 70%;
+  float: left;
+  top: 30px;
+  height: 95vh;
+  margin: auto;
+  display: block;
+  left: 0;
+  z-index: 0;
+}

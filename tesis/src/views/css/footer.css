@@ -1,0 +1,44 @@
+.footer{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #121558;
+  text-align: center;
+  color: white;
+  font-style: bold;
+}
+
+.actions-menu{
+  position: absolute;
+  bottom: 40px;
+  width: 100%;
+  z-index: 1;
+}
+
+.actions-menu button{
+  display: block;
+  background-color: #121558;
+  color: white;
+  width: 100%;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: white;
+  text-decoration: none;
+}
+
+.actions-menu button:hover{
+  background-color: #4C5090;
+  font-style: bold;
+}
+
+.actions-menu button:focus{
+  outline: none;
+}
+.dropup:hover .actions-menu{
+  display: block;
+}
+

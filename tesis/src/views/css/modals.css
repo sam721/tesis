@@ -1,0 +1,22 @@
+.modal-header{
+  background-color: #121558;
+  color: white;
+}
+
+.modal-struct {
+  width: 100%;
+  top: 30px;
+  height: 50vh;
+  margin: auto;
+  display: block;
+  left: 0;
+  z-index: 0;
+  border-top-style: dotted;
+  border-top-color: gray;
+  border-top-width: 1px;
+}
+
+.tutorial-paragraph {
+  margin-top: 0;
+  margin-bottom: 0;
+}

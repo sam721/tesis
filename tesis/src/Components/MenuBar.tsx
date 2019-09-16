@@ -47,7 +47,7 @@ class MenuBar extends React.Component<Props>{
       <NavLink to={routes.AVL}><button className='dropdown-button'>Arbol AVL</button></NavLink>,
     ];
     return (
-      <div className='top-bar'>
+      true && <div className='top-bar'>
         <Row>
           <Col md={2}>
             <div className='dropdown'>

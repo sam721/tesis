@@ -45,7 +45,7 @@ class Home extends React.Component<Props> {
     return (
     <HashRouter>
       <div id='home'>
-        <div className='home-title' style={{borderBottomStyle: 'solid', borderBottomColor: 'gray', height: '40%'}}>
+        <div className='home-title'>
           <Row>
             <Col>
                 <h1>¡Bienvenido a CytoAyed!</h1>
