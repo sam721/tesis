@@ -306,7 +306,6 @@ class BinarySearch extends React.Component<Props, State> {
 			}
 
 			if (this.step === this.buffer.length) {
-				
 				this.props.dispatch({
 					type: found ? actions.BINARY_SEARCH_FOUND_SUCCESS : actions.BINARY_SEARCH_NOT_FOUND_INFO,
 				});
@@ -326,7 +325,7 @@ class BinarySearch extends React.Component<Props, State> {
 		}
 		step();
 	}
-  executeAnimation = (commands: Array<AnimationStep>, found?:boolean) => {
+  executeAnimation = (found?:boolean) => {
 		this.cy.nodes().style({
 			'background-color': 'white',
 			'color': 'black',
@@ -336,7 +335,7 @@ class BinarySearch extends React.Component<Props, State> {
 			type: actions.STARTING_BINARY_SEARCH_INFO,
 		});
 		this.step = 0;
-		this.animation();
+		this.animation(found);
   }
 
 	valuesToGraph(){
@@ -409,6 +408,7 @@ class BinarySearch extends React.Component<Props, State> {
 			const commands = BinarySearchAlgo(this.state.values, value);
 			this.buffer = processCommands(this.exportGraph(), commands);
 			const found = this.cy.nodes('[value = '+value+']').length > 0;
+			console.log(found);
       resolve(found);
     }).then((found:boolean)=> {
       setTimeout(this.executeAnimation, 1000/this.props.speed, found);
