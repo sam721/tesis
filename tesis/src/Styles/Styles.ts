@@ -109,4 +109,5 @@ export const NODE_POPPER = {
 	'width': 10,
 	'height': 10,
 	'visibility': 'visible',
+	'shape': 'square',
 }

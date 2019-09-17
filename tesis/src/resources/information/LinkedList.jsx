@@ -46,7 +46,7 @@ const complexity = (
             Buscar
           </td>
           <td>
-            <Latex>$O(n)$</Latex>
+            <Latex>$O(1)$</Latex>
           </td>
           <td>
             <Latex>$O(n)$</Latex>
