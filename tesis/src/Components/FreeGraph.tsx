@@ -51,9 +51,9 @@ class FreeGraph extends React.Component<{}>{
 			pixelRatio: '1.0'
     });
 
-    this.cy.on('click', (event: CytoEvent) => this.handleClickViewport(event));
-		this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
-		this.cy.on('click', 'edge', (event: CytoEvent) => this.handleClickOnEdge(event.target));
+    this.cy.on('tap', (event: CytoEvent) => this.handleClickViewport(event));
+		this.cy.on('tap', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
+		this.cy.on('tap', 'edge', (event: CytoEvent) => this.handleClickOnEdge(event.target));
 		this.cy.autopanOnDrag({ enabled: true, speed: 0.01 });
 		this.layout = this.cy.elements().makeLayout({
 			name: 'preset',
