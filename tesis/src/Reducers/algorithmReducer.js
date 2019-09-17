@@ -27,6 +27,7 @@ import LinkedListInfo from '../resources/information/LinkedList';
 import QueueInfo from '../resources/information/Queue';
 import StackInfo from '../resources/information/Stack';
 import DequeInfo from '../resources/information/Deque';
+import AVLInfo from '../resources/information/AVL';
 import actions from '../Actions/actions'
 const algorithmReducer = (state = {}, action) => {
   const control = (action.payload ? 
@@ -141,6 +142,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'AVL',
         pseudo: avl,
+        article: AVLInfo,
       }
 
     case actions.SELECT_BUBBLESORT:
