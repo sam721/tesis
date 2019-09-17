@@ -9,6 +9,8 @@ import prim from '../resources/pseudocodes/prim';
 import {heap} from '../resources/pseudocodes/heap';
 import {avl, bst} from '../resources/pseudocodes/bst';
 import binarySearch from '../resources/pseudocodes/binarySearch';
+import listPseudo from '../resources/pseudocodes/list';
+
 
 import BFSInfo from '../resources/information/BFS';
 import DFSInfo from '../resources/information/DFS';
@@ -21,7 +23,10 @@ import mergeSortInfo from '../resources/information/MergeSort';
 import HeapInfo from '../resources/information/Heap';
 import BSTInfo from '../resources/information/BST';
 import binarySearchInfo from '../resources/information/BinarySearch';
-import listPseudo from '../resources/pseudocodes/list';
+import LinkedListInfo from '../resources/information/LinkedList';
+import QueueInfo from '../resources/information/Queue';
+import StackInfo from '../resources/information/Stack';
+import DequeInfo from '../resources/information/Deque';
 import actions from '../Actions/actions'
 const algorithmReducer = (state = {}, action) => {
   const control = (action.payload ? 
@@ -176,24 +181,28 @@ const algorithmReducer = (state = {}, action) => {
             ...nextState,
             algorithm: 'SingleLinkedList',
             pseudo: listPseudo.singlySet.main,
+            article: LinkedListInfo,
           }
         case actions.SELECT_DOUBLE_LINKED_LIST:
           return {
             ...nextState,
             algorithm: 'DoubleLinkedList',
             pseudo: listPseudo.doublySet.main,
+            article: DequeInfo,
           }
         case actions.SELECT_QUEUE:
           return {
             ...nextState,
             algorithm: 'Queue',
             pseudo: listPseudo.queueSet.main,
+            article: QueueInfo,
           }
         case actions.SELECT_STACK:
           return {
             ...nextState,
             algorithm: 'Stack',
             pseudo: listPseudo.stackSet.main,
+            article: StackInfo,
           }
       }
       
