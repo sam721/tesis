@@ -247,6 +247,7 @@ class LinkedList extends React.Component<Props, State>{
 
     this.list._data = list;
     this.cy.on('click', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
+    this.cy.on('tap', 'node', (event: CytoEvent) => this.handleClickOnNode(event.target));
     this.cy.on('resize', () => this.refreshLayout(false))
     this.layout = this.cy.elements().makeLayout(layoutOptions);
     this.layout.run();
