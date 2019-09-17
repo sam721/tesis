@@ -7,7 +7,7 @@ import bubblesort from '../resources/pseudocodes/bubblesort';
 import mergesort from '../resources/pseudocodes/mergesort';
 import prim from '../resources/pseudocodes/prim';
 import {heap} from '../resources/pseudocodes/heap';
-import {avl} from '../resources/pseudocodes/avl';
+import {avl, bst} from '../resources/pseudocodes/bst';
 import binarySearch from '../resources/pseudocodes/binarySearch';
 
 import listPseudo from '../resources/pseudocodes/list';
@@ -101,6 +101,14 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'Heap',
         pseudo: heap,
+      }
+
+    case actions.SELECT_BST:
+      return {
+        ...state,
+        ...control,
+        algorithm: 'BST',
+        pseudo: bst,
       }
 
     case actions.SELECT_AVL:

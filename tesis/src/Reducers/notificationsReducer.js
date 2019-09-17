@@ -40,31 +40,37 @@ const notificationsReducer = action => {
 
     case actions.INVALID_INTEGER_ERROR: 
       createNotification('Error',
-      'Debe ingresar un numero entero entre -999 y 999',
+      'Debe ingresar un número entero entre -999 y 999',
       'danger');
       break;
 
     case actions.INVALID_ARRAY_ERROR:
-      createNotification('Arreglo invalido',
+      createNotification('Arreglo inválido',
       'Verifique que el arreglo cumpla con los requerimientos',
       'danger');
       break;
 
     case actions.INVALID_GRAPH_ERROR:
       createNotification('Error en el archivo',
-      'El archivo no representa un grafo valido',
+      'El archivo no representa un grafo válido',
       'danger');
       break;
     
     case actions.INVALID_HEAP_ERROR:
       createNotification('Error',
-      'El archivo proporcionado no representa un Heap valido. Intente con otro archivo',
+      'El archivo proporcionado no representa un Heap válido. Intente con otro archivo',
+      'danger');
+      break;
+
+    case actions.INVALID_BST_ERROR:
+      createNotification('Error',
+      'El archivo proporcionado no representa un Árbol Binario de Búsqueda válido. Intente con otro archivo',
       'danger');
       break;
 
     case actions.INVALID_AVL_ERROR:
       createNotification('Error',
-      'El archivo proporcionado no representa un AVL valido. Intente con otro archivo',
+      'El archivo proporcionado no representa un Árbol AVL válido. Intente con otro archivo',
       'danger');
       break;
     
@@ -82,37 +88,37 @@ const notificationsReducer = action => {
 
     case actions.EMPTY_LIST_WARNING:
       createNotification('La lista se encuentra vacia',
-      'No se pudo realizar la accion',
+      'No se pudo realizar la acción',
       'warning');
       break;
 
     case actions.EMPTY_HEAP_WARNING:
-      createNotification('Heap vacio',
-      'No se puede extraer el minimo elemento de un heap vacio',
+      createNotification('Heap vacío',
+      'No se puede extraer el mínimo elemento de un heap vacío',
       'warning');
       break;
     
     case actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING:
       createNotification('Cuidado con las aristas con peso negativo',
-      'El algoritmo de Dijkstra puede no obtener el camino minimo si hay aristas negativas',
+      'El algoritmo de Dijkstra puede no obtener el camino mínimo si hay aristas negativas',
       'warning');
       break;
 
     case actions.NEGATIVE_CYCLE_FOUND:
       createNotification('El algoritmo ha encontrado un ciclo negativo',
-      'Los nodos pertenecientes al ciclo estan marcados en rojo',
+      'Los nodos pertenecientes al ciclo están marcados en rojo',
       'warning');
       break;
 
     case actions.AVL_NOT_FOUND_INFO:
-      createNotification('El elemento no fue encontrado en el arbol AVL',
-      'Debe volver a la edicion para modificar el arreglo',
+      createNotification('El elemento no fue encontrado en el árbol AVL',
+      'Debe volver a la edición para modificar el arreglo',
       'info');
       break;
 
     case actions.AVL_ELEMENT_ALREADY_INFO:
-      createNotification('Elemento en el arbol',
-      'El elemento ya se encuentra en el arbol AVL',
+      createNotification('Elemento en el árbol',
+      'El elemento ya se encuentra en el árbol AVL',
       'info');
       break;
 
@@ -130,25 +136,25 @@ const notificationsReducer = action => {
     
     case actions.STARTING_DIJKSTRA_INFO:
       createNotification('',
-      'Calculando caminos de peso minimo desde el nodo seleccionado mediante Dijkstra',
+      'Calculando caminos de peso mínimo desde el nodo seleccionado mediante Dijkstra',
       'info');
       break;
     
     case actions.STARTING_BELLMAN_FORD_INFO:
       createNotification('',
-      'Calculando caminos de peso minimo desde el nodo seleccionado mediante Bellman-Ford',
+      'Calculando caminos de peso mínimo desde el nodo seleccionado mediante Bellman-Ford',
       'info');
       break;
 
     case actions.STARTING_KRUSKAL_INFO:
       createNotification('',
-      'Obteniendo arbol recubridor minimo mediante el algoritmo de Kruskal',
+      'Obteniendo árbol recubridor mínimo mediante el algoritmo de Kruskal',
       'info');
       break;
     
     case actions.STARTING_PRIM_INFO:
       createNotification('',
-      'Obteniendo arbol recubridor minimo mediante el algoritmo de Prim',
+      'Obteniendo árbol recubridor mínimo mediante el algoritmo de Prim',
       'info');
       break;
     
@@ -166,77 +172,77 @@ const notificationsReducer = action => {
 
     case actions.STARTING_BINARYSEARCH_INFO:
       createNotification('',
-      'Realizando busqueda binaria sobre el arreglo',
+      'Realizando búsqueda binaria sobre el arreglo',
       'info');
       break;
 
     case actions.STARTING_GIF_RECORDING_INFO:
-      createNotification('Creacion de GIF iniciada',
-      'La grabacion tendra una duracion maxima de 30 segundos',
+      createNotification('Creación de GIF iniciada',
+      'La grabación tendra una duracion maxima de 30 segundos',
       'info');
       break;
     
     case actions.FINISHED_GIF_RECORDING_INFO:
-      createNotification('Grabacion de GIF terminada',
+      createNotification('Grabación de GIF terminada',
       'Procesando GIF para descargar',
       'info');
       break;
 
     case actions.SORTING_BINARY_SEARCH_INFO:
       createNotification('Solo arreglos ordenados',
-      'Los arreglos se ordenaran para realizar la busqueda binaria',
+      'Los arreglos se ordenarán para realizar la búsqueda binaria',
       'info');
       break;
     
     case actions.BINARY_SEARCH_NOT_FOUND_INFO:
       createNotification('El elemento no se encuentra en el arreglo',
-      'Debe volver a la edicion para modificar el arreglo',
+      'Debe volver a la edición para modificar el arreglo',
       'info');
       break;
     
     case actions.NO_FILE_SELECTED_INFO:
-      createNotification('Ningun archivo seleccionado',
+      createNotification('Ningún archivo seleccionado',
       'Debe seleccionar un archivo para subirlo',
       'info');
       break;
 
     case actions.FINISHED_GIF_SUCCESS:
-      createNotification('Creacion de GIF terminada',
-      'El archivo GIF sera descargado a su dispositivo',
+      createNotification('Creación de GIF terminada',
+      'El archivo GIF será descargado a su dispositivo',
       'success');
       break;
     
     case actions.LOAD_GRAPH_SUCCESS:
-      createNotification('Grafo cargado con exito',
+      createNotification('Grafo cargado con éxito',
       ' ',
       'success');
       break;
     
     case actions.PHOTO_SUCCESS:
-      createNotification('Captura realizada','La captura sera descargada a su dispositivo','success');
+      createNotification('Captura realizada','La captura será descargada a su dispositivo','success');
       break;
     
     case actions.FINISHED_ALGORITHM_SUCCESS:
-      createNotification('Ejecucion terminada exitosamente',
-      'Debe volver a la edicion para modificar el grafo',
+      createNotification('Ejecución terminada exitosamente',
+      'Debe volver a la edición para modificar el grafo',
       'success');
       break;
 
     case actions.AVL_FOUND_SUCCESS:
-      createNotification('Busqueda terminada',
-      'El elemento fue encontrado en el arbol AVL',
+      createNotification('Búsqueda terminada',
+      'El elemento fue encontrado en el árbol AVL',
       'success');
       break;
     
     case actions.ARRAY_SORTED_SUCCESS:
       createNotification('El arreglo fue ordenado exitosamente',
-      'Debe volver a la edicion para modificar el arreglo',
+      'Debe volver a la edición para modificar el arreglo',
       'success');
       break;
 
     case actions.BINARY_SEARCH_FOUND_SUCCESS:
       createNotification('El elemento fue encontrado en el arreglo',
-      'Debe volver a la edicion para modificar el arreglo',
+      'Debe volver a la edición para modificar el arreglo',
       'success');
       break;
   }

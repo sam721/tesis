@@ -49,7 +49,7 @@ export function getHeight(node){
   return node.data('height');
 }
 
-export function validateAVL(text, addNode, addEdge, clearGraph){
+export function validateBST(text, addNode, addEdge, clearGraph, balanced=true){
   let pos = 0, n = text.length, id = 0;
   const nodes = [], edges = [];
   const recursion = (min, max, parent=-1) => {
@@ -85,7 +85,9 @@ export function validateAVL(text, addNode, addEdge, clearGraph){
     const height = Math.max(left.height, right.height) + 1;
     const balance = right.height - left.height;
 
-    if(Math.abs(balance) > 1) return {correct: false};
+    if(balanced && Math.abs(balance) > 1){
+      return {correct: false};
+    }
     nodes.push({id: current.toString(), value, height, balance});
     if(parent !== -1){
       edges.push({
@@ -96,8 +98,8 @@ export function validateAVL(text, addNode, addEdge, clearGraph){
     return {correct: true, height, balance};
   }
 
-  const valid = recursion(-Infinity, Infinity);
-  if(!valid || pos !== n){
+  const result = recursion(-Infinity, Infinity);
+  if(!result.correct || pos !== n){
     return false;
   }
 

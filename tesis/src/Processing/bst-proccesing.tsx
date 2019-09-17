@@ -1,7 +1,7 @@
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-import { getChildren, lca, getHeight, isLeaf } from '../utils/avl-utils';
+import { getChildren, lca, getHeight, isLeaf } from '../utils/bst-utils';
 import {edgeId} from '../utils/cy-utils';
-import {insert, remove, balance, search} from '../resources/pseudocodes/avl';
+import {insert, remove, balance, search} from '../resources/pseudocodes/bst';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -14,18 +14,19 @@ type exportStep = {
   treeRoot: string,
   refresh?: boolean,
 }
-class AVLProcessor { 
+class BSTProcessor { 
 
   cy = cytoscape();
   vh:number;
   vw:number;
   treeRoot:string="";
 
+  balanced: boolean;
   buffer:Array<exportStep> = [];
 
   pseudo:Array<Object> = [];
-  constructor(vw: number, vh: number){
-    this.vh = vh; this.vw = vw; 
+  constructor(vw: number, vh: number, balanced:boolean){
+    this.vh = vh; this.vw = vw; this.balanced=balanced; 
   }
 
   loadGraph(elements:Array<Object>, root: string){
@@ -272,6 +273,7 @@ class AVLProcessor {
     this.pushStep();
   }
   balance(start: CytoscapeElement){
+    if(!this.balanced) return;
     let node = start;
     /*
     this.props.dispatch({
@@ -563,4 +565,4 @@ class AVLProcessor {
   }
 }
 
-export default AVLProcessor;
+export default BSTProcessor;

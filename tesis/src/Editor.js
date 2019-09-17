@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Graph from './Components/Graph';
 import Heap from './Components/Heap';
 import Home from './Components/Home';
-import AVL from './Components/AVL'
+import BST from './Components/BST'
 import properties from './algorithm-properties';
 import BubbleSort from './Components/BubbleSort';
 import MergeSort from './Components/MergeSort';
@@ -32,7 +32,8 @@ class Editor extends React.Component {
 							<Route key={names.Prim} path={routes.Prim} render={() => <Graph {...properties.Prim} />} />
 							<Route key={names.Kruskal} path={routes.Kruskal} render={() => <Graph {...properties.Kruskal} />} />
 							<Route key={names.Heap} path={routes.MinHeap} render={() => <Heap {...properties.Heap} />} />
-							<Route key={names.AVL} path={routes.AVL} render={() => <AVL {...properties.AVL} />} />
+							<Route key={names.BST} path={routes.BST} render={() => <BST {...properties.BST} />} />
+							<Route key={names.AVL} path={routes.AVL} render={() => <BST {...properties.AVL} />} />
 							<Route key={names.BubbleSort} path={routes.BubbleSort} render={() => <BubbleSort {...properties.BubbleSort} />} />
 							<Route key={names.MergeSort} path={routes.MergeSort} render={() => <MergeSort {...properties.MergeSort} />} />
 							<Route key={names.BinarySearch} path={routes.BinarySearch} render={() => <BinarySearch {...properties.BinarySearch}/>}/>

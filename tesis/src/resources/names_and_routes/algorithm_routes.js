@@ -14,6 +14,7 @@ const algorithmRoutes = {
   Stack: '/pila',
   MinHeap: '/minheap',
   AVL: '/avl',
+  BST: '/arbol-binario-de-busqueda',
 };
 
 export default algorithmRoutes;

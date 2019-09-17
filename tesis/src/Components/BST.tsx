@@ -5,18 +5,17 @@ import downloadGif from '../utils/gifshot-utils'
 import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
 import TreeBar from './TreeBar';
 import InputModal from './InputModal';
-import InputAVLModal from './InputAVLModal';
+import InputBSTModal from './InputBSTModal';
 import { Row, Container } from 'react-bootstrap';
 import PriorityQueue from '../Algorithms/DS/PriorityQueue'
 
 import HeapArray from './HeapArray';
 import { number, string } from 'prop-types';
 
-import {isLeaf, getChildren, getHeight, lca, parseAVL} from '../utils/avl-utils';
+import {isLeaf, getChildren, getHeight, lca, parseAVL} from '../utils/bst-utils';
 import {edgeId} from '../utils/cy-utils';
 import MediaRecorder from '../utils/MediaRecorder';
-import {remove, insert, balance, search} from '../resources/pseudocodes/avl';
-import AVLProcessor from '../Processing/avl-proccesing';
+import BSTProcessor from '../Processing/bst-proccesing';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
@@ -81,6 +80,7 @@ type Props = {
 		id: string,
 		weight: string,
   }
+  balanced: boolean,
   paused: boolean,
   dispatch: (action: Object) => Object,
 }
@@ -94,7 +94,7 @@ const mapStateToProps = (state: storeState) => {
   }
 }
 
-class AVL extends React.Component<Props, State>{
+class BST extends React.Component<Props, State>{
 
   _isMounted = false;
   _mediaRecorder = new MediaRecorder();
@@ -117,7 +117,7 @@ class AVL extends React.Component<Props, State>{
 
   nodeStyle = Styles.NODE;
   edgeStyle = Styles.EDGE;
-  AVLProcessor:any;
+  BSTProcessor:any;
   cy = cytoscape();
 
   buffer:Array<exportStep> = [];
@@ -128,6 +128,7 @@ class AVL extends React.Component<Props, State>{
   constructor(props:Props){
     super(props);
     this._mediaRecorder = new MediaRecorder(props.dispatch);
+    const name = props.balanced ? 'AVL' : 'ABB';
     this.options = [
       {
         name: 'Insertar',
@@ -142,11 +143,11 @@ class AVL extends React.Component<Props, State>{
         run: () => this.setState({showSearchModal: true}),
       },
       {
-        name: 'Subir AVL',
+        name: 'Subir ' + name,
         run: () => this.setState({show: true}),
       },
       {
-        name: 'Descargar AVL',
+        name: 'Descargar ' + name,
         run:  () => parseAVL(this.cy.getElementById(this.treeRoot)),
       }
     ];
@@ -155,7 +156,7 @@ class AVL extends React.Component<Props, State>{
   componentDidMount() {
     this._isMounted = true;
     this.initialize({ root: '', elements: []});
-    this.AVLProcessor = new AVLProcessor(this.cy.width(), this.cy.height());
+    this.BSTProcessor = new BSTProcessor(this.cy.width(), this.cy.height(), this.props.balanced);
     this.props.dispatch({
       type: this.props.action,
       payload:{
@@ -252,7 +253,7 @@ class AVL extends React.Component<Props, State>{
       this.redo.push({ root: this.treeRoot, elements: currentElements});
       this.treeRoot = state.root;
       this.loadGraph(state.elements);
-      this.AVLProcessor.loadGraph(state.elements, state.root);
+      this.BSTProcessor.loadGraph(state.elements, state.root);
     }
 	}
 
@@ -278,7 +279,7 @@ class AVL extends React.Component<Props, State>{
 		  this.undo.push({ root: this.treeRoot, elements: currentElements});
       this.treeRoot = state.root;
       this.loadGraph(state.elements);
-      this.AVLProcessor.loadGraph(state.elements, state.root);
+      this.BSTProcessor.loadGraph(state.elements, state.root);
     }
 	}
 
@@ -642,7 +643,7 @@ class AVL extends React.Component<Props, State>{
       }
     }
     this.pushState();
-    this.buffer = this.AVLProcessor.insert(value);
+    this.buffer = this.BSTProcessor.insert(value);
     this.step = 0;
     new Promise((resolve, reject) => {
       this.props.dispatch({type: actions.ANIMATION_START});
@@ -651,7 +652,7 @@ class AVL extends React.Component<Props, State>{
   }
 
   search(value=0){
-    let {found, buffer} = this.AVLProcessor.search(value);
+    let {found, buffer} = this.BSTProcessor.search(value);
     this.buffer = buffer;
     console.log(buffer);
     this.step = 0;
@@ -663,7 +664,7 @@ class AVL extends React.Component<Props, State>{
 
   remove(value=0){ 
     this.pushState();
-    this.buffer = this.AVLProcessor.remove(value);
+    this.buffer = this.BSTProcessor.remove(value);
     console.log(this.buffer);
     this.step = 0;
     new Promise((resolve, reject) => {
@@ -674,11 +675,13 @@ class AVL extends React.Component<Props, State>{
 
   handleClose = (update: boolean = false) => {
     this.setState({show: false});
+
+    console.log(update);
     if(update){
       this.treeRoot = "0";
       this.layoutProcessing();
       this.refreshLayout();
-      this.AVLProcessor.loadGraph(this.exportGraph(), "0");
+      this.BSTProcessor.loadGraph(this.exportGraph(), "0");
     }
   }
 
@@ -693,7 +696,7 @@ class AVL extends React.Component<Props, State>{
     if(nodes.length === 0) return;
     this.pushState();
     nodes.forEach((node:CytoscapeElement) => this.cy.remove(node));
-    this.AVLProcessor.loadGraph([], '');
+    this.BSTProcessor.loadGraph([], '');
   }
 
   render() {
@@ -714,12 +717,13 @@ class AVL extends React.Component<Props, State>{
           handleClose={() => this.setState({showRemoveModal: false})}
           callback={(v:number) => this.remove(v)}
         />
-        <InputAVLModal 
+        <InputBSTModal 
           show={this.state.show} 
           handleClose={this.handleClose} 
           addNode={this.addNode} 
           addEdge={this.addEdge} 
           clearGraph={this.clearGraph}
+          balanced={this.props.balanced}
         />
         <div id="canvas" className='standard-struct'/>
       </>
@@ -727,4 +731,4 @@ class AVL extends React.Component<Props, State>{
   }
 }
 
-export default connect(mapStateToProps)(AVL);
+export default connect(mapStateToProps)(BST);

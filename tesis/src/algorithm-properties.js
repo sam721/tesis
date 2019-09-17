@@ -45,9 +45,16 @@ const properties = {
   Heap: {
     action: actions.SELECT_HEAP,
   },
+  BST: {
+    action: actions.SELECT_BST,
+    balanced: false,
+  },
+
   AVL: {
     action: actions.SELECT_AVL,
+    balanced: true,
   },
+  
   BubbleSort: {
     action: actions.SELECT_BUBBLESORT,
   },

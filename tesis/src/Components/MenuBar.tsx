@@ -44,6 +44,7 @@ class MenuBar extends React.Component<Props>{
       <NavLink to={routes.Stack}><button className='dropdown-button'>Pila</button></NavLink>,
       <NavLink to={routes.DoubleLinkedList}><button className='dropdown-button'>Lista doble</button></NavLink>,
       <NavLink to={routes.MinHeap}><button className='dropdown-button'>Min Heap</button></NavLink>,
+      <NavLink to={routes.BST}><button className='dropdown-button'>ABB</button></NavLink>,
       <NavLink to={routes.AVL}><button className='dropdown-button'>Arbol AVL</button></NavLink>,
     ];
     return (

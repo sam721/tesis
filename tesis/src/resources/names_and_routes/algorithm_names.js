@@ -6,6 +6,7 @@ const algorithmNames = {
   Kruskal: 'Kruskal',
   Prim: 'Prim',
   MinHeap: 'MinHeap',
+  BST: 'BST',
   AVL: 'AVL',
   BubbleSort: 'BubbleSort',
   MergeSort: 'MergeSort',

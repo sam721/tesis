@@ -71,9 +71,10 @@ class Home extends React.Component<Props> {
             <Col md={4}>
               <AlgoThumb imgSrc={AVL} title='Estructuras de datos'>
                 <div className='thumb-menu'>
-                  <NavLink to={routes.MinHeap}><button>Heap minimo</button></NavLink>
-                  <NavLink to={routes.AVL}><button>Arbol Binario de Busqueda AVL</button></NavLink>
                   <NavLink to={routes.SingleLinkedList}><button>Listas Enlazadas</button></NavLink>
+                  <NavLink to={routes.MinHeap}><button>Heap Mínimo</button></NavLink>
+                  <NavLink to={routes.BST}><button>Árbol Binario de Búsqueda</button></NavLink>
+                  <NavLink to={routes.AVL}><button>Árbol AVL</button></NavLink>
                 </div>
               </AlgoThumb>
             </Col>

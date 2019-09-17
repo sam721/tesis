@@ -53,3 +53,13 @@ export const avl = [
   { text: 'sucesor(nodo u)', ind: 1},
   { text: '}', ind: 0},
 ]
+
+export const bst = [
+  { text: 'ABB{', ind: 0},
+  { text: 'Nodo raiz', ind: 1},
+  { text: 'insertar(nodo u, entero v)', ind: 1},
+  { text: 'eliminar(nodo u)', ind: 1},
+  { text: 'buscar(nodo u, entero v)', ind: 1},
+  { text: 'sucesor(nodo u)', ind: 1},
+  { text: '}', ind: 0},
+]

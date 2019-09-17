@@ -1,12 +1,13 @@
 import React, { ReactElement } from 'react';
 import Modal from 'react-bootstrap/Modal'
 import { Button, FormControl } from 'react-bootstrap';
-import {validateAVL} from '../utils/avl-utils';
+import {validateBST} from '../utils/bst-utils';
 import actions from '../Actions/actions';
 
 const {connect} = require('react-redux');
 type Props = {
   show: boolean,
+  balanced: boolean,
   handleClose: (update?: boolean) => void,
   addNode: (id: string, value: number) => void,
   addEdge: (source: string, target: string) => void,
@@ -38,15 +39,16 @@ class InputAVLModal extends React.Component<Props, State>{
   }
 
   validateArray(text: string) {
-    const {addNode, addEdge, clearGraph} = this.props;
+    const {addNode, addEdge, clearGraph, balanced} = this.props;
     let regex = /^([^0-9().-]|([0-9]{4,})|([.]{2,}))/;
     if (text && regex.test(text)) {
       this.props.dispatch({type: actions.INVALID_AVL_ERROR})
       return false;
     } else {
-      if(validateAVL(text, addNode, addEdge, clearGraph)) this.props.handleClose(true);
+      if(validateBST(text, addNode, addEdge, clearGraph, balanced))this.props.handleClose(true);
       else{
-        this.props.dispatch({type: actions.INVALID_AVL_ERROR})
+        if(balanced) this.props.dispatch({type: actions.INVALID_AVL_ERROR});
+        else this.props.dispatch({type: actions.INVALID_BST_ERROR});
       }
     }
   }

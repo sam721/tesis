@@ -27,6 +27,7 @@ const algoDict:({[name: string]: string})= {
   'Prim': 'Prim',
   'Kruskal': 'Kruskal',
   'Heap': 'Min Heap',
+  'BST': 'ABB',
   'AVL': 'Arbol AVL',
   'BubbleSort': 'Bubble Sort',
   'MergeSort': 'Merge Sort',
