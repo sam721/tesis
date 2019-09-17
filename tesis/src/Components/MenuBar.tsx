@@ -50,7 +50,7 @@ class MenuBar extends React.Component<Props>{
     return (
       true && <div className='top-bar'>
         <Row>
-          <Col md={2}>
+          <Col xs={1} sm={2} md={2}>
             <div className='dropdown'>
               <button className='dropdown-button'>Algoritmos</button>
               <HashRouter>
@@ -83,13 +83,13 @@ class MenuBar extends React.Component<Props>{
               </HashRouter>
             </div>
           </Col>
-          <Col md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
+          <Col xs={1} sm={2} md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
             <PhotoControl callback={this.props.photo}/>
           </Col>
-          <Col md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
+          <Col xs={1} sm={2} md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
             <GIFControl callback={this.props.gif}/>
           </Col>
-          <Col md={{span: 2, offset: 6}}>
+          <Col xs={1} sm={2} md={{span: 2, offset: 6}}>
             <div className='dropdown'>
               <button className='dropdown-button'>Ayuda</button>
               <div className='dropdown-menu'>

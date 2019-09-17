@@ -21,6 +21,8 @@ const initialState = {
   paused: false,
   processingGif: false,
   
+  article: null,
+  
   remove: null,
   clear: null,
   undo: () => {},

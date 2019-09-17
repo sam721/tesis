@@ -10,6 +10,17 @@ import {heap} from '../resources/pseudocodes/heap';
 import {avl, bst} from '../resources/pseudocodes/bst';
 import binarySearch from '../resources/pseudocodes/binarySearch';
 
+import BFSInfo from '../resources/information/BFS';
+import DFSInfo from '../resources/information/DFS';
+import DijkstraInfo from '../resources/information/Dijkstra';
+import BellmanFordInfo from '../resources/information/BellmanFord';
+import PrimInfo from '../resources/information/Prim';
+import KruskalInfo from '../resources/information/Kruskal';
+import bubbleSortInfo from '../resources/information/BubbleSort';
+import mergeSortInfo from '../resources/information/MergeSort';
+import HeapInfo from '../resources/information/Heap';
+import BSTInfo from '../resources/information/BST';
+import binarySearchInfo from '../resources/information/BinarySearch';
 import listPseudo from '../resources/pseudocodes/list';
 import actions from '../Actions/actions'
 const algorithmReducer = (state = {}, action) => {
@@ -46,6 +57,7 @@ const algorithmReducer = (state = {}, action) => {
         algorithm: 'BFS',
         selection: null,
         pseudo: BFS,
+        article: BFSInfo,
         run: action.payload.run,
       }
 
@@ -56,6 +68,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'DFS',
         pseudo: DFS,
+        article: DFSInfo,
         run: action.payload.run,
       }
 
@@ -65,6 +78,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'Dijkstra',
         pseudo: dijkstra,
+        article: DijkstraInfo,
         run: action.payload.run,
       }
 
@@ -74,6 +88,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'BellmanFord',
         pseudo: bellmanFord,
+        article: BellmanFordInfo,
         run: action.payload.run,
       }
 
@@ -83,6 +98,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'Kruskal',
         pseudo: kruskal,
+        article: KruskalInfo,
         run: action.payload.run,
       }
 
@@ -92,6 +108,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'Prim',
         pseudo: prim,
+        article: PrimInfo,
         run: action.payload.run,
       }
 
@@ -101,6 +118,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'Heap',
         pseudo: heap,
+        article: HeapInfo,
       }
 
     case actions.SELECT_BST:
@@ -109,6 +127,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'BST',
         pseudo: bst,
+        article: BSTInfo,
       }
 
     case actions.SELECT_AVL:
@@ -125,6 +144,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'BubbleSort',
         pseudo: bubblesort,
+        article: bubbleSortInfo,
       }
 
     case actions.SELECT_MERGESORT:
@@ -133,6 +153,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'MergeSort',
         pseudo: mergesort,
+        article: mergeSortInfo,
       }
 
     case actions.SELECT_BINARY_SEARCH:
@@ -141,6 +162,7 @@ const algorithmReducer = (state = {}, action) => {
         ...control,
         algorithm: 'BinarySearch',
         pseudo: binarySearch,
+        article: binarySearchInfo,
       }
 
     case actions.SELECT_LINKED_LIST:

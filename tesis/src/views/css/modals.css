@@ -20,3 +20,11 @@
   margin-top: 0;
   margin-bottom: 0;
 }
+
+.complexity{
+  margin: auto; 
+  float: right; 
+  font-size: 12px;
+  font-weight: bold; 
+  padding-left: 10px;
+}

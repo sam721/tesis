@@ -16,6 +16,7 @@ import {
   faTimes, 
   faTrash,
   faInfo,} from '@fortawesome/free-solid-svg-icons'
+import InfoModal from './InfoModal';
 const { connect } = require('react-redux');
 
 
@@ -54,6 +55,8 @@ type Props = {
   clear: () => void,
   end: () => void,
   paused: boolean,
+
+  article: JSX.Element | null,
 }
 
 type ButtonProps = {
@@ -64,6 +67,7 @@ type ButtonProps = {
 
 type State = {
   showActions: boolean,
+  showInfo: boolean,
 }
 const mapStateToProps = (state:Props) => {
   return {...state}
@@ -81,6 +85,7 @@ const ControlButton:FunctionComponent<ButtonProps> = ({title, callback, delay, c
 class Footer extends React.Component<Props, State>{
   state = {
     showActions: true,
+    showInfo: false,
   }
   interval = 0;
   render(){
@@ -90,12 +95,12 @@ class Footer extends React.Component<Props, State>{
     if(!animation){ 
       control = 
         [
-          <Col md={1}>
+          <Col xs={1} sm={1} md={1}>
             <ControlButton title="Deshacer" callback={this.props.undo} delay={500}>
               <FontAwesomeIcon icon={faUndo} size = "lg"/>
             </ControlButton>
           </Col>,
-          <Col md={1}>
+          <Col xs={1} sm={1} md={1}>
             <ControlButton title="Rehacer" callback={this.props.redo} delay={500}>
               <FontAwesomeIcon icon={faRedo} size = "lg"/>
             </ControlButton>
@@ -103,7 +108,7 @@ class Footer extends React.Component<Props, State>{
         ];
         if(this.props.remove){
           control.push(
-            <Col md={1}>
+            <Col sm={1} md={1}>
             <button title="Eliminar elemento" className='dropdown-button' onClick={this.props.remove}>
               <FontAwesomeIcon icon={faTimes} size = "lg"/>
             </button>
@@ -112,7 +117,7 @@ class Footer extends React.Component<Props, State>{
         }
         if(this.props.clear){
           control.push(
-            <Col md={1}>
+            <Col xs={1} sm={1} md={1}>
             <button title="Limpiar canvas" className='dropdown-button' onClick={this.props.clear}>
               <FontAwesomeIcon icon={faTrash} size = "lg"/>
             </button>
@@ -123,27 +128,27 @@ class Footer extends React.Component<Props, State>{
     }else{
       control = 
         [
-          <Col md={1} >
+          <Col xs={1} sm={1} md={1} >
             <button title='Principio' className='dropdown-button'  onClick={this.props.repeat}>
               <FontAwesomeIcon icon={faStepBackward} size = "lg"/>
             </button>
           </Col>,
-          <Col md={1}>
+          <Col xs={1} sm={1} md={1}>
             <ControlButton title="Retroceder" callback={this.props.rewind} delay={200}>
               <FontAwesomeIcon icon={faBackward} size = "lg"/>
             </ControlButton>
           </Col>,
-          <Col md={1}>
+          <Col xs={1} sm={1} md={1}>
             <button title={paused ? 'Continuar' : 'Pausa'} className='dropdown-button' onClick={this.props.pause}>
               <FontAwesomeIcon icon={paused ? faPlay : faPause} size = "lg"/>
             </button>
           </Col>,
-          <Col md={1}>
+          <Col xs={1} sm={1} md={1}>
             <ControlButton title="Avanzar" callback={this.props.forward} delay={200}>
               <FontAwesomeIcon icon={faForward} size = "lg"/>
             </ControlButton>
           </Col>,
-          <Col md={1} >
+          <Col xs={1} sm={1} md={1} >
           <button title='Final' className='dropdown-button'  onClick={this.props.end}>
             <FontAwesomeIcon icon={faStepForward} size = "lg"/>
           </button>
@@ -152,36 +157,43 @@ class Footer extends React.Component<Props, State>{
     }
     
     return(
-      <div className='footer'>
-        {this.props.algorithm !== 'none' && 
-          <Row>
-            <Col md={2}>
-              <div className="dropup">
-                <button className='dropdown-button' onClick={() => this.setState({showActions: !this.state.showActions})}>{algoDict[this.props.algorithm]}</button>
-                { 
-                  this.state.showActions && 
-                  <div className='actions-menu'>
-                    <OptionsMenu op={this.props.options}/>
-                  </div>
-                }
-              </div>
+      <>
+        <InfoModal 
+          show={this.state.showInfo} 
+          close={() => this.setState({showInfo: false})}
+          article={this.props.article}/>
+        <div className='footer'>
+          {this.props.algorithm !== 'none' && 
+            <Row>
+              <Col xs={2} sm={2} md={2}>
+                <div className="dropup">
+                  <button className='dropdown-button' 
+                  onClick={() => this.setState({showActions: !this.state.showActions})}>{algoDict[this.props.algorithm]}</button>
+                  { 
+                    this.state.showActions && 
+                    <div className='actions-menu'>
+                      <OptionsMenu op={this.props.options}/>
+                    </div>
+                  }
+                </div>
+              </Col>
+              <Col xs={1} sm={1} md={1}>
+                <span>Velocidad</span>
+                <SpeedBar/>
+              </Col>
+              <>{control}</>
+              <Col xs={1} sm={{span: 1, offset: 6-control.length}} md={{span: 1, offset: 6-control.length}}>
+                <button className='dropdown-button' title="Información" onClick={()=>this.setState({showInfo: true})}>
+                  <FontAwesomeIcon icon={faInfo} size="lg"/>
+                </button>
+              </Col>
+              <Col xs={1} sm={2} md={2}>
+              <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
             </Col>
-            <Col md={1}>
-              <span>Velocidad</span>
-              <SpeedBar/>
-            </Col>
-            <>{control}</>
-            <Col md={{span: 1, offset: 6-control.length}}>
-              <button className='dropdown-button' title="Información">
-                <FontAwesomeIcon icon={faInfo} size="lg"/>
-              </button>
-            </Col>
-            <Col md={2}>
-            <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_PSEUDO})}>Pseudocodigo</button>
-          </Col>
-          </Row>
-        }
-      </div>
+            </Row>
+          }
+        </div>
+      </>
     )
   }
 }
