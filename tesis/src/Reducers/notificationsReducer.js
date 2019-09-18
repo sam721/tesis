@@ -1,6 +1,5 @@
 import actions from '../Actions/actions';
 import { store } from 'react-notifications-component';
-import React from 'react';
 const createNotification = (title, message, type) => {
   store.addNotification({
     title,
@@ -244,6 +243,9 @@ const notificationsReducer = action => {
       createNotification('El elemento fue encontrado en el arreglo',
       'Debe volver a la edición para modificar el arreglo',
       'success');
+      break;
+    
+    default:
       break;
   }
 }

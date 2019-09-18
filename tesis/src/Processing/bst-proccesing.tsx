@@ -1,10 +1,9 @@
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
+import { CytoscapeElement } from '../Types/types';
 import { getChildren, lca, getHeight, isLeaf } from '../utils/bst-utils';
 import {edgeId} from '../utils/cy-utils';
 import {insert, remove, balance, search} from '../resources/pseudocodes/bst';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
-const { connect } = require('react-redux');
 
 type exportStep = {
   elements: Array<Object>
@@ -141,7 +140,7 @@ class BSTProcessor {
       node.data('depth', depth);
       node.data('X', x);
       
-      if(levels[depth] === undefined) levels[depth] = Array();
+      if(levels[depth] === undefined) levels[depth] = [];
       levels[depth].push(node.id());
 
       let [left, right] = getChildren(node);

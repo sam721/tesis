@@ -1,5 +1,4 @@
-import React, {FunctionComponent} from 'react';
-import BFSWiki from '../resources/information/BFS';
+import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
 type Props = {

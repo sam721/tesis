@@ -4,7 +4,7 @@ type Props = {
 }
 const OptionsMenu = (props:Props) => {
   const {op} = props;
-  const links = Array();
+  const links:Array<JSX.Element> = [];
   op.forEach((option:{name:string, run: () => void}) => {
     const {name, run} = option;
     links.push(

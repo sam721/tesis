@@ -26,7 +26,6 @@ const BellmanFord = (param) => {
   );
     
   const n = cy.nodes().length/2;
-  const edges = cy.edges();
   for(let i = 0; i < n - 1; i++){
     for(let j = 1; j <= n; j++){
       const currentId = 'node-'+j;
@@ -67,8 +66,9 @@ const BellmanFord = (param) => {
   for(let j = 1; j <= n && !negativeCycle; j++){
     const currentId = 'node-'+j;
     const current = cy.getElementById(currentId);
-    current.outgoers('edge').forEach(edge => {
-      if(negativeCycle) return;
+    const outgoers = current.outgoers('edge');
+    for(const edge of outgoers){
+      if(negativeCycle) break;
       let   u = edge.data('source'),
             v = edge.data('target'),
             w = edge.data('weight');
@@ -108,7 +108,7 @@ const BellmanFord = (param) => {
           eles: [u, v, edgeId],
           style: [Styles.NODE, Styles.NODE, Styles.EDGE_DIRECTED],
         });
-    });
+    }
   };
 
   return commands;

@@ -1,8 +1,7 @@
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
+import { CytoscapeElement, AnimationStep } from '../Types/types';
 import PriorityQueue from '../Algorithms/DS/PriorityQueue'
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
-const { connect } = require('react-redux');
 
 class HeapProcessor{
 	heap = new PriorityQueue((x, y) => x < y, (x, y) => x === y);
@@ -27,7 +26,6 @@ class HeapProcessor{
         node.data('style', Styles.NODE_POPPER);
       }
     });
-    console.log(this.heap._data);
   }
   
 	exportGraph = () => {
@@ -55,18 +53,10 @@ class HeapProcessor{
           source: edge.source().id(), target: edge.target().id(),
           weight: edge.data('weight'),
           style: edge.data('style'),
-          /*
-          style: {
-            lineColor: edge.style('line-color'),
-            targetArrowShape: edge.style('target-arrow-shape'),
-            targetArrowColor: edge.style('target-arrow-color'),
-            lineStyle: edge.style('line-style'),
-          }
-          */
+
         }
       })
     });
-    //console.log(elements);
     return JSON.parse(JSON.stringify(elements));
   }
   
@@ -148,7 +138,7 @@ class HeapProcessor{
     let lastLines:Array<number> = [];
     let lastDuration = 0;
     for(let pos = 0; pos < commands.length; pos++){
-      let { eles, style, duration, data, classes, lines} = commands[pos];
+      let { eles, style, duration, data, lines} = commands[pos];
       if(duration == null) duration = 1000;
       if(lines == null) lines = lastLines;
 
@@ -185,7 +175,6 @@ class HeapProcessor{
       steps = steps.concat(this.processCommands(commands));
 		} else {
 			let nodeId = this.heap.length();
-			console.log(nodeId);
 			let src = this.cy.getElementById(Math.floor(nodeId / 2).toString());
 			this.addNode(nodeId.toString(), val, src.data('position'));
 			this.cy.add(

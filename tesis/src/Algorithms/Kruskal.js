@@ -22,9 +22,6 @@ const Kruskal = param => {
   ];
 
   const ds = new DisjointSet(nodes);
-  let weight = 0;
-  let edges_used = 0;
-  
   while(!sorted.isEmpty()){
     const edge = sorted.top(); sorted.pop();
     const x = edge.source().id(), y = edge.target().id();
@@ -36,7 +33,6 @@ const Kruskal = param => {
     })
     if(!ds.connected(x, y)){
       ds.join(x, y);
-      weight += edge.data('weight');
       const source = edge.source(), target = edge.target();
       commands.push(
         {
@@ -50,7 +46,6 @@ const Kruskal = param => {
           lines: [4,5],
         }
       );
-      edges_used++;
     }else{
       commands.push({
         eles: [edge.id()],

@@ -206,6 +206,8 @@ const algorithmReducer = (state = {}, action) => {
             pseudo: listPseudo.stackSet.main,
             article: StackInfo,
           }
+        default:
+          return {...nextState}
       }
       
     default:

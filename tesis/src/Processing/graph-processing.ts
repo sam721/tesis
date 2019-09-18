@@ -1,8 +1,8 @@
+/*jshint loopfunc:true */
 import actions from '../Actions/actions';
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
+import { CytoscapeElement, AnimationStep } from '../Types/types';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
-const { connect } = require('react-redux');
 
 const exportGraph = (cy: any) => {
   const elements:Array<Object> = [];
@@ -26,18 +26,9 @@ const exportGraph = (cy: any) => {
         source: edge.source().id(), target: edge.target().id(),
         weight: edge.data('weight'),
         style: edge.data('style'),
-        /*
-        style: {
-          lineColor: edge.style('line-color'),
-          targetArrowShape: edge.style('target-arrow-shape'),
-          targetArrowColor: edge.style('target-arrow-color'),
-          lineStyle: edge.style('line-style'),
-        }
-        */
       }
     })
   });
-  //console.log(elements);
   return JSON.parse(JSON.stringify(elements));
 }
 
@@ -74,8 +65,7 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
     }
 
     if(inst){
-      console.log(inst);
-      inst.forEach(ele => {
+      for(const ele of inst){
         if(ele.name === 'update_level'){
           const {data} = ele;
           if(data){
@@ -88,7 +78,7 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
         }else if(ele.name === 'negative_cycle'){
           action = actions.NEGATIVE_CYCLE_FOUND;
         }
-      });
+      }
     }
   }
   steps.push({elements: exportGraph(cy), lines: lastLines, duration: 0, action});

@@ -1,13 +1,10 @@
 import React from 'react';
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-import { Container, Row } from 'react-bootstrap';
-import ControlBar from './ControlBar';
+import { CytoscapeElement, AnimationStep } from '../Types/types';
 import InputArrayModal from './InputArrayModal';
 import Mergesort from '../Algorithms/MergeSort';
 import actions from '../Actions/actions';
 import MediaRecorder from '../utils/MediaRecorder';
 import processCommands from '../Processing/mergesort-processing';
-import { node } from 'prop-types';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');

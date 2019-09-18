@@ -1,23 +1,14 @@
-// @flow
-import React, { useState } from 'react';
+import React from 'react';
 import ReactNotification from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
-
 import './views/css/App.css';
-
 import { Container, Row, Col } from 'react-bootstrap';
-import AlgorithmInfo from './Components/AlgorithmInfo'
 import Editor from './Editor';
-import Sidebar from './Components/Sidebar';
 import CodeBlock from './Components/CodeBlock';
-import BFS from './resources/pseudocodes/BFS';
-import BFS_table from './resources/value_tables/BFS_table';
-import BFSWiki from './resources/information/BFS'
+
 import Footer from './Components/Footer';
 import MenuBar from './Components/MenuBar';
 import FreeGraphModal from './Components/FreeGraphModal';
-import InfoModal from './Components/InfoModal';
-import About from './Components/About';
 class App extends React.Component<{algorithm:string, show:boolean}>{
   render() {
     return (

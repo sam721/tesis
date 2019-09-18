@@ -28,7 +28,6 @@ const Prim = param => {
     if(node.id().match('-popper')) return;
     pq.push({target: node.id(), edgeId: 'NONE', weight: Infinity})
   })
-  let mst = 0;
   while(!pq.isEmpty()){
     const edge = pq.top(); pq.pop() ;
     const{target, edgeId, weight} = edge;
@@ -67,7 +66,6 @@ const Prim = param => {
       part_of_tree[edgeId] = true;
     }
 
-    mst += weight;
     const neighborhood = cy.getElementById(target).connectedEdges();
 
     neighborhood.forEach(edge => {

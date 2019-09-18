@@ -1,25 +1,16 @@
 import React from 'react';
 import actions from '../Actions/actions';
-
-import downloadGif from '../utils/gifshot-utils'
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-import TreeBar from './TreeBar';
+import { CytoscapeElement } from '../Types/types';
 import InputModal from './InputModal';
 import InputBSTModal from './InputBSTModal';
-import { Row, Container } from 'react-bootstrap';
-import PriorityQueue from '../Algorithms/DS/PriorityQueue'
 
-import HeapArray from './HeapArray';
-import { number, string } from 'prop-types';
-
-import {isLeaf, getChildren, getHeight, lca, parseAVL} from '../utils/bst-utils';
+import {getChildren, lca, parseAVL} from '../utils/bst-utils';
 import {edgeId} from '../utils/cy-utils';
 import MediaRecorder from '../utils/MediaRecorder';
 import BSTProcessor from '../Processing/bst-proccesing';
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
 const { connect } = require('react-redux');
-const popper = require('cytoscape-popper');
 
 cytoscape.warnings(false);
 type options = {
@@ -554,7 +545,7 @@ class BST extends React.Component<Props, State>{
       node.data('depth', depth);
       node.data('X', x);
       
-      if(levels[depth] === undefined) levels[depth] = Array();
+      if(levels[depth] === undefined) levels[depth] = [];
       levels[depth].push(node.id());
 
       let [left, right] = getChildren(node);
@@ -652,9 +643,8 @@ class BST extends React.Component<Props, State>{
   }
 
   search(value=0){
-    let {found, buffer} = this.BSTProcessor.search(value);
+    let {buffer} = this.BSTProcessor.search(value);
     this.buffer = buffer;
-    console.log(buffer);
     this.step = 0;
     new Promise((resolve, reject) => {
       this.props.dispatch({type: actions.ANIMATION_START});

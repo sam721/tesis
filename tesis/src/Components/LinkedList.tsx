@@ -3,7 +3,7 @@ import MediaRecorder from '../utils/MediaRecorder';
 import LinkedListSimulator from '../Algorithms/DS/LinkedListSimulator';
 import ListProcessor from '../Processing/list-processing';
 import actions from '../Actions/actions';
-import { AnimationStep, CytoscapeElement, CytoEvent } from '../Types/types';
+import { CytoscapeElement, CytoEvent } from '../Types/types';
 import InputModal from './InputModal';
 
 const cytoscape = require('cytoscape');

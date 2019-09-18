@@ -24,7 +24,7 @@ const AlgoThumb:FunctionComponent<ThumbProps> = ({imgSrc, title, children}) => {
     <div className='algoThumbnail'>
       {children}
       <div className='algoPicture' style={{height: '65%'}}>
-        <img src={imgSrc} height={'100%'} width={'100%'}></img>
+        <img src={imgSrc} alt='menu-pic' height={'100%'} width={'100%'}></img>
       </div>
       <div className='algoName'>
         {title}

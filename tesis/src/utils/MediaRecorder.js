@@ -43,12 +43,11 @@ class MediaRecorder{
               type: actions.FINISHED_GIF_SUCCESS,
             });
             
-            console.log(obj.error);
+            console.error(obj.error);
           }
         }
       );
     }catch(error){
-      console.log(error);
       dispatch({
         type: actions.FINISHED_GIF_ENCODING,
       });
@@ -114,20 +113,12 @@ class MediaRecorder{
   }
 
   readJson(){
-    /*
-    const graph = prompt("Insertar grafo en formato JSON");
-    if(graph){
-      console.log(JSON.parse(graph));
-      cy.json(JSON.parse(graph));
-    }
-    */
    let input = document.createElement('input');
    input.setAttribute('type', 'file');
    input.setAttribute('id','myFile');
    input.setAttribute('style', 'position: absolute');
    document.body.appendChild(input);
    input.click();
-   console.log(input.value);
   }
 
   

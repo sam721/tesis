@@ -6,8 +6,7 @@ import MyModal from './UploadGraphModal';
 import InputModal from './InputModal';
 import graphProcessing from '../Processing/graph-processing';
 import algoNames from '../resources/names_and_routes/algorithm_names'
-import { instanceOf } from 'prop-types';
-import { withCookies, Cookies } from 'react-cookie';
+import { withCookies } from 'react-cookie';
 
 const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
@@ -59,7 +58,6 @@ type storeState = {
 }
 
 type State = {
-	values: Array<string>,
 	showModal: boolean,
 	showWeightModal: boolean,
 }
@@ -87,7 +85,6 @@ class Graph extends React.Component<Props, State>{
 	_mediaRecorder = new MediaRecorder();
 
 	state = {
-		values: new Array(),
 		showModal: false,
 		showWeightModal: false,
 	}
@@ -551,7 +548,6 @@ class Graph extends React.Component<Props, State>{
 
 	runButton = () => {
 		if (this.props.animation === true) {
-			//this.setState({values: Array()});
 			new Promise((resolve) => {
 				this.props.dispatch({
 					type: actions.ANIMATION_END,
@@ -829,12 +825,6 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	render() {
-		let edgeWeight = null;
-		let { selection } = this.props;
-		if (selection && selection.type === 'edge') {
-			const id = selection.id;
-			edgeWeight = this.cy.getElementById(id).data('weight');
-		}
 		return (
 			<>
 				<MyModal show={this.state.showModal} handleClose={() => this.setState({showModal: false})}/>
@@ -844,23 +834,6 @@ class Graph extends React.Component<Props, State>{
 					callback = {(w:number) => this.changeWeight(w)}
 				/>
 				<div id = "canvas" className="standard-struct"/>
-				{
-					/*
-				<GraphArray array={this.state.values}/>
-				
-					
-					<ControlBar
-						run={this.runButton}
-						remove={this.removeButton}
-						clearGraph={this.clearGraph}
-						changeWeight={this.changeWeight}
-						weighted={this.props.weighted}
-						edgeWeight={edgeWeight}
-					/>
-					<button onClick={() => this._mediaRecorder.takePicture(this.cy)}>Test picture</button>
-					<button onClick={() => this._mediaRecorder.takeGif(this.cy)}>Test gif</button>
-					*/
-				}
 			</>
 		)
 	}

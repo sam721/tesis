@@ -59,7 +59,7 @@ const mergeSortAnimation = (input, width, height) => {
         nodes: [],
         duration: 1000,
       };
-      if(ri == right.length || (li < left.length && left[li].value<=right[ri].value)){
+      if(ri === right.length || (li < left.length && left[li].value<=right[ri].value)){
         cmd.nodes = [{id: left[li].id}];
         cmd.lines = [11,12];
         cmd.positions = [{x: pos, y: h}];

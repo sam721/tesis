@@ -15,7 +15,6 @@ import {
   faStepForward,
   faTimes, 
   faTrash,
-  faInfo,
   faBookOpen} from '@fortawesome/free-solid-svg-icons'
 import InfoModal from './InfoModal';
 const { connect } = require('react-redux');

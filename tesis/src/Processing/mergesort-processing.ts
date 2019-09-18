@@ -1,9 +1,6 @@
-import actions from '../Actions/actions';
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
+import { CytoscapeElement, AnimationStep } from '../Types/types';
 
-const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
-const { connect } = require('react-redux');
 
 const exportGraph = (cy: any) => {
   const elements:Array<Object> = [];
@@ -30,24 +27,14 @@ const exportGraph = (cy: any) => {
         source: edge.source().id(), target: edge.target().id(),
         weight: edge.data('weight'),
         style: edge.data('style'),
-        /*
-        style: {
-          lineColor: edge.style('line-color'),
-          targetArrowShape: edge.style('target-arrow-shape'),
-          targetArrowColor: edge.style('target-arrow-color'),
-          lineStyle: edge.style('line-style'),
-        }
-        */
       }
     })
   });
-  console.log(JSON.parse(JSON.stringify(elements)));
   return JSON.parse(JSON.stringify(elements));
 }
 
 
 const addShadow = (cy: any, id: string, position: {x: number, y: number}) => {
-  console.log('adding shadow');
   cy.add({
     group: 'nodes',
     data: { 
@@ -59,7 +46,6 @@ const addShadow = (cy: any, id: string, position: {x: number, y: number}) => {
     },
     position: {x: position.x, y: position.y}
   });
-  console.log('shadow added', cy.nodes());
 }
 
 const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>) => {
@@ -93,7 +79,6 @@ const processCommands = (elements: Array<Object>, commands:Array<AnimationStep>)
       })
     }
     if(shadows){
-      //console.log(shadows);
       shadows.forEach(shadow => {
         if(shadow.value === '+') addShadow(cy, shadow.id, shadow.position);
         else cy.remove('node[id="'+shadow.id+'"]');

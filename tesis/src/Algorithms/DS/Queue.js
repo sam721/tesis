@@ -1,10 +1,6 @@
 class Queue {
     _data = [];
 
-    constructor(){
-
-    }
-
     isEmpty(){
         return this._data.length === 0;
     }   

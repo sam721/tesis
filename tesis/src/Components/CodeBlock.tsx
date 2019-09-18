@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { LINE_FOCUS, LINE_STD } from '../Styles/Styles';
 const { connect } = require('react-redux');
 

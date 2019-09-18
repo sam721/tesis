@@ -93,7 +93,6 @@ export const EDGE_SELECTED = {
 }
 
 export const LINE_STD = {
-	//'background-color': '#1E1E1E',
 	'color': '#CECFE6',
 }
 

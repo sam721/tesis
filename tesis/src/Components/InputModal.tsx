@@ -1,6 +1,6 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import Modal from 'react-bootstrap/Modal'
-import { Button, FormControl } from 'react-bootstrap';
+import { Button} from 'react-bootstrap';
 import actions from '../Actions/actions';
 
 const { connect } = require('react-redux');
@@ -43,7 +43,7 @@ class InputModal extends React.Component<Props, State>{
 
   componentDidUpdate(prevProps:Props){
     const {currentValue} = this.props;
-    if(currentValue != null && currentValue != prevProps.currentValue){
+    if(currentValue != null && currentValue !== prevProps.currentValue){
       this.setState({
         text: this.props.currentValue.toString(),
       })

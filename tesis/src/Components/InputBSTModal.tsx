@@ -1,6 +1,6 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import Modal from 'react-bootstrap/Modal'
-import { Button, FormControl } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import {validateBST} from '../utils/bst-utils';
 import actions from '../Actions/actions';
 

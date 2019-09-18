@@ -1,9 +1,6 @@
-import actions from '../Actions/actions';
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
+import { CytoscapeElement, AnimationStep } from '../Types/types';
 import LinkedListSimulator from '../Algorithms/DS/LinkedListSimulator';
-const Styles = require('../Styles/Styles');
 const cytoscape = require('cytoscape');
-const { connect } = require('react-redux');
 
 type exportStep = {
   elements: Array<Object>

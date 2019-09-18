@@ -19,7 +19,6 @@ const downloadGif = (buffer, width, height) => {
 			link.style.display = 'none';
 			document.body.appendChild(link);
 			link.click();
-			//document.body.removeChild(link);
     }
   }
   );

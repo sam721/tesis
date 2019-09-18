@@ -1,7 +1,5 @@
 import React from 'react';
 import { Row, Col, Container } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faTimes, faPlayCircle, faStopCircle} from '@fortawesome/free-solid-svg-icons'
 import SpeedBar from './SpeedBar';
 const { connect } = require('react-redux');
 

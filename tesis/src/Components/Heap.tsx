@@ -1,13 +1,7 @@
 import React from 'react';
 import actions from '../Actions/actions';
 
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-import TreeBar from './TreeBar';
-import { Row, Container } from 'react-bootstrap';
-import PriorityQueue from '../Algorithms/DS/PriorityQueue'
-import downloadGif from '../utils/gifshot-utils';
-import HeapArray from './HeapArray';
-import { number, string } from 'prop-types';
+import { CytoscapeElement} from '../Types/types';
 import InputHeapModal from './InputHeapModal';
 import MediaRecorder from '../utils/MediaRecorder';
 import { parseHeap } from '../utils/heap-utils';

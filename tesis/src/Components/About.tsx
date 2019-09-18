@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import UCV from '../static/images/UCV.png';
 import Ciencias from '../static/images/logo_ciencias.png';
@@ -12,8 +12,8 @@ const About = (props:{show:boolean, close:() => void}) => {
       <Modal.Body>
         <div style={{ display: 'block', overflow: 'auto', paddingBottom: '30px'}}>
           <div style={{float: 'right', paddingLeft: '30px', paddingTop: '0px'}}>
-            <img src={UCV} height='100px'/><br/>
-            <img src={Ciencias} height='100px'/>
+            <img src={UCV} alt='ucv-logo' height='100px'/><br/>
+            <img src={Ciencias} alt='ciencias-logo' height='100px'/>
           </div>
           <div style={{textAlign: 'justify'}}>
             <p>CytoAyed es desarrollado por el estudiante Samuel Nacache, 
@@ -28,7 +28,7 @@ const About = (props:{show:boolean, close:() => void}) => {
         </div>
         <div style={{ display: 'block', overflow: 'auto', paddingBottom: '30px'}}>
           <div style={{float: 'left', paddingRight: '30px', paddingTop: '0px'}}>
-            <img src={CytoLogo} width='200px'/>
+            <img src={CytoLogo} alt='cytoscape-logo' width='200px'/>
           </div>
           <p>
             CytoAyed utiliza para la renderización de grafos y estructuras de datos abstractas

@@ -1,8 +1,5 @@
 import React from 'react';
-import { CytoscapeElement, CytoEvent, AnimationStep } from '../Types/types';
-import { Container, Row } from 'react-bootstrap';
-import ControlBar from './ControlBar';
-import Bubblesort from '../Algorithms/BubbleSort';
+import { CytoscapeElement } from '../Types/types';
 import actions from '../Actions/actions';
 import MediaRecorder from '../utils/MediaRecorder';
 import InputArrayModal from './InputArrayModal';

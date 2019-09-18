@@ -1,7 +1,4 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
-import actions from '../Actions/actions';
-
 const {connect} = require('react-redux');
 
 type Props = {
