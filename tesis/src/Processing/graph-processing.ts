@@ -1,4 +1,3 @@
-/*jshint loopfunc:true */
 import actions from '../Actions/actions';
 import { CytoscapeElement, AnimationStep } from '../Types/types';
 const Styles = require('../Styles/Styles');

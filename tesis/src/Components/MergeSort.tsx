@@ -178,7 +178,6 @@ class MergeSort extends React.Component<Props, State> {
 		this.cy.autopanOnDrag({ enabled: true, speed: 0.01 });
 		this.layout = this.cy.elements().makeLayout(layoutOptions);
     this.layout.run();
-		//this.refreshLayout();
 	}
 
 	handleUndo = () => {

@@ -7,7 +7,7 @@ type Props = {
   dispatch: (action: Object) => Object,
   algorithm: string,
   animation: Boolean,
-  selection: any, //CAMBIAR
+  selection: any,
   weighted: boolean,
   run: () => void,
   remove: () => void,

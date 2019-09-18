@@ -146,7 +146,6 @@ class LinkedListSimulator {
         lines,
       }
     );
-    //this._data.shift();
     return commands;
   }
 
@@ -154,7 +153,6 @@ class LinkedListSimulator {
     const n = this.length();
     const commands = [];
     for(let i = 0; i < n; i++){
-      //Animations steps here
       const id = this._data[i].id;
       commands.push({
         eles: [id],
