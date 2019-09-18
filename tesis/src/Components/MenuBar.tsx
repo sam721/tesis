@@ -4,6 +4,7 @@ import PhotoControl from './PhotoControl';
 import GIFControl from './GIFControl';
 import routes from '../resources/names_and_routes/algorithm_routes';
 import actions from '../Actions/actions';
+import About from './About';
 const {connect} = require('react-redux');
 const {
 	NavLink,
@@ -17,11 +18,16 @@ type Props = {
   dispatch: (action:Object) => void,
 }
 
+type State = {
+  showAbout: boolean,
+}
 const mapStateToProps = (state:Props) => {
   return { ...state };
 }
 
-class MenuBar extends React.Component<Props>{
+class MenuBar extends React.Component<Props, State>{
+  state = {showAbout: false};
+
   render(){
     const searchAlgorithms = [
       <NavLink to={routes.BFS}><button className='dropdown-button'>BFS</button></NavLink>,
@@ -48,7 +54,8 @@ class MenuBar extends React.Component<Props>{
       <NavLink to={routes.AVL}><button className='dropdown-button'>Arbol AVL</button></NavLink>,
     ];
     return (
-      true && <div className='top-bar'>
+      <div className='top-bar'>
+        <About show={this.state.showAbout} close={()=>this.setState({showAbout: false})}/>
         <Row>
           <Col xs={1} sm={2} md={2}>
             <div className='dropdown'>
@@ -96,7 +103,7 @@ class MenuBar extends React.Component<Props>{
                 <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_TUTORIAL_MODAL})}>
                   Dibujo de grafos
                 </button>
-                <button className='dropdown-button'>
+                <button className='dropdown-button' onClick={() => this.setState({showAbout: true})}>
                   Acerca de
                 </button>
               </div>

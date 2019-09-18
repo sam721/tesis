@@ -17,13 +17,9 @@ import Footer from './Components/Footer';
 import MenuBar from './Components/MenuBar';
 import FreeGraphModal from './Components/FreeGraphModal';
 import InfoModal from './Components/InfoModal';
+import About from './Components/About';
 class App extends React.Component<{algorithm:string, show:boolean}>{
-
-  state = {
-    show: true,
-  }
   render() {
-    const {show} = this.state;
     return (
       <body>
         <div>

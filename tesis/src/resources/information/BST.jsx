@@ -6,7 +6,7 @@ const complexity = (
     <Table striped bordered hover>
       <thead>
         <tr>
-          <th>#</th>
+          <th>Operación</th>
           <th>Mejor caso</th>
           <th>Peor caso</th>
           <th>Caso promedio</th>

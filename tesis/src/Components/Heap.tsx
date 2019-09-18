@@ -489,7 +489,7 @@ class Heap extends React.Component<Props, State>{
 	}
 
 	refreshLayout(animate: boolean = true) {
-		this.layoutProcessing();
+		//this.layoutProcessing();
 		this.layout.stop();
 		this.layout = this.cy.elements().makeLayout({ ...layoutOptions, animate });
 		this.layout.run();

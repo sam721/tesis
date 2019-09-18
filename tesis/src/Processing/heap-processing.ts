@@ -118,7 +118,7 @@ class HeapProcessor{
 		}
 		let height = getHeight(this.cy.getElementById("1"));
 
-		let sep = (1 << height) * 5;
+		let sep = (1 << height) * 6;
 
 		const setSep = (node: CytoscapeElement, nx: number, ny: number, sep: number) => {
       const prevPosition = node.data('position');
@@ -179,7 +179,7 @@ class HeapProcessor{
       steps.push({
         elements: this.exportGraph(),
         duration: 1000,
-        lines: [1,2,3,4]
+        lines: [1,2],
       });
       const commands = this.heap.push(val, true);
       steps = steps.concat(this.processCommands(commands));
@@ -197,7 +197,7 @@ class HeapProcessor{
       steps.push({
         elements: this.exportGraph(),
         duration: 1000,
-        lines: [1,2,3,4]
+        lines: [1,2]
       });
       const commands = this.heap.push(val, true);
       steps = steps.concat(this.processCommands(commands));

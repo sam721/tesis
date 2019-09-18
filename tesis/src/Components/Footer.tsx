@@ -15,7 +15,8 @@ import {
   faStepForward,
   faTimes, 
   faTrash,
-  faInfo,} from '@fortawesome/free-solid-svg-icons'
+  faInfo,
+  faBookOpen} from '@fortawesome/free-solid-svg-icons'
 import InfoModal from './InfoModal';
 const { connect } = require('react-redux');
 
@@ -184,7 +185,7 @@ class Footer extends React.Component<Props, State>{
               <>{control}</>
               <Col xs={1} sm={{span: 1, offset: 6-control.length}} md={{span: 1, offset: 6-control.length}}>
                 <button className='dropdown-button' title="Información" onClick={()=>this.setState({showInfo: true})}>
-                  <FontAwesomeIcon icon={faInfo} size="lg"/>
+                  <FontAwesomeIcon icon={faBookOpen} size="lg"/>
                 </button>
               </Col>
               <Col xs={1} sm={2} md={2}>
