@@ -181,7 +181,6 @@ class BubbleSort extends React.Component<Props, State> {
 	}
 
 	handleUndo = () => {
-		console.log('UNDO');
 		if(this.undo.length === 0) return;
 
 		if(this.props.animation){

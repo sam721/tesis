@@ -9,28 +9,26 @@ import CodeBlock from './Components/CodeBlock';
 import Footer from './Components/Footer';
 import MenuBar from './Components/MenuBar';
 import FreeGraphModal from './Components/FreeGraphModal';
-class App extends React.Component<{algorithm:string, show:boolean}>{
+class App extends React.Component<{ algorithm: string, show: boolean }>{
   render() {
     return (
-      <body>
-        <div>
-          <Container>
-            <ReactNotification/>
-            <FreeGraphModal/>
-            <CodeBlock/>
-            <MenuBar/>
-            <Row>
-              <Col>
-                <Editor algorithm={this.props.algorithm} />
-              </Col>
-            </Row>
-            <Footer/>
-          </Container>
-        </div>
-      </body>
+      <div>
+        <Container>
+          <ReactNotification />
+          <FreeGraphModal />
+          <CodeBlock />
+          <MenuBar />
+          <Row>
+            <Col>
+              <Editor algorithm={this.props.algorithm} />
+            </Col>
+          </Row>
+          <Footer />
+        </Container>
+      </div>
     );
   }
-  
+
 }
 
 export default App;

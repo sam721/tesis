@@ -283,8 +283,6 @@ class MergeSort extends React.Component<Props, State> {
 			if (style != null) node.style(style);
       const position = node.data('position');
       if(keep && positions[node.id()]) node.position({x:positions[node.id()].x, y:positions[node.id()].y});
-			//console.log("PREV", node.position());
-			//console.log("NEXT", position);
 			if (position != null) {
 				layoutOptions.positions[node.id()] = JSON.parse(JSON.stringify(position));
 			}
@@ -362,7 +360,6 @@ class MergeSort extends React.Component<Props, State> {
 
   animation(){
 		let step = () => {
-			console.log(this.props.paused);
 			if (this.step === this.buffer.length) {
 				
 				this.props.dispatch({
@@ -383,7 +380,6 @@ class MergeSort extends React.Component<Props, State> {
 			if(this.props.paused) return;
 			this.loadGraph(elements);
 			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
-			console.log(duration);
 			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
 		}
 		step();

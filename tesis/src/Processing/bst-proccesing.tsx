@@ -136,7 +136,6 @@ class BSTProcessor {
     const levels:{[lvl: number]: Array<string>} = {};
 
     const dfs = (node: CytoscapeElement, depth: number, x: number) => {
-      console.log(node.data('value'));
       node.data('depth', depth);
       node.data('X', x);
       
@@ -220,7 +219,6 @@ class BSTProcessor {
     if(B){
       this.removeEdge(y.id(), B.id());
       this.addEdge(x.id(), B.id());
-      //B.data('prev', x.id());
     }
     const prev = x.data('prev');
     this.addEdge(y.id(), x.id());
@@ -228,12 +226,9 @@ class BSTProcessor {
     if(this.treeRoot !== x.id()){
       this.removeEdge(prev, x.id());
       this.addEdge(prev, y.id());
-      //y.data('prev', prev);
     }else{
       this.treeRoot = y.id();
-      console.log(this.treeRoot);
     }
-    //x.data('prev', y.id());
 
     x.data('height', Math.max(getHeight(B), getHeight(C))+1);
     y.data('height', Math.max(getHeight(A), getHeight(x))+1);
@@ -250,7 +245,6 @@ class BSTProcessor {
     if(B){
       this.removeEdge(x.id(), B.id());
       this.addEdge(y.id(), B.id());
-      //B.data('prev', y.id());
     }
     const prev = y.data('prev');
     this.addEdge(x.id(), y.id());
@@ -258,12 +252,9 @@ class BSTProcessor {
     if(this.treeRoot !== y.id()){
       this.removeEdge(prev, y.id());
       this.addEdge(prev, x.id());
-      //x.data('prev', prev);
     }else{
       this.treeRoot = x.id();
-      console.log(this.treeRoot);
     }
-    //y.data('prev', x.id());
 
     y.data('height', Math.max(getHeight(A), getHeight(B))+1);
     x.data('height', Math.max(getHeight(y), getHeight(C))+1);
@@ -274,15 +265,6 @@ class BSTProcessor {
   balance(start: CytoscapeElement){
     if(!this.balanced) return;
     let node = start;
-    /*
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: balance,
-      }
-    });
-    */
-    //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: []}});
     this.pseudo = balance;
     this.pushStep();
 
@@ -295,11 +277,9 @@ class BSTProcessor {
       if(bal === 2){
         if(right.data('balance') >= 0){
           this.pushStep([2,3]);
-          //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [2, 3]}});
           this.rotateRight(node);
         }else{
           this.pushStep([6,7]);
-          //this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines: [6, 7]}});
           this.rotateLeft(right);
           this.rotateRight(node);
         }
@@ -326,15 +306,12 @@ class BSTProcessor {
       }
     }  
     this.pushStep([1]);
-    //this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [1]}});
     
     node.data('style', {
       'background-color': 'red',
       'color': 'black',
     })
-    
-    //setTimeout(recursion, 1000/this.props.speed);
-    recursion();
+        recursion();
   }
 
   insert(value: number) {
@@ -348,7 +325,6 @@ class BSTProcessor {
 
     if(n > 1){
       let insertion = (current: CytoscapeElement, prev: CytoscapeElement | null) => {
-        console.log(current);
         
         if(prev) prev.data('style',{
           'color': 'black',
@@ -365,17 +341,12 @@ class BSTProcessor {
           let [left, right] = getChildren(current);
           if (value < current.data('value')) {
             this.pushStep([3, 4]);
-            //this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [3, 4]}});
-            //setTimeout(insertion, 1000/this.props.speed, left, current);  
             insertion(left, current);
           } else {
             this.pushStep([5, 6]);
-            //this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [5, 6]}});
-            //setTimeout(insertion, 1000/this.props.speed, right, current);
             insertion(right, current);
           }
         }else{
-          //this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines: [1, 2]}});
           if(prev){
             this.addNode(id.toString(), value, 0, 0, prev.data('position'));
             newNode = this.cy.getElementById(id.toString());
@@ -387,8 +358,6 @@ class BSTProcessor {
             }
           }
           this.pushStep([1,2]);
-          //this.refreshLayout();
-          //setTimeout(resolve, 1000/this.props.speed, null);
         } 
       }
       insertion(this.cy.getElementById(this.treeRoot), null);
@@ -432,8 +401,6 @@ class BSTProcessor {
           });
           found = true;
           this.pushStep([2]);
-
-          //setTimeout(bsearch, 1000/this.props.speed, null, node);
           bsearch(null, node);
         }else if(node.data('value') < value){
           this.pushStep([5,6]);
@@ -516,7 +483,6 @@ class BSTProcessor {
       this.pushStep([1]);
       if(anc !== '') this.balance(this.cy.getElementById(anc));
     }else if(node.outgoers('node').length === 1){
-      //this.props.dispatch({type: actions.CHANGE_LINE, payload: {lines: [3, 4]}});
       if(node.id() === this.treeRoot){
         this.treeRoot = node.outgoers('node')[0].id();
         anc = this.treeRoot;
@@ -536,16 +502,12 @@ class BSTProcessor {
     }else{
       this.pushStep([6]);
       const suc = this.inorderSuccessor(node);
-      console.log('NODE', node);
-      console.log('SUC', suc);
       this.pushStep([7,8]);
       node.data('value', suc.data('value'));
       suc.data('value', value);
       this.pushStep([7,8], 1000, false);
 
       if(!isLeaf(suc)){
-        console.log("ERROR");
-        console.log(getChildren(suc));
         const right = getChildren(suc)[1];
         right.data('prev', suc.data('prev'));
         this.addEdge(suc.data('prev'), right.id());

@@ -5,10 +5,10 @@ type Props = {
 const OptionsMenu = (props:Props) => {
   const {op} = props;
   const links:Array<JSX.Element> = [];
-  op.forEach((option:{name:string, run: () => void}) => {
+  op.forEach((option:{name:string, run: () => void}, index:number) => {
     const {name, run} = option;
     links.push(
-      <button onClick={run}>{name}</button>
+      <button key={index} onClick={run}>{name}</button>
     );
   });
   return  (

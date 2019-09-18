@@ -159,7 +159,6 @@ class Graph extends React.Component<Props, State>{
 			}
 		});
 		const {cookies} = this.props;
-		console.log(cookies.getAll());
 		if(this.props.action === actions.SELECT_DIJKSTRA){
 			if(!cookies.get('dijkstra_warning')){
 				cookies.set('dijkstra_warning', 'true', {path: '/'});		
@@ -220,7 +219,6 @@ class Graph extends React.Component<Props, State>{
 
 
 	initialize(elements: Array<Object>, withPoppers:boolean=false){
-		console.log(elements);
 		
 		let edgeStyle = Styles.EDGE;
 		if (this.props.weighted) {
@@ -279,7 +277,6 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	handleUndo = () => {
-		console.log(this.undo);
 		if(this.undo.length === 0){
 			return;
 		}
@@ -297,7 +294,6 @@ class Graph extends React.Component<Props, State>{
 
 		const currentElements = this.exportGraph();
 		let elements = this.undo.pop();
-		console.log(elements);
 		this.redo.push(currentElements);
 		
 		if(elements !== undefined) this.loadGraph(elements);
@@ -332,7 +328,6 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	handleRewind = () => { 
-		console.log(this.animationTimeout);
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.max(this.step-1, 0);
@@ -345,7 +340,6 @@ class Graph extends React.Component<Props, State>{
 		clearTimeout(this.animationTimeout);
 		this.props.dispatch({type: actions.ANIMATION_PAUSE});
 		this.step = Math.min(this.step+1, this.buffer.length-1);
-		console.log(this.step);
 		const {elements, lines} = this.buffer[this.step];
 		this.loadGraph(elements);
 		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
@@ -563,7 +557,6 @@ class Graph extends React.Component<Props, State>{
 		this.pushState();
 		let { selection } = this.props;
 		if (this.props.algorithm !== algoNames.Kruskal && this.props.algorithm !== algoNames.Prim) {
-			console.log(this.props.algorithm);
 			if (!selection || selection.type !== 'node') {
 				this.props.dispatch({
 					type: actions.NO_NODE_SELECTED_ERROR,

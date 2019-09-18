@@ -43,7 +43,6 @@ class InputArrayModal extends React.Component<Props, State>{
     if(this.input && this.validateArray(this.input.value)){
       const text = this.input.value;
       const values = text.split(',').map(x => parseInt(x));
-      console.log(values);
       this.props.changeArray(values);
       this.props.handleClose();
     }

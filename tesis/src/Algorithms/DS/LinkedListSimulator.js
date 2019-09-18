@@ -51,7 +51,6 @@ class LinkedListSimulator {
       }],
       lines,
     });
-    console.log(commands);
     return commands;
   }
 

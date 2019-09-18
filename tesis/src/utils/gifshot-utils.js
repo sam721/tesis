@@ -2,7 +2,6 @@ import dataURItoBlob from './dataURItoBlob';
 const gifshot = require('gifshot');
 
 const downloadGif = (buffer, width, height) => {
-  console.log(buffer.length);
   gifshot.createGIF({
     'images': buffer,
     'gifWidth': width,

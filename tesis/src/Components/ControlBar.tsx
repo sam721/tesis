@@ -49,7 +49,6 @@ class ControlBar extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    console.log(this.props.selection);
     if (this.props.selection && this.props.selection.type === 'edge') {
       if (!prevProps.selection || prevProps.selection.id !== this.props.selection.id) {
         this.setState({ weight: this.props.selection.weight });

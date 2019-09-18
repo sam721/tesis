@@ -33,7 +33,6 @@ class InputHeapModal extends React.Component<Props, State>{
       const file = input.files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        console.log(reader.result);
         if(typeof reader.result === 'string'){
           const text = reader.result;
           this.validateArray(text);
@@ -45,10 +44,8 @@ class InputHeapModal extends React.Component<Props, State>{
 
   validateArray(text: string) {
     let regex = /^(([-]?([0-9]{1,3})[,]){0,15})([-]?([0-9]{1,3}))$/;
-    console.log(text);
     if (text && regex.test(text)) {
       const values = text.split(',').map(x => parseInt(x));
-      console.log(values);
       if(validateHeap(values)){
         this.props.changeArray(values);
         this.props.handleClose();

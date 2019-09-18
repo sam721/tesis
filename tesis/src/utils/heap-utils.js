@@ -2,7 +2,6 @@ export function validateHeap(values){
   const n = values.length;
   for(let i = 1; 2*i < n; i++){
     const left = values[2*i], right = ((2*i + 1) === n ? Infinity : values[2*i+1]);
-    console.log(values[i], left, right);
     if(left < values[i] || right < values[i]) return false;
   }
   return true;

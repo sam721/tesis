@@ -24,18 +24,18 @@ const complexity = (
             <Latex>$O(|V^2|)$</Latex>
           </td>
         </tr>
-      </tbody>
-      <tr>
-        <td>
-          Lista de adyacencia
+        <tr>
+          <td>
+            Lista de adyacencia
+            </td>
+          <td>
+            <Latex>$O(|V|+|E|)$</Latex>
           </td>
-        <td>
-          <Latex>$O(|V|+|E|)$</Latex>
-        </td>
-        <td>
-          <Latex>$O(|V|+|E|)$</Latex>
-        </td>
-      </tr>
+          <td>
+            <Latex>$O(|V|+|E|)$</Latex>
+          </td>
+        </tr>
+      </tbody>
     </Table>
   </div>
 );

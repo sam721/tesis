@@ -353,8 +353,6 @@ class Heap extends React.Component<Props, State>{
 			const style = node.data('style');
 			if (style != null) node.style(style);
 			const position = node.data('position');
-			//console.log("PREV", node.position());
-			//console.log("NEXT", position);
 			if (position != null) {
 				layoutOptions.positions[node.id()] = JSON.parse(JSON.stringify(position));
 			}
@@ -456,7 +454,6 @@ class Heap extends React.Component<Props, State>{
 			if(this.props.paused) return;
 			this.loadGraph(elements);
 			if (lines) this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
-			console.log(duration);
 			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration) / (this.props.speed));
 		}
 		step();
@@ -483,7 +480,6 @@ class Heap extends React.Component<Props, State>{
 	}
 
 	refreshLayout(animate: boolean = true) {
-		//this.layoutProcessing();
 		this.layout.stop();
 		this.layout = this.cy.elements().makeLayout({ ...layoutOptions, animate });
 		this.layout.run();
@@ -553,7 +549,6 @@ class Heap extends React.Component<Props, State>{
 		this.pushState();
 
 		this.buffer = this.heapProcessor.insert(val);
-		console.log(this.buffer);
 		this.executeAnimation();
 	}
 
@@ -575,7 +570,6 @@ class Heap extends React.Component<Props, State>{
 		this.pushState();
 
 		this.buffer = this.heapProcessor.remove();
-		console.log(this.buffer);
 		this.executeAnimation();
 	}
 

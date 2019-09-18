@@ -10,17 +10,6 @@ type exportStep = {
   list?: Array<Object>,
 }
 
-type pseudoSet = {
-  main: Array<{text: string, ind: number}>,
-  pushFront: Array<{text: string, ind: number}>,
-  pushBack: Array<{text: string, ind: number}>,
-  popFront: Array<{text: string, ind: number}>,
-  popBack: Array<{text: string, ind: number}>,
-  insertBefore: Array<{text: string, ind: number}>,
-  insertAfter: Array<{text: string, ind: number}>,
-  remove: Array<{text: string, ind: number}>,
-}
-
 class ListProcessor{
   cy = cytoscape();
   vh:number;
@@ -107,7 +96,6 @@ class ListProcessor{
   }
   
   addEdge(x: string, y: string) {
-    //this.pushState();
 		this.cy.add({
 			group: 'edges',
 			data: {
@@ -136,7 +124,6 @@ class ListProcessor{
     let lastLines:Array<number> = [];
     let lastDuration = 0;
     this.pushStep([], 0);
-    console.log(commands);
     for(let pos = 0; pos < commands.length; pos++){
       let { eles, style, duration, inst, lines} = commands[pos];
       if(duration == null) duration = 1000;
@@ -220,7 +207,6 @@ class ListProcessor{
           }else if(ele.name === 'add_edge'){
             let {source, target} = ele.data;
             if(source && target){
-              console.log('ADD', source, target);
               this.addEdge(source, target);
             }
           }else if(ele.name === 'remove_edge'){
@@ -238,34 +224,17 @@ class ListProcessor{
   }
 
   pushFront(value: number = 0){
-    /*
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: this.props.pseudoset.pushFront,
-      }
-    });
-    */
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     const commands = this.list.push_front({id: id.toString(), value});
     this.processCommands(commands);
     this.layoutProcessing();
     this.pushStep();
-    //console.log(this.buffer);
     return this.buffer;
   }
 
 
   pushBack(value: number = 0, slow:boolean = false){
-    /*
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: this.props.pseudoset.pushBack,
-      }
-    });
-    */
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     const commands = this.list.push_back({id: id.toString(), value}, slow);
@@ -276,14 +245,6 @@ class ListProcessor{
   }
 
   popFront(){
-    /*
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: this.props.pseudoset.popFront,
-      }
-    });
-    */
     const commands = this.list.pop_front();
     this.processCommands(commands);
     this.layoutProcessing();
@@ -292,14 +253,6 @@ class ListProcessor{
   }
 
   popBack(slow:boolean=false){
-    /*
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: this.props.pseudoset.popBack,
-      }
-    });
-    */
     const commands = this.list.pop_back(slow);
     this.processCommands(commands);
     this.layoutProcessing();
@@ -308,19 +261,9 @@ class ListProcessor{
   }
 
   insert(value:number = 0, where:string, slow = false, nodeId: string){
-    /*
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: (where === 'before' ? this.props.pseudoset.insertBefore : this.props.pseudoset.insertAfter),
-      }
-    });
-    */
     let id = 0;
     while(this.cy.getElementById(id.toString()).length > 0) id++;
     let commands;
-    console.log(nodeId);
-    console.log(this.list._data);
     if(where === 'before') commands = this.list.insert_before(nodeId, id.toString(), value, slow);
     else commands = this.list.insert_after(nodeId, id.toString(), value, slow);
     this.processCommands(commands);
@@ -330,15 +273,6 @@ class ListProcessor{
   }
 
   remove(slow = false, nodeId: string){
-
-    /*
-    this.props.dispatch({
-      type: actions.CHANGE_PSEUDO,
-      payload: {
-        pseudo: this.props.pseudoset.remove,
-      }
-    });
-    */
     const commands = this.list.delete_position(nodeId, slow);  
     this.processCommands(commands);
     this.layoutProcessing();

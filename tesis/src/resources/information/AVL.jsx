@@ -97,30 +97,30 @@ const AVL = (
     </p>
     <p>Existen dos casos a considerar cuando se balancea un árbol A, los cuales se dividen en dos casos:</p>
     <ul>
-      <li>
+      <li key='1'>
         <p><b>Caso 1</b>: El sub-árbol derecho es el mas alto (el factor del árbol es 2) </p>
         <p>Siendo D el sub-árbol derecho, se consideran dos casos:</p>
         <ul>
-          <li>
+          <li key='1.1'>
             <p><b>Caso 1.1</b>: El sub-árbol derecho de D es mas alto (el factor de D es 1 o 0)</p>
             <p>En este caso se realiza una rotación izquierda en A</p>
           </li>
-          <li>
+          <li key='1.2'>
             <p><b>Caso 1.2</b>: El sub-árbol izquierdo de D es mas alto (el factor de D es -1)</p>
             <p>En este caso se realizará una <i>doble rotación</i>, primero se rotará D hacia la derecha y luego
             se rotará A hacia la izquierda</p>
           </li>
         </ul>
       </li>
-      <li>
+      <li key='2'>
         <p><b>Caso 2</b>: El sub-árbol izquierdo de A es el mas alto (el factor de A es 2) </p>
         <p>Siendo I el sub-árbol izquierdo, se consideran dos casos:</p>
         <ul>
-          <li>
+          <li key='2.1'>
             <p><b>Caso 2.1</b>: El sub-árbol izquierdo de I es mas alto (el factor de I es -1 o 0)</p>
             <p>En este caso se realiza una rotación derecha en A</p>
           </li>
-          <li>
+          <li key='2.2'>
             <p><b>Caso 2.2</b>: El sub-árbol derecho de I es mas alto (el factor de I es 1)</p>
             <p>En este caso se realizará una <i>doble rotación</i>, primero se rotará I hacia la izquierda y luego
             se rotará A hacia la derecha</p>

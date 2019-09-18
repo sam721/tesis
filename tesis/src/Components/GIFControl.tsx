@@ -26,7 +26,6 @@ class  GIFControl extends React.Component<Props>{
     this.props.callback();
   }
   render(){
-    console.log(this.props.processing);
     const {timeEllapsed} = this.props;
     let ss = Math.floor(timeEllapsed/10).toString();
     let ms = (timeEllapsed%10).toString();

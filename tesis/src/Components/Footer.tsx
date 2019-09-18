@@ -76,8 +76,8 @@ const mapStateToProps = (state:Props) => {
 let interval = 0;
 const ControlButton:FunctionComponent<ButtonProps> = ({title, callback, delay, children}) => {
   return <button title={title} className='dropdown-button'
-          onMouseDown={()=>{callback(); interval=window.setInterval(() => callback(), delay); console.log('STARTED', interval)}}
-          onMouseUp={() => {console.log('STOP', interval); clearInterval(interval)}}>
+          onMouseDown={()=>{callback(); interval=window.setInterval(() => callback(), delay);}}
+          onMouseUp={() => { clearInterval(interval)}}>
             {children}
           </button>
 }
@@ -89,7 +89,6 @@ class Footer extends React.Component<Props, State>{
   }
   interval = 0;
   render(){
-    console.log(this.props.algorithm);
     const {animation, paused} = this.props;
     let control;
     if(!animation){ 

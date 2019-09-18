@@ -405,7 +405,6 @@ class BinarySearch extends React.Component<Props, State> {
 			const commands = BinarySearchAlgo(this.state.values, value);
 			this.buffer = processCommands(this.exportGraph(), commands);
 			const found = this.cy.nodes('[value = '+value+']').length > 0;
-			console.log(found);
       resolve(found);
     }).then((found:boolean)=> {
       setTimeout(this.executeAnimation, 1000/this.props.speed, found);

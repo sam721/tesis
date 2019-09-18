@@ -71,18 +71,18 @@ const BST = (
         Un Árbol Binario de Búsqueda es una estructura de datos
         en la cual se cumplen las siguientes propiedades:
         <ol>
-          <li>
+          <li key='1'>
             Es un Árbol Binario
           </li>
-          <li>
+          <li key='2'>
             Todos los nodos pertenecientes al sub-árbol izquierdo son menores
             o iguales que la raíz
           </li>
-          <li>
+          <li key='3'>
             Todos los nodos pertenecientes al sub-árbol derecho son mayores
             que la raíz
           </li>
-          <li>
+          <li key='4'>
             Todos los nodos del árbol son Árboles Binarios de Búsqueda
           </li>
         </ol>
@@ -117,16 +117,16 @@ const BST = (
     <p>
       Existen tres casos a considerar en la eliminación de nodos en un ABB.
       <ol>
-        <li>
+        <li key='1'>
           Eliminar una hoja: El caso mas sencillo, simplemente se elimina del árbol. Se sigue manteniendo
           la propiedad del ABB.
         </li>
-        <li>Eliminar un nodo con un solo hijo: En este caso, el único hijo del nodo a eliminar
+        <li key='2'>Eliminar un nodo con un solo hijo: En este caso, el único hijo del nodo a eliminar
           lo suplantará. Llamando P y H a los nodos padre e hijo del nodo a eliminar, se convierte a H
           como el nuevo hijo de P. En el caso de que el nodo a eliminar sea la raíz, H se convierte en la nueva
           raíz del árbol
         </li>
-        <li>
+        <li key='3'>
           <p>
             Eliminar un nodo con dos hijos: Debido a la complejidad de eliminar un nodo con
             dos hijos, este caso se puede simplificar a alguno de los casos anteriores. Para esto, se busca el nodo

@@ -4,7 +4,6 @@ import { Button} from 'react-bootstrap';
 import actions from '../Actions/actions';
 
 const { connect } = require('react-redux');
-//5(3(1(.)(.))(4(.)(.)))(9(7(6(.)(.))(8(.)(.)))(15(11(.)(.))(.)))
 type Props = {
   show: boolean,
   handleClose: () => void,

@@ -215,7 +215,6 @@ class BST extends React.Component<Props, State>{
 			}
     });
     this.treeRoot = root;
-		//this.cy.on('resize', () => { this.layoutProcessing(); this.refreshLayout(false)});
 		this.layout = this.cy.elements().makeLayout({...layoutOptions, animate: false});
 		this.layout.run();
 
@@ -291,8 +290,6 @@ class BST extends React.Component<Props, State>{
 			if (style != null) node.style(style);
       const position = node.data('position');
       if(keep && positions[node.id()]) node.position({x:positions[node.id()].x, y:positions[node.id()].y});
-			//console.log("PREV", node.position());
-			//console.log("NEXT", position);
 			if (position != null) {
 				layoutOptions.positions[node.id()] = JSON.parse(JSON.stringify(position));
 			}
@@ -340,7 +337,6 @@ class BST extends React.Component<Props, State>{
 	}
 
 	pushState(){
-    console.log('pushed');
 		this.redo = [];
 		this.undo.push({root: this.treeRoot, elements: this.exportGraph()});
   }
@@ -433,7 +429,6 @@ class BST extends React.Component<Props, State>{
                 this.loadGraph(this.buffer[this.buffer.length-1].elements);
                 this.treeRoot = this.buffer[this.buffer.length-1].treeRoot;
                 this.props.dispatch({ type: actions.ANIMATION_END });
-                console.log(getChildren(this.cy.getElementById(this.treeRoot)));
 							}
 						}]
 				}
@@ -541,7 +536,6 @@ class BST extends React.Component<Props, State>{
     const levels:{[lvl: number]: Array<string>} = {};
 
     const dfs = (node: CytoscapeElement, depth: number, x: number) => {
-      console.log(node.data('value'));
       node.data('depth', depth);
       node.data('X', x);
       
@@ -616,7 +610,6 @@ class BST extends React.Component<Props, State>{
       if(pseudo) this.props.dispatch({ type: actions.CHANGE_PSEUDO, payload: { pseudo}});
       if (lines) this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
       if(treeRoot != null) this.treeRoot = treeRoot;
-			console.log(duration);
 			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration) / (this.props.speed));
 		}
 		step();
@@ -655,7 +648,6 @@ class BST extends React.Component<Props, State>{
   remove(value=0){ 
     this.pushState();
     this.buffer = this.BSTProcessor.remove(value);
-    console.log(this.buffer);
     this.step = 0;
     new Promise((resolve, reject) => {
       this.props.dispatch({type: actions.ANIMATION_START});
@@ -665,8 +657,6 @@ class BST extends React.Component<Props, State>{
 
   handleClose = (update: boolean = false) => {
     this.setState({show: false});
-
-    console.log(update);
     if(update){
       this.treeRoot = "0";
       this.layoutProcessing();
