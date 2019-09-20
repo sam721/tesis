@@ -80,16 +80,25 @@ const BellmanFord = (param) => {
           lines: [9],
         });
       if(dist[u] != null){
+        commands.push(
+          {
+            eles: [u, v, edgeId],
+            style: [Styles.NODE, Styles.NODE, Styles.EDGE_DIRECTED],
+            lines: [9],
+            duration: 0,
+          });
         if(dist[u] + w < dist[v]){
           const eles = [], style = [];
           const visited = {};
           while(true){
-            visited[u] = true;
             const prev = pre[u];
-            eles.push(prev.id, prev.u);
-            style.push(Styles.EDGE_SELECTED, Styles.NODE_RED);
+            if(visited[prev.u] == null) visited[prev.u] = 1;
+            else if(visited[prev.u] === 1){
+              eles.push(prev.id, prev.u);
+              style.push(Styles.EDGE_SELECTED, Styles.NODE_RED);
+              visited[prev.u] = 2;
+            }else break;
             u = prev.u;
-            if(visited[u]) break;
           }
           commands.push(
             {
