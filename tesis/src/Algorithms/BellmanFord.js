@@ -67,8 +67,8 @@ const BellmanFord = (param) => {
     const currentId = 'node-'+j;
     const current = cy.getElementById(currentId);
     const outgoers = current.outgoers('edge');
-    for(const edge of outgoers){
-      if(negativeCycle) break;
+    outgoers.forEach(edge => {
+      if(negativeCycle) return;
       let   u = edge.data('source'),
             v = edge.data('target'),
             w = edge.data('weight');
@@ -108,7 +108,7 @@ const BellmanFord = (param) => {
           eles: [u, v, edgeId],
           style: [Styles.NODE, Styles.NODE, Styles.EDGE_DIRECTED],
         });
-    }
+    });
   };
 
   return commands;
