@@ -108,9 +108,8 @@ class HeapProcessor{
 		}
 		let height = getHeight(this.cy.getElementById("1"));
 
-		let sep = (1 << height) * 6;
-
-		const setSep = (node: CytoscapeElement, nx: number, ny: number, sep: number) => {
+    const w = 40, c = 10;
+		const setSep = (node: CytoscapeElement, nx: number, ny: number, height: number) => {
       const prevPosition = node.data('position');
       node.data('prevPosition', prevPosition);
       node.data('position', { x: nx, y: ny });
@@ -118,10 +117,16 @@ class HeapProcessor{
       const prevPopPosition = popper.data('position');
       popper.data('prevPosition', prevPopPosition);
 			popper.data('position', { x: nx, y: ny + 32 });
-			if (node.outgoers('node').length) setSep(node.outgoers('node')[0], nx - sep, ny + 50, sep / 2);
-			if (node.outgoers('node').length === 2) setSep(node.outgoers('node')[1], nx + sep, ny + 50, sep / 2);
+			if (node.outgoers('node').length){
+        const width = (1<<(height-1))*(w + c) - c;
+        setSep(node.outgoers('node')[0], nx - width/2 - c/2, ny + 50, height-1);
+      }
+			if (node.outgoers('node').length === 2){
+        const width = (1<<(height-1))*(w + c) - c;
+        setSep(node.outgoers('node')[1], nx + width/2 + c/2, ny + 50, height-1);
+      }
 		}
-		setSep(this.cy.getElementById("1"), this.vw / 2, this.vh / 4, sep);
+		setSep(this.cy.getElementById("1"), this.vw / 2, this.vh / 4, height-1);
 		return true;
   }
   

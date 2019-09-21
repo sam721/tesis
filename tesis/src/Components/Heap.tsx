@@ -503,34 +503,6 @@ class Heap extends React.Component<Props, State>{
 			this.removeNode(nodes[i].id());
 		}
 	}
-
-	layoutProcessing() {
-		const getHeight = (node: CytoscapeElement) => {
-			let outgoers = node.outgoers('node');
-			let height = 0;
-			for (let i = 0; i < outgoers.length; i++) {
-				height = Math.max(height, getHeight(outgoers[i]));
-			}
-			return height + 1;
-		}
-		let height = getHeight(this.cy.getElementById("1"));
-
-		let sep = (1 << height) * 5;
-
-		const setSep = (node: CytoscapeElement, nx: number, ny: number, sep: number) => {
-			layoutOptions.positions[node.id()] = { x: nx, y: ny }
-			node.data('position', {x: nx, y: ny});
-			const popper = this.cy.getElementById(node.id() + '-popper');
-			layoutOptions.positions[popper.id()] = { x: nx, y: ny + 32 }
-			popper.data('position', {x: nx, y: ny+32});
-			if (node.outgoers('node').length) setSep(node.outgoers('node')[0], nx - sep, ny + 50, sep / 2);
-			if (node.outgoers('node').length === 2) setSep(node.outgoers('node')[1], nx + sep, ny + 50, sep / 2);
-		}
-		const vw = this.cy.width(), vh = this.cy.height();
-		setSep(this.cy.getElementById("1"), vw / 2, vh / 4, sep);
-		return true;
-	}
-	
 	insert(val = 0) {
 		if (this.props.animation) {
 			this.props.dispatch({
