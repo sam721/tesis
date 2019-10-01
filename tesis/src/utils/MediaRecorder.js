@@ -104,7 +104,7 @@ class MediaRecorder{
     const graph = JSON.stringify(elements); 
     let link = document.createElement('a');
     link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(graph));
-    link.setAttribute('download', 'graph.json');
+    link.setAttribute('download', 'grafo.cyf');
     link.setAttribute('target', '_blank');
     link.style.display = 'none';
     document.body.appendChild(link);

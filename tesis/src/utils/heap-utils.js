@@ -11,7 +11,7 @@ export function parseHeap(values){
   const output = values.toString();
   let link = document.createElement('a');
   link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(output));
-  link.setAttribute('download', 'avl.txt');
+  link.setAttribute('download', 'heap.cyf');
   link.setAttribute('target', '_blank');
   link.style.display = 'none';
   document.body.appendChild(link);
