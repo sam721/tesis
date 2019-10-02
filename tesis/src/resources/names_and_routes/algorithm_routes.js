@@ -15,6 +15,7 @@ const algorithmRoutes = {
   MinHeap: '/minheap',
   AVL: '/avl',
   BST: '/arbol-binario-de-busqueda',
+  Home: '/',
 };
 
 export default algorithmRoutes;

@@ -177,7 +177,7 @@ const notificationsReducer = action => {
 
     case actions.STARTING_GIF_RECORDING_INFO:
       createNotification('Creación de GIF iniciada',
-      'La grabación tendra una duracion maxima de 30 segundos',
+      'Para detener la grabación, presione nuevamente el botón',
       'info');
       break;
     

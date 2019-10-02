@@ -5,6 +5,11 @@ import GIFControl from './GIFControl';
 import routes from '../resources/names_and_routes/algorithm_routes';
 import actions from '../Actions/actions';
 import About from './About';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faHome,
+}from '@fortawesome/free-solid-svg-icons'
+
 const {connect} = require('react-redux');
 const {
 	NavLink,
@@ -54,63 +59,70 @@ class MenuBar extends React.Component<Props, State>{
       <NavLink to={routes.AVL}><button className='dropdown-button'>Árbol AVL</button></NavLink>,
     ];
     return (
-      <div className='top-bar'>
-        <About show={this.state.showAbout} close={()=>this.setState({showAbout: false})}/>
-        <Row>
-          <Col xs={1} sm={2} md={2}>
-            <div className='dropdown'>
-              <button className='dropdown-button'>Algoritmos</button>
-              <HashRouter>
-                <div className='dropdown-menu'>
-                  <div className='dropright'>
-                    <button className='dropdown-button'>Algoritmos de Búsqueda</button>
-                    <div className='right-menu'>
-                      {searchAlgorithms}
-                    </div>  
-                  </div>
-                  <div className='dropright'>
-                  <button className='dropdown-button'>Árbol Recubridor Mínimo</button>
-                    <div className='right-menu'>
-                      {mstAlgorithms}
-                    </div>
-                  </div>
-                  <div className='dropright'>
-                  <button className='dropdown-button'>Arreglos</button>
-                    <div className='right-menu'>
-                      {arrays}
-                    </div>
-                  </div>
-                  <div className='dropright'>
-                  <button className='dropdown-button'>Estructuras de Datos</button>
-                    <div className='right-menu'>
-                      {dataStructures}
-                    </div>
-                  </div>
-                </div>
-              </HashRouter>
-            </div>
-          </Col>
-          <Col xs={1} sm={2} md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
-            <PhotoControl callback={this.props.photo}/>
-          </Col>
-          <Col xs={1} sm={2} md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
-            <GIFControl callback={this.props.gif}/>
-          </Col>
-          <Col xs={1} sm={2} md={{span: 2, offset: 6}}>
-            <div className='dropdown'>
-              <button className='dropdown-button'>Ayuda</button>
-              <div className='dropdown-menu'>
-                <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_TUTORIAL_MODAL})}>
-                  Dibujo de grafos
+      <HashRouter>
+        <div className='top-bar'>
+          <About show={this.state.showAbout} close={()=>this.setState({showAbout: false})}/>
+          <Row>
+            <Col xs={1} sm={1} md={1}>
+              <NavLink to={routes.Home}>
+                <button className='dropdown-button'>
+                  <FontAwesomeIcon title='Home' icon={faHome} size="lg"/>
                 </button>
-                <button className='dropdown-button' onClick={() => this.setState({showAbout: true})}>
-                  Acerca de
-                </button>
+              </NavLink>
+            </Col>
+            <Col xs={1} sm={2} md={2}>
+              <div className='dropdown'>
+                <button className='dropdown-button'>Algoritmos</button>
+                  <div className='dropdown-menu'>
+                    <div className='dropright'>
+                      <button className='dropdown-button'>Algoritmos de Búsqueda</button>
+                      <div className='right-menu'>
+                        {searchAlgorithms}
+                      </div>  
+                    </div>
+                    <div className='dropright'>
+                    <button className='dropdown-button'>Árbol Recubridor Mínimo</button>
+                      <div className='right-menu'>
+                        {mstAlgorithms}
+                      </div>
+                    </div>
+                    <div className='dropright'>
+                    <button className='dropdown-button'>Arreglos</button>
+                      <div className='right-menu'>
+                        {arrays}
+                      </div>
+                    </div>
+                    <div className='dropright'>
+                    <button className='dropdown-button'>Estructuras de Datos</button>
+                      <div className='right-menu'>
+                        {dataStructures}
+                      </div>
+                    </div>
+                  </div>
               </div>
-            </div>
-          </Col>
-        </Row>
-      </div>
+            </Col>
+            <Col xs={1} sm={2} md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
+              <PhotoControl callback={this.props.photo}/>
+            </Col>
+            <Col xs={1} sm={2} md={1} style={{visibility: this.props.algorithm !== 'none' ? 'visible' : 'hidden'}}>
+              <GIFControl callback={this.props.gif}/>
+            </Col>
+            <Col xs={1} sm={2} md={{span: 2, offset: 5}}>
+              <div className='dropdown'>
+                <button className='dropdown-button'>Ayuda</button>
+                <div className='dropdown-menu'>
+                  <button className='dropdown-button' onClick={() => this.props.dispatch({type: actions.TOGGLE_TUTORIAL_MODAL})}>
+                    Dibujo de grafos
+                  </button>
+                  <button className='dropdown-button' onClick={() => this.setState({showAbout: true})}>
+                    Acerca de
+                  </button>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </HashRouter>
     )
   }
 };
