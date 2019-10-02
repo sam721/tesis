@@ -58,12 +58,12 @@ class Home extends React.Component<Props> {
             <Col md={4}>
               <AlgoThumb imgSrc={BFS} title='Algoritmos sobre grafos'>
                 <div className='thumb-menu'>
-                  <NavLink to={routes.BFS}><button>Busqueda en Anchura</button></NavLink>
-                  <NavLink to={routes.DFS}><button>Busqueda en Profundidad</button></NavLink>
-                  <NavLink to={routes.Dijkstra}><button>Camino minimo - Dijkstra</button></NavLink>
-                  <NavLink to={routes.BellmanFord}><button>Camino minimo - Bellman-Ford</button></NavLink>
-                  <NavLink to={routes.Kruskal}><button>Arbol Recubridor Minimo - Kruskal</button></NavLink>
-                  <NavLink to={routes.Prim}><button>Arbol Recubridor Minimo - Prim</button></NavLink>
+                  <NavLink to={routes.BFS}><button>Búsqueda en Anchura</button></NavLink>
+                  <NavLink to={routes.DFS}><button>Búsqueda en Profundidad</button></NavLink>
+                  <NavLink to={routes.Dijkstra}><button>Camino mínimo - Dijkstra</button></NavLink>
+                  <NavLink to={routes.BellmanFord}><button>Camino mínimo - Bellman-Ford</button></NavLink>
+                  <NavLink to={routes.Kruskal}><button>Árbol Recubridor Mínimo - Kruskal</button></NavLink>
+                  <NavLink to={routes.Prim}><button>Árbol Recubridor Mínimo - Prim</button></NavLink>
                 </div>
               </AlgoThumb>
             </Col>
@@ -84,7 +84,7 @@ class Home extends React.Component<Props> {
                 <div className='thumb-menu'>
                   <NavLink to={routes.BinarySearch}><button>Ordenamiento Burbuja</button></NavLink>
                   <NavLink to={routes.MergeSort}><button>Ordenamiento por Mezcla</button></NavLink>
-                  <NavLink to={routes.BinarySearch}><button>Busqueda Binaria</button></NavLink>
+                  <NavLink to={routes.BinarySearch}><button>Búsqueda Binaria</button></NavLink>
                 </div>
               </AlgoThumb>
             </Col>
