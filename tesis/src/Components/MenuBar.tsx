@@ -42,7 +42,7 @@ class MenuBar extends React.Component<Props, State>{
     const arrays = [
       <NavLink to={routes.BubbleSort}><button className='dropdown-button'>Bubble Sort</button></NavLink>,
       <NavLink to={routes.MergeSort}><button className='dropdown-button'>Merge Sort</button></NavLink>,
-      <NavLink to={routes.BinarySearch}><button className='dropdown-button'>Busqueda Binaria</button></NavLink>
+      <NavLink to={routes.BinarySearch}><button className='dropdown-button'>Búsqueda Binaria</button></NavLink>
     ];
     const dataStructures = [
       <NavLink to={routes.SingleLinkedList}><button className='dropdown-button'>Lista enlazada</button></NavLink>,
@@ -51,7 +51,7 @@ class MenuBar extends React.Component<Props, State>{
       <NavLink to={routes.DoubleLinkedList}><button className='dropdown-button'>Lista doble</button></NavLink>,
       <NavLink to={routes.MinHeap}><button className='dropdown-button'>Min Heap</button></NavLink>,
       <NavLink to={routes.BST}><button className='dropdown-button'>ABB</button></NavLink>,
-      <NavLink to={routes.AVL}><button className='dropdown-button'>Arbol AVL</button></NavLink>,
+      <NavLink to={routes.AVL}><button className='dropdown-button'>Árbol AVL</button></NavLink>,
     ];
     return (
       <div className='top-bar'>
@@ -63,13 +63,13 @@ class MenuBar extends React.Component<Props, State>{
               <HashRouter>
                 <div className='dropdown-menu'>
                   <div className='dropright'>
-                    <button className='dropdown-button'>Algoritmos de Busqueda</button>
+                    <button className='dropdown-button'>Algoritmos de Búsqueda</button>
                     <div className='right-menu'>
                       {searchAlgorithms}
                     </div>  
                   </div>
                   <div className='dropright'>
-                  <button className='dropdown-button'>Arbol Recubridor Minimo</button>
+                  <button className='dropdown-button'>Árbol Recubridor Mínimo</button>
                     <div className='right-menu'>
                       {mstAlgorithms}
                     </div>
