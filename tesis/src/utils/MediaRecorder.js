@@ -26,7 +26,7 @@ class MediaRecorder{
       
             let link = document.createElement('a');
             link.setAttribute('href', window.URL.createObjectURL(image));
-            link.setAttribute('download', 'test.gif');
+            link.setAttribute('download', 'animacion.gif');
             link.setAttribute('target', '_blank');
             link.style.display = 'none';
             document.body.appendChild(link);
@@ -61,7 +61,7 @@ class MediaRecorder{
     if(download){
       let link = document.createElement('a');
       link.setAttribute('href', image);
-      link.setAttribute('download', 'test.jpg');
+      link.setAttribute('download', 'foto.jpg');
       link.setAttribute('target', '_blank');
       link.style.display = 'none';
       document.body.appendChild(link);
