@@ -69,7 +69,7 @@ class ListProcessor{
       const node = this.cy.getElementById(id);
       const prevPosition = node.data('position');
       node.data('prevPosition', {x: prevPosition.x, y: prevPosition.y});
-      node.data('position', { x: mid - (n-1)*(40) + 70*i, y: this.vh/4 });
+      node.data('position', { x: mid - (n-1)*(40) + 80*i, y: this.vh/4 });
     }
   }
 

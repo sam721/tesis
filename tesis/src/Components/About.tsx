@@ -16,10 +16,10 @@ const About = (props:{show:boolean, close:() => void}) => {
             <img src={Ciencias} alt='ciencias-logo' height='100px'/>
           </div>
           <div style={{textAlign: 'justify'}}>
-            <p>CytoAyed es desarrollado por el estudiante Samuel Nacache, 
+            <p>CytoAyed es desarrollado por Samuel Nacache, 
               estudiante de computación de la Facultad de Ciencias de la Universidad Central de Venezuela,
               como trabajo final para optar por el título de Licenciado en Computación</p>
-            <p>Creado con el objetivo de ayudar a tanto nuevos estudiantes de computación, como a 
+            <p>Creado con el objetivo de ayudar tanto a nuevos estudiantes de computación, como a 
               interesados en las ciencias de la computación en general, CytoAyed ofrece visualizaciones 
               de diversos algoritmos, cubriendo principalmente el contenido temático de las asignaturas 
               de pregrado de la carrera de computación de la Facultad de Ciencias
