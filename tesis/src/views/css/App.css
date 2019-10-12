@@ -11,3 +11,11 @@
 .App {
   text-align: center;
 }
+
+.mobile {
+	font-size: 30px;
+	height: 100vh;
+	width: 100%;
+	background: rgb(2,0,36);
+ 	background: linear-gradient(to bottom, rgba(2,0,36,1) 0%, rgba(18,21,88,1) 25%, rgba(0,212,255,1) 100%);
+}
