@@ -82,7 +82,7 @@ class Home extends React.Component<Props> {
             <Col md={4}>
               <AlgoThumb imgSrc={ArrayPic} title='Algoritmos sobre arreglos'>
                 <div className='thumb-menu'>
-                  <NavLink to={routes.BinarySearch}><button>Ordenamiento Burbuja</button></NavLink>
+                  <NavLink to={routes.BubbleSort}><button>Ordenamiento Burbuja</button></NavLink>
                   <NavLink to={routes.MergeSort}><button>Ordenamiento por Mezcla</button></NavLink>
                   <NavLink to={routes.BinarySearch}><button>Búsqueda Binaria</button></NavLink>
                 </div>

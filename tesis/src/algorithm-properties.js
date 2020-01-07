@@ -5,6 +5,13 @@ import BellmanFord from './Algorithms/BellmanFord';
 import Prim from './Algorithms/Prim';
 import Kruskal from './Algorithms/Kruskal';
 
+import MergeSort from './Algorithms/MergeSort';
+import BubbleSort from './Algorithms/BubbleSort';
+import BinarySearch from './Algorithms/BinarySearch';
+
+import process from './Processing/graph-processing';
+import mergeSortProcess from './Processing/mergesort-processing';
+
 import pseudocodes from './resources/pseudocodes/list';
 import actions from './Actions/actions';
 const properties = {
@@ -57,12 +64,18 @@ const properties = {
   
   BubbleSort: {
     action: actions.SELECT_BUBBLESORT,
+    execute: BubbleSort,
+    process,
   },
   MergeSort: {
     action: actions.SELECT_MERGESORT,
+    execute: MergeSort,
+    process: mergeSortProcess,
   },
   BinarySearch: {
     action: actions.SELECT_BINARY_SEARCH,
+    execute: BinarySearch,
+    process,
   },
   SingleLinkedList: {
     action: actions.SELECT_LINKED_LIST,

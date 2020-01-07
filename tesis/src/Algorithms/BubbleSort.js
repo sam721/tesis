@@ -1,6 +1,6 @@
 const BubbleSort = (param) => {
   const values = [];
-  for(let i = 0; i < param.length; i++) values.push(param[i]);
+  for(let i = 0; i < param.values.length; i++) values.push(param.values[i]);
   const n = values.length;
 
   const commands = [];

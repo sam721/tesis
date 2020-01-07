@@ -4,13 +4,11 @@ import Heap from './Components/Heap';
 import Home from './Components/Home';
 import BST from './Components/BST'
 import properties from './algorithm-properties';
-import BubbleSort from './Components/BubbleSort';
-import MergeSort from './Components/MergeSort';
-import BinarySearch from './Components/BinarySearch';
 import LinkedList from './Components/LinkedList';
 
 import routes from './resources/names_and_routes/algorithm_routes';
 import names from './resources/names_and_routes/algorithm_names';
+import ArrayComponent from './Components/ArrayComponent';
 
 const { HashRouter, Route, Switch } = require('react-router-dom');
 class Editor extends React.Component {
@@ -27,9 +25,9 @@ class Editor extends React.Component {
 					<Route key={names.Heap} path={routes.MinHeap} render={() => <Heap {...properties.Heap} />} />
 					<Route key={names.BST} path={routes.BST} render={() => <BST {...properties.BST} />} />
 					<Route key={names.AVL} path={routes.AVL} render={() => <BST {...properties.AVL} />} />
-					<Route key={names.BubbleSort} path={routes.BubbleSort} render={() => <BubbleSort {...properties.BubbleSort} />} />
-					<Route key={names.MergeSort} path={routes.MergeSort} render={() => <MergeSort {...properties.MergeSort} />} />
-					<Route key={names.BinarySearch} path={routes.BinarySearch} render={() => <BinarySearch {...properties.BinarySearch} />} />
+					<Route key={names.BubbleSort} path={routes.BubbleSort} render={() => <ArrayComponent {...properties.BubbleSort} />} />
+					<Route key={names.MergeSort} path={routes.MergeSort} render={() => <ArrayComponent {...properties.MergeSort} />} />
+					<Route key={names.BinarySearch} path={routes.BinarySearch} render={() => <ArrayComponent {...properties.BinarySearch} />} />
 					<Route key={names.SingleLinkedList} path={routes.SingleLinkedList} render={() => <LinkedList {...properties.SingleLinkedList} />} />
 					<Route key={names.DoubleLinkedList} path={routes.DoubleLinkedList} render={() => <LinkedList {...properties.DoubleLinkedList} />} />
 					<Route key={names.Queue} path={routes.Queue} render={() => <LinkedList {...properties.Queue} />} />

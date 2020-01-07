@@ -400,9 +400,7 @@ class BubbleSort extends React.Component<Props, State> {
     new Promise((resolve: () => void, reject) => { 
       this.props.dispatch({
         type: actions.ANIMATION_START,
-      })
-			const commands = Bubblesort(this.state.values);
-			this.buffer = processCommands(this.exportGraph(), commands);     
+      })   
 			resolve();
     }).then(()=> {
       setTimeout(this.executeAnimation, 1000/this.props.speed);

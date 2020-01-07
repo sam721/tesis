@@ -426,8 +426,7 @@ class MergeSort extends React.Component<Props, State> {
       this.props.dispatch({
         type: actions.ANIMATION_START,
       })
-			const commands = Mergesort(this.state.values, this.cy.width(), this.cy.height());
-			this.buffer = processCommands(this.exportGraph(), commands);     
+  
 			resolve();
     }).then(()=> {
       setTimeout(this.executeAnimation, 1000/this.props.speed);

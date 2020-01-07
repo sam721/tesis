@@ -1,4 +1,6 @@
-const mergeSortAnimation = (input, width, height) => {
+const mergeSortAnimation = (obj) => {
+  let input = obj.values;
+  const {width, height} = obj;
   const commands = [];
 
   const mergeSort = (param, start, l, r, h) => {

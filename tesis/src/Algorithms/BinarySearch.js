@@ -1,6 +1,7 @@
 import Sort from './BubbleSort-util';
-const BinarySearch = (param, value) => {
-  const values = Sort(param);
+const BinarySearch = (param) => {
+  const values = Sort(param.values);
+  const value = param.value;
   const n = values.length;
   const positions = Array(n).fill().map((value, index) => index.toString());
   const defaultStyle = Array(n).fill({'border-width': 1, 'z-index': 0});
