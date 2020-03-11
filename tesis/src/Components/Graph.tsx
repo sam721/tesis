@@ -17,7 +17,7 @@ const autopanOnDrag = require('cytoscape-autopan-on-drag');
 autopanOnDrag(cytoscape);
 
 type Props = {
-	
+
 	dispatch: (action: Object) => Object,
 
 	weighted: Boolean,
@@ -99,32 +99,20 @@ class Graph extends React.Component<Props, State>{
 
 	undo: Array<Array<Object>> = [];
 	redo: Array<Array<Object>> = [];
-	
-	options: Array<{name: string, run: () => void}>;
+
+	options: Array<{ name: string, run: () => void }>;
 	cy = cytoscape();
 
-	buffer: Array<{elements: Array<Object>, lines: Array<number>, duration: number, action?:string}> = [];
+	buffer: Array<{ elements: Array<Object>, lines: Array<number>, duration: number, action?: string }> = [];
 
-	step:number=0;
+	step: number = 0;
 	animationTimeout = 0;
 	constructor(props: Props) {
 		super(props);
-		if (this.props.weighted) {
-			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_WEIGHTED };
-		}
-		if (this.props.directed) {
-			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_DIRECTED };
-		}
-
-		this._mediaRecorder = new MediaRecorder(props.dispatch);
 		this.options = [
 			{
 				name: 'Ejecutar',
 				run: this.runButton,
-			},
-			{
-				name: 'Cambiar peso',
-				run: this.weightButton,
 			},
 			{
 				name: 'Descargar grafo',
@@ -132,9 +120,25 @@ class Graph extends React.Component<Props, State>{
 			},
 			{
 				name: 'Subir grafo',
-				run: () => this.setState({showModal: true}),
+				run: () => this.setState({ showModal: true }),
 			}
 		];
+
+		if (this.props.weighted) {
+			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_WEIGHTED };
+			this.options.push(
+				{
+					name: 'Cambiar peso',
+					run: this.weightButton,
+				},
+			)
+		}
+		if (this.props.directed) {
+			this.edgeStyle = { ...this.edgeStyle, ...Styles.EDGE_DIRECTED };
+		}
+
+		this._mediaRecorder = new MediaRecorder(props.dispatch);
+
 	}
 
 	componentDidMount() {
@@ -142,7 +146,7 @@ class Graph extends React.Component<Props, State>{
 		this.initialize([]);
 		this.props.dispatch({
 			type: this.props.action,
-			payload:{
+			payload: {
 				run: this.runButton,
 				photo: () => this._mediaRecorder.takePicture(this.cy),
 				gif: () => this._mediaRecorder.takeGif(this.cy),
@@ -158,28 +162,28 @@ class Graph extends React.Component<Props, State>{
 				clear: this.clearGraph,
 			}
 		});
-		const {cookies} = this.props;
-		if(this.props.action === actions.SELECT_DIJKSTRA){
-			if(!cookies.get('dijkstra_warning')){
-				cookies.set('dijkstra_warning', 'true', {path: '/'});		
+		const { cookies } = this.props;
+		if (this.props.action === actions.SELECT_DIJKSTRA) {
+			if (!cookies.get('dijkstra_warning')) {
+				cookies.set('dijkstra_warning', 'true', { path: '/' });
 				this.props.dispatch({
 					type: actions.DIJKSTRA_NEGATIVE_WEIGHT_WARNING,
 				});
 			}
 		}
 
-		if(!cookies.get('visited')){
-			cookies.set('visited', 'true', {path: '/' });
+		if (!cookies.get('visited')) {
+			cookies.set('visited', 'true', { path: '/' });
 			this.props.dispatch({
 				type: actions.TOGGLE_TUTORIAL_MODAL,
 			});
 		}
 	}
 
-	componentDidUpdate(prevProps:Props){
-		if(!prevProps.loadingGraph && this.props.loadingGraph){
+	componentDidUpdate(prevProps: Props) {
+		if (!prevProps.loadingGraph && this.props.loadingGraph) {
 			const elements = JSON.parse(this.props.data);
-			if(elements){
+			if (elements) {
 				this.pushState();
 				this.loadGraph(elements);
 			}
@@ -187,16 +191,16 @@ class Graph extends React.Component<Props, State>{
 				type: actions.FINISHED_LOAD,
 			});
 		}
-		if(!prevProps.animation && this.props.animation){
+		if (!prevProps.animation && this.props.animation) {
 			this.props.dispatch({
 				type: actions.CHANGE_OPTIONS,
 				payload: {
 					options: [
-						{ name: 'Volver a edicion', run: this.runButton}
+						{ name: 'Volver a edicion', run: this.runButton }
 					]
 				}
 			})
-		}else if(prevProps.animation && !this.props.animation){
+		} else if (prevProps.animation && !this.props.animation) {
 			this.props.dispatch({
 				type: actions.CHANGE_OPTIONS,
 				payload: {
@@ -205,12 +209,12 @@ class Graph extends React.Component<Props, State>{
 			});
 		}
 	}
-	
+
 	componentWillUnmount() {
 		this.props.dispatch({
 			type: actions.ANIMATION_END,
 		});
-		
+
 		this._isMounted = false;
 		clearTimeout(this.animationTimeout);
 		this._mediaRecorder.cancelGif();
@@ -218,8 +222,8 @@ class Graph extends React.Component<Props, State>{
 	}
 
 
-	initialize(elements: Array<Object>, withPoppers:boolean=false){
-		
+	initialize(elements: Array<Object>, withPoppers: boolean = false) {
+
 		let edgeStyle = Styles.EDGE;
 		if (this.props.weighted) {
 			edgeStyle = { ...edgeStyle, ...Styles.EDGE_WEIGHTED };
@@ -260,10 +264,10 @@ class Graph extends React.Component<Props, State>{
 			motionBlurOpacity: 0.2,
 			pixelRatio: '1.0'
 		});
-		if(!withPoppers) this.removePoppers();
-		else{
-			this.cy.nodes().forEach((node:CytoscapeElement) => {
-				if(node.id().match('popper')) node.style({'visibility': 'hidden'});
+		if (!withPoppers) this.removePoppers();
+		else {
+			this.cy.nodes().forEach((node: CytoscapeElement) => {
+				if (node.id().match('popper')) node.style({ 'visibility': 'hidden' });
 			});
 		}
 		this.cy.on('tap', (event: CytoEvent) => this.handleClickViewport(event));
@@ -277,11 +281,11 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	handleUndo = () => {
-		if(this.undo.length === 0){
+		if (this.undo.length === 0) {
 			return;
 		}
-		
-		if(this.props.animation){
+
+		if (this.props.animation) {
 			this.props.dispatch({
 				type: actions.ANIMATION_RUNNING_ERROR,
 			});
@@ -295,23 +299,23 @@ class Graph extends React.Component<Props, State>{
 		const currentElements = this.exportGraph();
 		let elements = this.undo.pop();
 		this.redo.push(currentElements);
-		
-		if(elements !== undefined) this.loadGraph(elements);
-		
+
+		if (elements !== undefined) this.loadGraph(elements);
+
 	}
 
 	handleRedo = () => {
-		if(this.redo.length === 0){
+		if (this.redo.length === 0) {
 			return;
 		}
 
-		if(this.props.animation){
+		if (this.props.animation) {
 			this.props.dispatch({
 				type: actions.ANIMATION_RUNNING_ERROR,
 			});
 			return;
 		}
-		
+
 		this.props.dispatch({
 			type: actions.NO_SELECTION,
 		});
@@ -319,57 +323,57 @@ class Graph extends React.Component<Props, State>{
 		const currentElements = this.exportGraph();
 		const elements = this.redo.pop();
 		this.undo.push(currentElements);
-		if(elements !== undefined) this.loadGraph(elements);
+		if (elements !== undefined) this.loadGraph(elements);
 	}
 
-	pushState(){
+	pushState() {
 		this.redo = [];
 		this.undo.push(this.exportGraph());
 	}
 
-	handleRewind = () => { 
+	handleRewind = () => {
 		clearTimeout(this.animationTimeout);
-		this.props.dispatch({type: actions.ANIMATION_PAUSE});
-		this.step = Math.max(this.step-1, 0);
-		const {elements, lines} = this.buffer[this.step];
+		this.props.dispatch({ type: actions.ANIMATION_PAUSE });
+		this.step = Math.max(this.step - 1, 0);
+		const { elements, lines } = this.buffer[this.step];
 		this.loadGraph(elements);
-		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
 	}
 
-	handleForward = () => { 
+	handleForward = () => {
 		clearTimeout(this.animationTimeout);
-		this.props.dispatch({type: actions.ANIMATION_PAUSE});
-		this.step = Math.min(this.step+1, this.buffer.length-1);
-		const {elements, lines} = this.buffer[this.step];
+		this.props.dispatch({ type: actions.ANIMATION_PAUSE });
+		this.step = Math.min(this.step + 1, this.buffer.length - 1);
+		const { elements, lines } = this.buffer[this.step];
 		this.loadGraph(elements);
-		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
 	}
 
 	handleRepeat = () => {
 		clearTimeout(this.animationTimeout);
-		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.props.dispatch({ type: actions.ANIMATION_PAUSE });
 		this.step = 0;
-		const {elements, lines} = this.buffer[this.step];
+		const { elements, lines } = this.buffer[this.step];
 		this.loadGraph(elements);
-		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
 	}
 
 	handleEnd = () => {
 		clearTimeout(this.animationTimeout);
-		this.props.dispatch({type: actions.ANIMATION_PAUSE});
+		this.props.dispatch({ type: actions.ANIMATION_PAUSE });
 		this.step = this.buffer.length - 1;
-		const {elements, lines} = this.buffer[this.step];
+		const { elements, lines } = this.buffer[this.step];
 		this.loadGraph(elements);
-		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines }});
+		this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
 	}
 
 	handlePauseContinue = () => {
-		if(!this.props.paused){
+		if (!this.props.paused) {
 			clearTimeout(this.animationTimeout);
 			this.props.dispatch({
 				type: actions.ANIMATION_PAUSE,
 			})
-		}else{
+		} else {
 			new Promise(resolve => {
 				this.props.dispatch({
 					type: actions.ANIMATION_CONTINUE
@@ -378,38 +382,38 @@ class Graph extends React.Component<Props, State>{
 			}).then(() => this.animation());
 		}
 	}
-	
-	loadGraph(elements:Array<Object>, withPoppers:boolean = false){
-		try{
+
+	loadGraph(elements: Array<Object>, withPoppers: boolean = false) {
+		try {
 			const nodes = this.cy.nodes();
-			for(let i = 0; i < nodes.length; i++){
+			for (let i = 0; i < nodes.length; i++) {
 				this.removeNode(nodes[i].id());
 			}
-			for(let i = 0; i < elements.length; i++) this.cy.add(JSON.parse(JSON.stringify(elements[i])));
-			this.cy.nodes().forEach((node:CytoscapeElement) => {
+			for (let i = 0; i < elements.length; i++) this.cy.add(JSON.parse(JSON.stringify(elements[i])));
+			this.cy.nodes().forEach((node: CytoscapeElement) => {
 				const style = node.data('style');
-				if(style != null) node.style(style);
+				if (style != null) node.style(style);
 			})
-			this.cy.edges().forEach((edge:CytoscapeElement) => {
+			this.cy.edges().forEach((edge: CytoscapeElement) => {
 				const style = edge.data('style');
 				edge.style(this.edgeStyle);
-				if(style != null) edge.style(style);
+				if (style != null) edge.style(style);
 			})
-		}catch(error){
-			this.props.dispatch({ type: actions.INVALID_GRAPH_ERROR});
+		} catch (error) {
+			this.props.dispatch({ type: actions.INVALID_GRAPH_ERROR });
 		}
 	}
 
-	exportGraph(withStyle:boolean=false){
-		const elements:Array<Object> = [];
-		this.cy.nodes().forEach((node:CytoscapeElement) => {
+	exportGraph(withStyle: boolean = false) {
+		const elements: Array<Object> = [];
+		this.cy.nodes().forEach((node: CytoscapeElement) => {
 			elements.push({
 				group: 'nodes',
 				data: {
 					id: node.id(),
 					value: node.data('value'),
 					position: node.position(),
-					style: (withStyle? {
+					style: (withStyle ? {
 						color: node.style('color'),
 						backgroundColor: node.style('background-color'),
 						borderWidth: node.style('border-width'),
@@ -426,21 +430,21 @@ class Graph extends React.Component<Props, State>{
 				}
 			})
 		});
-		this.cy.edges().forEach((edge:CytoscapeElement) => {
+		this.cy.edges().forEach((edge: CytoscapeElement) => {
 			elements.push({
 				group: 'edges',
 				data: {
 					id: edge.id(),
 					source: edge.source().id(), target: edge.target().id(),
 					weight: edge.data('weight'),
-					style: (withStyle? {
+					style: (withStyle ? {
 						lineColor: edge.style('line-color'),
 						targetArrowShape: edge.style('target-arrow-shape'),
 						targetArrowColor: edge.style('target-arrow-color'),
 						lineStyle: edge.style('line-style'),
 						label: edge.style('label'),
 						textRotation: edge.style('text-rotation'),
-						textMarginY: edge.style('text-margin-y'),	
+						textMarginY: edge.style('text-margin-y'),
 					} : {}),
 				}
 			})
@@ -448,7 +452,7 @@ class Graph extends React.Component<Props, State>{
 		return elements;
 	}
 
-	
+
 	refreshLayout() {
 		this.layout.stop();
 		this.layout = this.cy.elements().makeLayout({ name: 'preset' });
@@ -456,7 +460,7 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	clearGraph = () => {
-		if(this.props.animation){
+		if (this.props.animation) {
 			this.props.dispatch({
 				type: actions.ANIMATION_RUNNING_ERROR,
 			});
@@ -466,7 +470,7 @@ class Graph extends React.Component<Props, State>{
 			type: actions.CLEAR_GRAPH,
 		});
 		let nodes = this.cy.nodes();
-		if(nodes.length === 0) return;
+		if (nodes.length === 0) return;
 		this.pushState();
 		for (let i = 0; i < nodes.length; i++) {
 			this.removeNode(nodes[i].id());
@@ -487,10 +491,10 @@ class Graph extends React.Component<Props, State>{
 		this.cy.remove('edge[id="' + edge + '"]');
 	}
 
-	animation(){
+	animation() {
 		let step = () => {
-			if(!this._isMounted) return;
-			if(this.step === this.buffer.length){
+			if (!this._isMounted) return;
+			if (this.step === this.buffer.length) {
 				this.props.dispatch({
 					type: actions.FINISHED_ALGORITHM_SUCCESS,
 				});
@@ -508,31 +512,31 @@ class Graph extends React.Component<Props, State>{
 				this.cy.autolock(false);
 				return;
 			}
-			if(this.props.paused) return;
-			const {elements, lines, duration, action} = this.buffer[this.step++];
-			if(action){
+			if (this.props.paused) return;
+			const { elements, lines, duration, action } = this.buffer[this.step++];
+			if (action) {
 				this.props.dispatch({ type: action });
 			}
 			this.loadGraph(elements, true);
-			if(lines) this.props.dispatch({type: actions.CHANGE_LINE, payload: { lines }});
+			if (lines) this.props.dispatch({ type: actions.CHANGE_LINE, payload: { lines } });
 			this.refreshLayout();
-			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration)/(this.props.speed));
+			this.animationTimeout = window.setTimeout(step, ((duration === undefined) ? 1000 : duration) / (this.props.speed));
 		}
 		step();
 	}
-	executeAnimation = (commands:Array<AnimationStep>) => {
+	executeAnimation = (commands: Array<AnimationStep>) => {
 		this.cy.nodes().style({
 			'background-color': 'white',
 			'color': 'black',
 		});
 		this.buffer = graphProcessing(this.exportGraph(true), commands);
 		let notification;
-		if(this.props.algorithm === algoNames.BFS) notification = actions.STARTING_BFS_INFO;
-		else if(this.props.algorithm === algoNames.DFS) notification = actions.STARTING_DFS_INFO;
-		else if(this.props.algorithm === algoNames.Dijkstra) notification = actions.STARTING_DIJKSTRA_INFO;
-		else if(this.props.algorithm === algoNames.BellmanFord) notification = actions.STARTING_BELLMAN_FORD_INFO;
-		else if(this.props.algorithm === algoNames.Kruskal) notification = actions.STARTING_KRUSKAL_INFO;
-		else if(this.props.algorithm === algoNames.Prim) notification = actions.STARTING_PRIM_INFO;
+		if (this.props.algorithm === algoNames.BFS) notification = actions.STARTING_BFS_INFO;
+		else if (this.props.algorithm === algoNames.DFS) notification = actions.STARTING_DFS_INFO;
+		else if (this.props.algorithm === algoNames.Dijkstra) notification = actions.STARTING_DIJKSTRA_INFO;
+		else if (this.props.algorithm === algoNames.BellmanFord) notification = actions.STARTING_BELLMAN_FORD_INFO;
+		else if (this.props.algorithm === algoNames.Kruskal) notification = actions.STARTING_KRUSKAL_INFO;
+		else if (this.props.algorithm === algoNames.Prim) notification = actions.STARTING_PRIM_INFO;
 		this.props.dispatch({
 			type: notification,
 		});
@@ -549,7 +553,7 @@ class Graph extends React.Component<Props, State>{
 				this.cy.autolock(false);
 				clearTimeout(this.animationTimeout);
 				resolve();
-			}).then(() => {this.handleUndo(); this.redo.pop()});
+			}).then(() => { this.handleUndo(); this.redo.pop() });
 
 			return;
 		}
@@ -565,11 +569,11 @@ class Graph extends React.Component<Props, State>{
 			}
 		}
 		const nodes = this.cy.nodes();
-		nodes.forEach((node:CytoscapeElement) => {
+		nodes.forEach((node: CytoscapeElement) => {
 			this.createPopper(node.id());
 		});
 		this.refreshLayout();
-		let animationPromise = new Promise((resolve: (commands:Array<AnimationStep>) => void, reject) => {
+		let animationPromise = new Promise((resolve: (commands: Array<AnimationStep>) => void, reject) => {
 			this.props.dispatch({
 				type: actions.ANIMATION_START,
 			});
@@ -577,7 +581,7 @@ class Graph extends React.Component<Props, State>{
 			resolve(commands);
 		});
 
-		animationPromise.then((commands:Array<AnimationStep>) => {
+		animationPromise.then((commands: Array<AnimationStep>) => {
 			this.cy.autolock(true);
 
 			this.executeAnimation(commands);
@@ -585,7 +589,7 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	removeButton = () => {
-		if(this.props.animation){
+		if (this.props.animation) {
 			this.props.dispatch({
 				type: actions.ANIMATION_RUNNING_ERROR,
 			});
@@ -717,15 +721,15 @@ class Graph extends React.Component<Props, State>{
 		});
 	}
 
-	createPopper(nodeId: string){
+	createPopper(nodeId: string) {
 		const ele = this.cy.getElementById(nodeId);
 		const position = ele.position();
 		this.cy.add({
 			group: 'nodes',
-			data: {id : nodeId+'-popper'},
+			data: { id: nodeId + '-popper' },
 			position: {
 				x: position.x,
-				y: position.y+32,
+				y: position.y + 32,
 			},
 			style: {
 				'z-index': 0,
@@ -738,13 +742,13 @@ class Graph extends React.Component<Props, State>{
 		});
 	}
 
-	removePoppers(){
-		
+	removePoppers() {
+
 		const nodes = this.cy.nodes();
-		nodes.forEach((node:CytoscapeElement) => {
-			this.removeNode(node.id()+'-popper');
+		nodes.forEach((node: CytoscapeElement) => {
+			this.removeNode(node.id() + '-popper');
 		})
-		
+
 	}
 
 	createEdge(x: string, y: string) {
@@ -764,7 +768,7 @@ class Graph extends React.Component<Props, State>{
 		const { selection } = this.props;
 		if (selection.type === 'edge') {
 			const { id } = selection;
-			if(this.cy.getElementById(id).data('weight') === weight) return;
+			if (this.cy.getElementById(id).data('weight') === weight) return;
 			this.pushState();
 			this.cy.getElementById(id).data('weight', weight);
 			this.props.dispatch({
@@ -781,10 +785,10 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	weightButton = () => {
-		const {selection} = this.props;
-		if(selection && selection.type === 'edge'){
-			this.setState({showWeightModal: true});
-		}else{
+		const { selection } = this.props;
+		if (selection && selection.type === 'edge') {
+			this.setState({ showWeightModal: true });
+		} else {
 			this.props.dispatch({
 				type: actions.NO_EDGE_SELECTED_ERROR,
 			})
@@ -792,7 +796,7 @@ class Graph extends React.Component<Props, State>{
 	}
 
 	handleClickViewport = (event: CytoEvent) => {
-		if (this.props.animation === true){
+		if (this.props.animation === true) {
 			this.props.dispatch({
 				type: actions.ANIMATION_RUNNING_ERROR,
 			})
@@ -820,13 +824,13 @@ class Graph extends React.Component<Props, State>{
 	render() {
 		return (
 			<>
-				<MyModal show={this.state.showModal} handleClose={() => this.setState({showModal: false})}/>
-				<InputModal 
-					show={this.state.showWeightModal} 
-					handleClose = {() => this.setState({showWeightModal: false})}
-					callback = {(w:number) => this.changeWeight(w)}
+				<MyModal show={this.state.showModal} handleClose={() => this.setState({ showModal: false })} />
+				<InputModal
+					show={this.state.showWeightModal}
+					handleClose={() => this.setState({ showWeightModal: false })}
+					callback={(w: number) => this.changeWeight(w)}
 				/>
-				<div id = "canvas" className="standard-struct"/>
+				<div id="canvas" className="standard-struct" />
 			</>
 		)
 	}
